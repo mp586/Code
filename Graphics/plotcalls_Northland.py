@@ -59,7 +59,7 @@ print ('land sfc area (*10^14) = '+str(land_sfc_area/(10**14)))
 ocean_sfc_area = np.sum(area_array.where(landmask!=1.))
 print ('ocean sfc area (*10^14) = '+str(ocean_sfc_area/(10**14)))
 
-globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',runmin,runmax,1.,landmaskxr,select='all')
+# globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',runmin,runmax,1.,landmaskxr,select='all')
 
 
 ### only for 6 hourly data ###
@@ -73,8 +73,8 @@ globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',r
   #   msf[i-runmin] = (np.cumsum(vbar*dp, axis='pfull')*c)
 # TypeError: 'str' object cannot be interpreted as an index
 
-[msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg)
+#[msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
+#plot_streamfunction_seasonal(msf_seasonal_avg)
 ###########
 
 [tsurf,tsurf_avg,tsurf_seasonal_avg,tsurf_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
@@ -167,13 +167,13 @@ any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg),area_array,'mm/d
 
 #any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg,area_array,'W/m^2','ocean_heat_transport','tempdiff',landmaskxr,minval=-200,maxval=200)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,nmb_contours=4,minval = 0., maxval = 8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,nmb_contours=4,minval = 0., maxval = 6.)
 
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,slp_avg,area_array,'hPa','slp avg','slp',landmaskxr,nmb_contours=10)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=8,minval=0.,maxval=8.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg,area_array,'K','avg_surface_T','temp',landmaskxr,nmb_contours=5)
-
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=5,minval=0.,maxval=4.5)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,nmb_contours=10, minval = -25., maxval = 25.)
+exit
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
 
 

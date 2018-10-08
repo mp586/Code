@@ -1,3 +1,7 @@
+### NB: in python3 don't need to add ' ' when inputting a string, but need to convert input into integer - automatically read in as string
+####
+
+
 from netCDF4 import Dataset
 import numpy as np
 from matplotlib import pyplot as plt
@@ -8,7 +12,7 @@ import os
 
 import sys
 sys.path.insert(0, '/scratch/mp586/Code/PYCODES')
-from plotting_routines_kav7 import *
+from plotting_routines_kav7_py3 import *
 import stats as st
 
 GFDL_BASE = os.environ['GFDL_BASE']
@@ -27,8 +31,8 @@ elif (model == 'gfdl') or (model == 'GFDL'):
 
 
 testdir= input('Enter data directory name as string ')
-runmin=input('Enter runmin number ')  # Should be a January month for seasonal variables to be correct
-runmax=input('Enter runmax number ')
+runmin=int(input('Enter runmin number '))  # Should be a January month for seasonal variables to be correct
+runmax=int(input('Enter runmax number '))
 
 outdir = output_dir + '/' + testdir
 testdir = model_data + '/' + testdir
@@ -36,7 +40,7 @@ testdir = model_data + '/' + testdir
 
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+input('Which landmask? ')+'/land.nc'),mode='r')
 
-level = input('Which level?')
+level = int(input('Which level?'))
 landmask=landfile.variables['land_mask'][:]
 landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
@@ -120,7 +124,7 @@ rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,lan
 
 # animated_map(outdir,slp_month_avg,'hPa','slp','slp_clim_animated','slp',0,12)
 # animated_map(outdir,bucket_depth_month_avg,'m','soil moisture','bucket_depth_animated','fromwhite',0,12,minval = 0., maxval = 0.15)
-# animated_map(outdir,tsurf_month_avg,'K','T','tsurf_animated','temp',0,12,minval = 240.,maxval = 320.)
+# animated_map(outdir,tsurf_month_avg,'K','T','tsurf_animated','',0,12,minval = 240.,maxval = 320.)
 # animated_map(outdir,net_lhe_month_avg,'mm/d','E','E_animated','fromwhite',0,12,minval = 0.,maxval = 8.0)
 # animated_map(outdir,precipitation_month_avg,'mm/d','P','P_animated','fromwhite',0,12,minval = 0.,maxval = 8.)
 

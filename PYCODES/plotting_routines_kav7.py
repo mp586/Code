@@ -21,6 +21,8 @@ class MidpointNormalize(colors.Normalize):
 	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
 
 	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+
+	http://chris35wills.github.io/matplotlib_diverging_colorbar/
 	"""
 	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
 		self.midpoint = midpoint
@@ -2208,7 +2210,7 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
 
     plt.show()
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True):
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True):
 # plotting only the zonal average next to the map 
 # currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
     plt.close()
@@ -2274,43 +2276,42 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 	    minval = array.min()
 	    maxval = array.max()
     
-    minval = np.absolute(minval)
-    maxval = np.absolute(maxval)
+	    minval = np.absolute(minval)
+	    maxval = np.absolute(maxval)
 
-    if maxval >= minval:
-	    minval = - maxval
-    else: 
-	    maxval = minval
-	    minval = - minval
+	    if maxval >= minval:
+		    minval = - maxval
+	    else: 
+		    maxval = minval
+		    minval = - minval
 
+    v = np.linspace(minval,maxval,steps) # , endpoint=True)
 
     if palette=='rainnorm':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG',vmin=minval, vmax=maxval)
+#	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
     elif palette == 'PE_scale':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='bwr_r',vmin=minval, vmax=maxval)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r')
     elif palette == 'raindefault':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG)
     elif palette=='temp':
 	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
 #	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
-
+    elif palette=='temp0':
+            cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r)
     elif palette=='fromwhite': 
-	    pal = plt.cm.Blues
-	    pal.set_under('w',None)
-	    cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+	    # pal = plt.cm.Blues
+	    # pal.set_under('w',None)
+	    # cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
 
     elif palette=='bucket': 
-	    pal = plt.cm.Greens
-	    pal.set_under('w',None)
-	    cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens')
 
     elif palette=='tempdiff': 
-	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), 
-		      norm=MidpointNormalize(midpoint=0), cmap=plt.cm.RdBu_r, 
-		      vmin = -maxval,
-		      vmax = maxval)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r)
     elif palette=='slp':
-	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.coolwarm,vmin=minval,vmax=maxval)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm)
 
 
 
@@ -2325,13 +2326,11 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 	    else:
 		    plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
-
-
 # Add Colorbar
     cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
     cbar.set_label(units, size=med)
     cbar.ax.tick_params(labelsize=med) 
-
+    cbar.set_clim(minval, maxval)
     # sns.palplot(sns.color_palette("BrBG", 7))
 
 # Read landmask
@@ -2499,7 +2498,7 @@ def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,ar
 
 
 	# Add Colorbar
-    cbar = m.colorbar(cs, location='bottom', pad="10%") # usually on right 
+    cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
     cbar.set_label(units, size=med)
     cbar.ax.tick_params(labelsize=small) 
 

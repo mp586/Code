@@ -8,7 +8,7 @@ import os
 
 import sys
 sys.path.insert(0, '/scratch/mp586/Code/PYCODES')
-from plotting_routines_kav7 import *
+from plotting_routines_kav7_py3 import *
 import stats as st
 
 GFDL_BASE = os.environ['GFDL_BASE']
@@ -37,8 +37,8 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir = ''
 
 testdir= input('Enter data directory name as string ')
-runmin=input('Enter runmin number ')  # Should be a January month for seasonal variables to be correct
-runmax=input('Enter runmax number ')
+runmin=int(input('Enter runmin number '))  # Should be a January month for seasonal variables to be correct
+runmax=int(input('Enter runmax number '))
 
 
 outdir = output_dir + '/' + testdir
@@ -53,7 +53,7 @@ landlons=landfile.variables['lon'][:]
 # for specified lats
 landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
-level = input('Which Level? ')
+level = int(input('Which Level? '))
 
 
 area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/GFDL_BASE/GFDL_FORK/GFDLmoistModel/') # added _all because then dx and dy are also returned 
@@ -149,16 +149,15 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg),area_array,'mm/day
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
 
 # Precipitation
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr, minval = 0., maxval = 8., steps = 11)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 8., steps = 11)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl_tinybar','fromwhite',landmaskxr,minval = 0., maxval = 2., steps = 11) 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr, minval=-2.,maxval=2.)
-
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=10,minval = 0., maxval = 8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,nmb_contours=10,minval = 0., maxval = 8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl_tinybar','fromwhite',landmaskxr,nmb_contours=10,minval = 0., maxval = 2.) 
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr,minval=-2.,maxval=2.)
 
 # Evaporation 
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl','rainnorm',landmaskxr,minval=-2.,maxval=2.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg),area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval=0.,maxval=8.,steps = 11)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg_ctl),area_array,'mm/day','E_ctl','fromwhite',landmaskxr,minval=0.,maxval=8., steps = 11)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg),area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval=0.,maxval=8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg_ctl),area_array,'mm/day','E_ctl','fromwhite',landmaskxr,minval=0.,maxval=8.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl_oceanscale','rainnorm',landmaskxr,minval=0.,maxval=0.5)
 
 
