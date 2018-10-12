@@ -113,7 +113,7 @@ print('SEB in W/m2 = '+str(SEB))
 [rh,rh_avg,rh_seasonal_avg,rh_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'rh','%',level=level)
 [sphum,sphum_avg,sphum_seasonal_avg,sphum_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum','kg/kg',level=level)
 
-rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+# rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
 
 
 

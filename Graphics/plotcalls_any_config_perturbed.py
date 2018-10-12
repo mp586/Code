@@ -137,8 +137,8 @@ rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipita
 
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl_narrowcbar','tempdiff',landmaskxr, minval = -4., maxval = 4.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl','tempdiff',landmaskxr, minval = -6., maxval = 6.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg,area_array,'K','$T_S$_avg','temp',landmaskxr, minval = 240., maxval = 310.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl,area_array,'K','$T_S$_ctl','temp',landmaskxr, minval = 240., maxval = 310.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'K','$T_S$_avg','temp0',landmaskxr, minval = -30., maxval = 30.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl - 273.15,area_array,'K','$T_S$_ctl','temp0',landmaskxr, minval = -30., maxval = 30.)
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((tsurf_avg-tsurf_avg_ctl)/tsurf_avg_ctl)*100.,area_array,'%','$T_S$_avg_minus_ctl_relativechange','tempdiff',landmaskxr)
 
 
@@ -159,7 +159,7 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precip
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl','rainnorm',landmaskxr,minval=-2.,maxval=2.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg),area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval=0.,maxval=8.,steps = 11)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg_ctl),area_array,'mm/day','E_ctl','fromwhite',landmaskxr,minval=0.,maxval=8., steps = 11)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl_oceanscale','rainnorm',landmaskxr,minval=0.,maxval=0.5)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl_oceanscale','rainnorm',landmaskxr,minval=-0.5,maxval=0.5)
 
 
 # Surface energy fluxes 

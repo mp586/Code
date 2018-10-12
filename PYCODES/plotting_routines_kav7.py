@@ -15,7 +15,6 @@ GFDL_BASE = os.environ['GFDL_BASE']
 from scipy import stats
 from scipy.stats import linregress as linreg
 
-
 class MidpointNormalize(colors.Normalize):
 	"""
 	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
@@ -2291,14 +2290,14 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 #	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
 	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
     elif palette == 'PE_scale':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r')
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
     elif palette == 'raindefault':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
     elif palette=='temp':
 	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
 #	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
     elif palette=='temp0':
-            cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r)
+            cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
     elif palette=='fromwhite': 
 	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
 	    # pal = plt.cm.Blues
@@ -2306,12 +2305,12 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 	    # cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
 
     elif palette=='bucket': 
-	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens')
+	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
 
     elif palette=='tempdiff': 
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
     elif palette=='slp':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm)
+	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
 
 
 
@@ -3917,19 +3916,60 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	[slope, intercept, r_value, p_value, std_err] = stats.linregress(rh_land_1d[mask],E_land_1d[mask])
 	line_E = slope*rh_land_1d + intercept
 
-# 	plt.plot(rh_land_1d,P_land_1d,'b.',label = 'P land')
-# 	plt.plot(rh_land_1d,E_land_1d,'g.',label = 'E land')
-# #	plt.plot(rh_1d, line_P, 'b', label = 'P_regr')
-# #	plt.plot(rh_1d, line_E, 'g', label = 'E_regr')
 
-# 	plt.legend()
-	# plt.xlabel('RH %')
-	# plt.ylabel('P and E (mm/d)')
-	# plt.title('P and E versus RH, annual mean (land only)')
-	# manager = plt.get_current_fig_manager()
-	# manager.window.showMaximized()	
-	# plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_land_'+str(runmin)+'-'+str(runmax), bbox_inches='tight', dpi=100)
-	# plt.show()
+######################################
+###### PLOTTING ########
+
+	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
+	axes[0].plot(rh_land_1d,P_land_1d,'b.',label = 'P land (tropics)')
+	axes[0].plot(rh_land_1d,E_land_1d,'g.',label = 'E land (tropics)')
+	a = axes[1].scatter(rh_land_1d,tsurf_land_1d - 273.15, c=P_land_1d, label = 'T land (tropics)', s = 7., cmap = 'BrBG', vmin = 0., vmax = 8.)
+	axes[0].set_xlabel("$RH$ $(\%)$",fontsize = lge)
+	axes[1].set_xlabel("$RH$ $(\%)$",fontsize = lge)
+	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
+	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(-30.,30.)).max() + 1.)
+	axes[0].tick_params(labelsize = med)
+	axes[1].tick_params(labelsize = med)
+	axes[0].legend(fontsize = lge)
+	axes[1].legend(fontsize = lge)
+	axes[0].set_ylabel('$P$ and $E$ $(mm/day)$',fontsize = lge)
+	axes[1].set_ylabel('$T_S$ $(^\circ C)$',fontsize = lge)
+	axes[1].set_ylim(tsurf_avg.sel(lat=slice(-30.,30.)).min() - 273.15 - 2., tsurf_avg.sel(lat=slice(-30.,30.)).max() - 273.15 + 2.)
+
+	fig.subplots_adjust(right=0.8)
+	cbar_ax = fig.add_axes([0.85, 0.15, 0.01, 0.7])
+	cbar = fig.colorbar(a, cax=cbar_ax)
+	cbar.set_label('$P$ $(mm/day)$', size=lge)
+	cbar.ax.tick_params(labelsize=med) 	
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+
+
+	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
+	axes[0].plot(rh_ocean_1d,P_ocean_1d,'b.',label = 'P ocean (tropics)')
+	axes[0].plot(rh_ocean_1d,E_ocean_1d,'g.',label = 'E ocean (tropics)')
+	a = axes[1].scatter(rh_ocean_1d,tsurf_ocean_1d - 273.15, c=P_ocean_1d, label = 'T ocean (tropics)', s = 7. , cmap = 'BrBG', vmin = 0., vmax = 8.)
+	axes[0].set_xlabel("$RH$ $(\%)$",fontsize = lge)
+	axes[1].set_xlabel("$RH$ $(\%)$",fontsize = lge)
+	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
+	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(-30.,30.)).max() + 1.)
+	axes[0].tick_params(labelsize = med)
+	axes[1].tick_params(labelsize = med)
+	axes[0].legend(fontsize = lge)
+	axes[1].legend(fontsize = lge)
+	axes[0].set_ylabel('$P$ and $E$ $(mm/day)$',fontsize = lge)
+	axes[1].set_ylabel('$T_S$ $(^\circ C)$',fontsize = lge)
+	axes[1].set_ylim(tsurf_avg.sel(lat=slice(-30.,30.)).min() - 273.15 -2. , tsurf_avg.sel(lat=slice(-30.,30.)).max() - 273.15 + 2.)
+
+	fig.subplots_adjust(right=0.8)
+	cbar_ax = fig.add_axes([0.85, 0.15, 0.01, 0.7])
+	cbar = fig.colorbar(a, cax=cbar_ax)
+	cbar.set_label('$P$ $(mm/day)$', size=lge)
+	cbar.ax.tick_params(labelsize=med) 	
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_ocean_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+
+
 
 	fig, ax = plt.subplots(1,2,sharey=True,figsize=(25,10))
 	ax[0].plot(rh_land_1d,P_land_1d,'b.',label = 'P land (tropics)')
