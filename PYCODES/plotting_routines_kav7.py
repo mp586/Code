@@ -767,7 +767,7 @@ def seasonal_surface_variable(testdir,model,runmin,runmax,varname,units,factor=1
     lons= nc.variables['lon'][:]
     lats= nc.variables['lat'][:]
     
-    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))]
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))] # has to start at zero so that it gives jan to dec. otherwise (1,12) goes from feb to jan!
     var=xr.DataArray((var.values)*factor,coords=[time[0],lats,lons],dims=['time','lat','lon'])
     var_avg=var.mean(dim='time')
     var_seasonal_avg=var.groupby('time.season').mean('time') 
@@ -2374,7 +2374,8 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 
 	    if save_fig == True:
 		    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
-#	    plt.show()
+	    else: 
+		    plt.show()
     return fig
 
 
@@ -3810,8 +3811,12 @@ def plot_streamfunction(msf_array,title,units='10^10 kg/s'):
 	
 	y, p = np.meshgrid(lats, pfull)
 
-	cset1 = plt.contourf(y, p, msf_array, norm=MidpointNormalize(midpoint=0.),
-                     cmap='RdBu_r', vmin=-20, vmax=20)
+	if minval == None:
+		minval = msf_array.min()
+		maxval = - minval
+
+	v = np.linspace(minval,maxval,21)
+	cset1 = plt.contourf(y, p, msf_array, v, cmap='RdBu_r')
 
 	cont = plt.contour(y,p,msf_array, 20, colors = 'k', linewidth=5)
 	plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
@@ -3821,10 +3826,11 @@ def plot_streamfunction(msf_array,title,units='10^10 kg/s'):
 	plt.xlabel('Latitude N')
 	plt.ylabel('Pressure (hPa)')
 	plt.gca().invert_yaxis()
-	plt.show()
+#	plt.show()
+	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_'+str(runmin)+'-'+str(runmax), bbox_inches='tight')
 
-def plot_streamfunction_seasonal(msf_array,units='10^10 kg/s'):
-#colorbar not properly working (limits are weird)
+
+def plot_streamfunction_seasonal(msf_array, outdir, runmin, runmax, units='10^10 kg/s', minval = None, maxval = None):
 	matplotlib.rcParams['contour.negative_linestyle']= 'dashed'
 
 	lats = msf_array.lat
@@ -3832,36 +3838,37 @@ def plot_streamfunction_seasonal(msf_array,units='10^10 kg/s'):
 	
 	y, p = np.meshgrid(lats, pfull)
 
+        if minval == None:
+                minval = msf_array.min()
+                maxval = - minval
+
+        v = np.linspace(minval,maxval,21)
 
 	fig, axes = plt.subplots(2,2, sharey = True, figsize = (25, 10))
 	fig.gca().invert_yaxis()
 
-	cset = axes[0,0].contourf(y, p, msf_array.sel(season='MAM'), 
-				   norm=MidpointNormalize(midpoint=0.),cmap='RdBu_r',vmin = -30.,vmax = 30.)
-	cont = axes[0,0].contour(y, p, msf_array.sel(season='MAM'), 20, colors = 'k', linewidth=5)
+	cset = axes[0,0].contourf(y, p, msf_array.sel(season='MAM'), v, cmap='RdBu_r')
+	cont = axes[0,0].contour(y, p, msf_array.sel(season='MAM'), 20, colors = 'k', linewidth=5, extend = 'both')
 	axes[0,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
 	axes[0,0].set_title('MAM')
 	axes[0,0].set_xlabel('Latitude N')
 	axes[0,0].set_ylabel('Pressure (hPa)')
 
-	cset = axes[0,1].contourf(y, p, msf_array.sel(season='JJA'), 
-				   norm=MidpointNormalize(midpoint=0.),cmap='RdBu_r',vmin = -30.,vmax = 30.)
+	cset = axes[0,1].contourf(y, p, msf_array.sel(season='JJA'), v, cmap='RdBu_r', extend = 'both')
 	cont = axes[0,1].contour(y, p, msf_array.sel(season='JJA'), 20, colors = 'k', linewidth=5)
 	axes[0,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
 	axes[0,1].set_title('JJA')
 	axes[0,1].set_xlabel('Latitude N')
 	axes[0,1].set_ylabel('Pressure (hPa)')
 
-	cset3 = axes[1,1].contourf(y, p, msf_array.sel(season='DJF'), 
-				   norm=MidpointNormalize(midpoint=0.),cmap='RdBu_r',vmin = -30.,vmax = 30.)
+	cset = axes[1,1].contourf(y, p, msf_array.sel(season='DJF'), v, cmap='RdBu_r', extend = 'both')
 	cont = axes[1,1].contour(y, p, msf_array.sel(season='DJF'), 20, colors = 'k', linewidth=5)
 	axes[1,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
 	axes[1,1].set_title('DJF')
 	axes[1,1].set_xlabel('Latitude N')
 	axes[1,1].set_ylabel('Pressure (hPa)')
 
-	cset = axes[1,0].contourf(y, p, msf_array.sel(season='SON'), 
-				   norm=MidpointNormalize(midpoint=0.),cmap='RdBu_r',vmin = -30.,vmax = 30.)
+	cset = axes[1,0].contourf(y, p, msf_array.sel(season='SON'), v, cmap='RdBu_r', extend = 'both')
 	cont = axes[1,0].contour(y, p, msf_array.sel(season='SON'), 20, colors = 'k', linewidth=5)
 	axes[1,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
 	axes[1,0].set_title('SON')
@@ -3869,10 +3876,10 @@ def plot_streamfunction_seasonal(msf_array,units='10^10 kg/s'):
 	axes[1,0].set_ylabel('Pressure (hPa)')
 
 
-	cbar = fig.colorbar(cset3,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+	cbar = fig.colorbar(cset,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
 	cbar.set_label(units)
-
-	plt.show()
+	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_seasonal_'+str(runmin)+'-'+str(runmax))
+	# plt.show()
 
 
 
@@ -3923,7 +3930,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
 	axes[0].plot(rh_land_1d,P_land_1d,'b.',label = 'P land (tropics)')
 	axes[0].plot(rh_land_1d,E_land_1d,'g.',label = 'E land (tropics)')
-	a = axes[1].scatter(rh_land_1d,tsurf_land_1d - 273.15, c=P_land_1d, label = 'T land (tropics)', s = 7., cmap = 'BrBG', vmin = 0., vmax = 8.)
+	a = axes[1].scatter(rh_land_1d,tsurf_land_1d - 273.15, c=P_land_1d, label = 'P land (tropics)', s = 7., cmap = 'BrBG', vmin = 0., vmax = 8.)
 	axes[0].set_xlabel("$RH$ $(\%)$",fontsize = lge)
 	axes[1].set_xlabel("$RH$ $(\%)$",fontsize = lge)
 	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
@@ -3942,13 +3949,13 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	cbar.set_label('$P$ $(mm/day)$', size=lge)
 	cbar.ax.tick_params(labelsize=med) 	
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 
 	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
 	axes[0].plot(rh_ocean_1d,P_ocean_1d,'b.',label = 'P ocean (tropics)')
 	axes[0].plot(rh_ocean_1d,E_ocean_1d,'g.',label = 'E ocean (tropics)')
-	a = axes[1].scatter(rh_ocean_1d,tsurf_ocean_1d - 273.15, c=P_ocean_1d, label = 'T ocean (tropics)', s = 7. , cmap = 'BrBG', vmin = 0., vmax = 8.)
+	a = axes[1].scatter(rh_ocean_1d,tsurf_ocean_1d - 273.15, c=P_ocean_1d, label = 'P ocean (tropics)', s = 7. , cmap = 'BrBG', vmin = 0., vmax = 8.)
 	axes[0].set_xlabel("$RH$ $(\%)$",fontsize = lge)
 	axes[1].set_xlabel("$RH$ $(\%)$",fontsize = lge)
 	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
@@ -3967,7 +3974,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	cbar.set_label('$P$ $(mm/day)$', size=lge)
 	cbar.ax.tick_params(labelsize=med) 	
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_ocean_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_ocean_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 
 

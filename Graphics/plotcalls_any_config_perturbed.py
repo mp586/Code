@@ -75,10 +75,10 @@ globavg_var_timeseries_total_and_land_perturbed(testdir,model,area_array,'t_surf
 
 # mass stream function adapted from J Penn
 [msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg)
+plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax)
 
 [msf_ctl,msf_avg_ctl,msf_seasonal_avg_ctl,msf_month_avg_ctl] = mass_streamfunction(control_dir,ctl_model,ctl_runmin,ctl_runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg_ctl)
+plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax)
 
 # Read in variables 
 
@@ -114,6 +114,9 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl)
 [sphum,sphum_avg,sphum_seasonal_avg,sphum_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum','kg/kg',level=level)
 [sphum_ctl,sphum_avg_ctl,sphum_seasonal_avg_ctl,sphum_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level=level)
 
+[div,div_avg,div_seasonal_avg,div_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'div','1/sec',level=level)
+[div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=level)
+
 PE = precipitation - net_lhe
 [PE,PE_avg,PE_seasonal_avg,PE_month_avg,time] = make_var_seasonal(PE)
 PE_ctl = precipitation_ctl - net_lhe_ctl
@@ -131,6 +134,13 @@ rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipita
 ################################################################################
 
 
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg - div_avg_ctl,area_array,'%','div_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg,area_array,'%','div_avg_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg_ctl,area_array,'%','div_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+
+exit 
 ####### Map plots annual means 
 
 # Temperature 

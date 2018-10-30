@@ -59,7 +59,7 @@ print ('land sfc area (*10^14) = '+str(land_sfc_area/(10**14)))
 ocean_sfc_area = np.sum(area_array.where(landmask!=1.))
 print ('ocean sfc area (*10^14) = '+str(ocean_sfc_area/(10**14)))
 
-globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',runmin,runmax,1.,landmaskxr,select='all')
+globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',1,runmax,1.,landmaskxr,select='all')
 
 
 ### only for 6 hourly data ###
@@ -74,12 +74,12 @@ globavg_var_timeseries_total_and_land(outdir,testdir,model,area_array,'t_surf',r
 # TypeError: 'str' object cannot be interpreted as an index
 
 [msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg)
+plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax)
 ###########
 
 [tsurf,tsurf_avg,tsurf_seasonal_avg,tsurf_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
 [precipitation,precipitation_avg,precipitation_seasonal_avg,precipitation_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
-#[bucket_depth,bucket_depth_avg,bucket_depth_seasonal_avg,bucket_depth_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'bucket_depth','m')
+[bucket_depth,bucket_depth_avg,bucket_depth_seasonal_avg,bucket_depth_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'bucket_depth','m')
 
 # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
 [net_sw,net_sw_avg,net_sw_seasonal_avg,net_sw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_sw','W/m^2',factor = 1.) # 
@@ -113,7 +113,7 @@ print('SEB in W/m2 = '+str(SEB))
 [rh,rh_avg,rh_seasonal_avg,rh_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'rh','%',level=level)
 [sphum,sphum_avg,sphum_seasonal_avg,sphum_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum','kg/kg',level=level)
 
-# rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
 
 
 
@@ -126,11 +126,11 @@ print('SEB in W/m2 = '+str(SEB))
 
 
 
-any_configuration_plot(outdir,runmin,runmax,-100.,100.,rh_avg,area_array,'%','rh_avg_level'+str(level),'fromwhite',landmaskxr,minval = 0, maxval = 100, nmb_contours=5)
+any_configuration_plot(outdir,runmin,runmax,-100.,100.,rh_avg,area_array,'%','rh_avg_level'+str(level),'fromwhite',landmaskxr,nmb_contours=10,minval = 0, maxval = 100)
 
+any_configuration_plot(outdir,runmin,runmax,-100.,100.,landmaskxr,area_array,'','','bucket',landmaskxr,minval = 0., maxval = 1.,steps = 3)
 
-
-# any_configuration_plot(outdir,runmin,runmax,outdir,runmin,runmax,-90.,90.,bucket_depth_avg.where(landmask==1.),area_array,'m','bucket_depth','fromwhite',landmaskxr,minval=0.,maxval=.5)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,bucket_depth_avg.where(landmask==1.),area_array,'m','bucket_depth','bucket',landmaskxr,minval=0.,maxval=.5)
 # if runmin == 1:
 #    animated_map(testdir,bucket_depth,'m','bucket depth','bucket_depth','fromwhite',0,runmax-2,0,2)
 #    animated_map(testdir,tsurf,'m','tsurf','tsurf','temp',0,runmax-2,240,310)
@@ -161,21 +161,22 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 print('P avg - E avg global integral / total sfc area'+str(PE_avg_sum/total_sfc_area))
 # any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg).where(landmask==1.),area_array,'mm/day','P-E avg','rainnorm',landmaskxr,minval=-2.,maxval=2.)
 
-any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg),area_array,'mm/day','P-E_avg','rainnorm',landmaskxr,minval=-3.,maxval=3.)
+any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg),area_array,'mm/day','P-E_avg','rainnorm',landmaskxr,nmb_contours=4,minval=-3.,maxval=3.)
 
 # # any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg.where(landmask==1.),area_array,'mm/day','E avg','fromwhite',landmaskxr,nmb_contours=4, minval = 0., maxval = 8.)
 
 #any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg,area_array,'W/m^2','ocean_heat_transport','tempdiff',landmaskxr,minval=-200,maxval=200)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,nmb_contours=4,minval = 0., maxval = 8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,nmb_contours=10,minval = 0., maxval = 8.)
 
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,slp_avg,area_array,'hPa','slp avg','slp',landmaskxr,nmb_contours=10)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,slp_avg,area_array,'hPa','slp avg','slp',landmaskxr)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=8,minval=0.,maxval=8.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg,area_array,'K','avg_surface_T','temp',landmaskxr,nmb_contours=5)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=5,minval=0.,maxval=8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,nmb_contours=5)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
 
+exit 
 
 JJA = 'JJA'
 DJF = 'DJF'
