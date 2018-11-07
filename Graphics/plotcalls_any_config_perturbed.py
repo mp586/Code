@@ -127,9 +127,17 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 #print('P avg - E avg global integral / total sfc area'+str(PE_avg_sum/total_sfc_area))
 
 
+
+# landfile=Dataset(os.path.join(GFDL_BASE,'input/square_Africa/land.nc'),mode='r')
+# landmaskEC=landfile.variables['land_mask'][:]
+
+
+# landfile=Dataset(os.path.join(GFDL_BASE,'input/square_South_America/land.nc'),mode='r')
+# landmaskWC=landfile.variables['land_mask'][:]
+
 ############# RH change vs P and E changes - scatter plots #####################
-rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
-rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='land')
+#rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
+#rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask, sfc='land')
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
 ################################################################################
 
@@ -140,7 +148,7 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg,area_array,'%','div
 
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg_ctl,area_array,'%','div_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
 
-exit 
+
 ####### Map plots annual means 
 
 # Temperature 

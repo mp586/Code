@@ -26,7 +26,7 @@ nc = Dataset('/scratch/mp586/HadGEM2_picontrol/pr_Amon_HadGEM2-ES_piControl_r1i1
 P = nc.variables['pr'][:]
 P = xr.DataArray(P*86400,coords=[time,lat,lon],dims=['time','lat','lon'])
 P_avg = P.mean('time')
-worldmap_variable(outdir,P_avg,'mm/d','avg_P','fromwhite',0,8,nmb_contours=6)
+worldmap_variable(outdir,P_avg,'mm/d','avg_P','fromwhite',0,8)
 
 nc = Dataset('/scratch/mp586/HadGEM2_picontrol/hfls_Amon_HadGEM2-ES_piControl_r1i1p1_240512-243011.nc')
 E = nc.variables['hfls'][:]

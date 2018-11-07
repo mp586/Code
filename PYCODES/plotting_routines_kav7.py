@@ -1762,7 +1762,7 @@ def worldmap_inputfile(filename,varname): # assuming that the input file has the
 
 
 
-def worldmap_variable(outdir,field,units,title,palette,minval,maxval,nmb_contours=0.):
+def worldmap_variable(outdir,array,units,title,palette,minval=None,maxval=None,nmb_contours=0.,steps=21):
     plt.close()
     
 
@@ -1771,8 +1771,8 @@ def worldmap_variable(outdir,field,units,title,palette,minval,maxval,nmb_contour
     lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-    lats=field.lat
-    lons=field.lon
+    lats=array.lat
+    lons=array.lon
     lon_0 = lons.mean() 
     lat_0 = lats.mean() 
 
@@ -1785,10 +1785,10 @@ def worldmap_variable(outdir,field,units,title,palette,minval,maxval,nmb_contour
 
     m = Basemap(projection='kav7',lon_0=0.,resolution='c')
 
-    field, lons = addcyclic(field, lons)
-    field = np.asarray(field) 
-    field,lons = shiftgrid(np.max(lons)-180.,field,lons,start=False,cyclic=np.max(lons))
-    field = xr.DataArray(field,coords=[lats,lons],dims=['lat','lon'])
+    array, lons = addcyclic(array, lons)
+    array = np.asarray(array) 
+    array,lons = shiftgrid(np.max(lons)-180.,array,lons,start=False,cyclic=np.max(lons))
+    array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 
     lon, lat = np.meshgrid(lons, lats)
@@ -1800,37 +1800,42 @@ def worldmap_variable(outdir,field,units,title,palette,minval,maxval,nmb_contour
     m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
     m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
 
-    if (minval==0) & (maxval==0):
 
-	    if palette=='rainnorm':
-		    cs = m.pcolor(xi,yi,field,norm=MidpointNormalize(midpoint=0.),cmap='BrBG')
-	    elif palette == 'raindefault':
-		    cs = m.pcolor(xi,yi,field, cmap=plt.cm.BrBG)
-	    elif palette=='temp': 
-		    cs = m.pcolor(xi,yi,field, cmap=plt.cm.seismic)
-	    else:
-		    cs = m.pcolor(xi,yi,field)
+    if minval==None and maxval==None:
+	    minval = array.min()
+	    maxval = array.max()
+    
+	    minval = np.absolute(minval)
+	    maxval = np.absolute(maxval)
+
+	    if maxval >= minval:
+		    minval = - maxval
+	    else: 
+		    maxval = minval
+		    minval = - minval
+
+    v = np.linspace(minval,maxval,steps) # , endpoint=True)
+
+    if palette=='rainnorm':
+	    cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+    elif palette == 'PE_scale':
+	    cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
+    elif palette == 'raindefault':
+	    cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
+    elif palette=='temp':
+	    cs = m.pcolor(xi,yi,array,norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+    elif palette=='temp0':
+            cs = m.contourf(xi,yi,array, v, cmap=plt.cm.RdBu_r, extend = 'both')
+    elif palette=='fromwhite': 
+	    cs = m.contourf(xi, yi, array, v, cmap = 'Blues', extend = 'max')
+    elif palette=='bucket': 
+	    cs = m.contourf(xi, yi, array, v, cmap = 'Greens', extend = 'max')
+    elif palette=='tempdiff': 
+	    cs = m.contourf(xi,yi,array, v, cmap=plt.cm.RdBu_r, extend = 'both')
+    elif palette=='slp':
+	    cs = m.contourf(xi,yi,array, v, cmap=plt.cm.coolwarm, extend = 'both')
     else:
-
-	    if palette=='rainnorm':
-		    cs = m.pcolor(xi,yi,field,norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin=minval, vmax=maxval)
-	    elif palette == 'raindefault':
-		    cs = m.pcolor(xi,yi,field, cmap=plt.cm.BrBG, vmin=minval, vmax=maxval)
-	    elif palette=='temp':
-		    cs = m.pcolor(xi,yi,field,norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
-
-
-
-
-	    elif palette=='fromwhite':
-		    pal = plt.cm.Blues
-		    pal.set_under('w',None)
-		    cs = m.pcolormesh(xi,yi,field,cmap=pal,vmin=0,vmax=maxval)
-
-	    else:
-		    cs = m.pcolor(xi,yi,field, vmin=minval, vmax=maxval)
-
-
+        cs = m.pcolor(xi,yi,array)
 
     if nmb_contours != 0:  # add contours 
 	    cont = m.contour(xi,yi,field,nmb_contours,cmap='PuBu_r', linewidth=5)
@@ -1839,7 +1844,7 @@ def worldmap_variable(outdir,field,units,title,palette,minval,maxval,nmb_contour
 	    else:
 		    plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
-    cbar = m.colorbar(cs, location='bottom', pad="10%")
+    cbar = m.colorbar(cs, location='right', pad="10%")
     cbar.set_label(units, size=med)
     cbar.ax.tick_params(labelsize=small) 
     plt.title(title, size=lge)
@@ -2209,11 +2214,17 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
 
     plt.show()
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True):
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None):
+
+
+
+
 # plotting only the zonal average next to the map 
 # currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
     plt.close()
 
+    if save_title == None: 
+	    save_title = plot_title
 
     small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
     med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
@@ -2311,9 +2322,6 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
     elif palette=='slp':
 	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
-
-
-
     else:
         cs = m.pcolor(xi,yi,array.sel(lat=selected_lats))
 
@@ -2343,7 +2351,7 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
     if np.any(landmask != 0.):
 	    m.contour(xi,yi,landmask, 1)
 
-    plt.title(title, size=lge)
+    plt.title(plot_title, size=lge)
 
     
     if month_annotate >= 1:
@@ -2356,7 +2364,7 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 
 	    plt.plot(zonavg_thin,lats)
 	    plt.ylabel('Latitude', size=med)
-	    plt.xlabel(title+' ('+units+')', size=med)
+	    plt.xlabel(units, size=med)
 	    ax2.yaxis.tick_right()
 	    ax2.yaxis.set_label_position('right')
 	    ax2.tick_params(axis='both', which='major', labelsize=small)
@@ -2373,9 +2381,9 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 #	    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
 
 	    if save_fig == True:
-		    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
+		    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
 	    else: 
-		    plt.show()
+		    fig.show()
     return fig
 
 
@@ -2617,7 +2625,7 @@ def animated_map(testdir,outdir,array,units,title,plot_title,palette,imin,imax,m
 def winds_at_heightlevel(uwind,vwind,level,array,palette,units,minval,maxval,landmaskxr,landlats,landlons,veclen=10):
 
 # Plots every third wind vector at specified height level
-# onto a world map of the 'array' which could be e.g. precip
+# onto a map of the 'array' which could be e.g. precip
 
 # uwind and vwind are 4D arrays, 
 # level should be between 0 and 39 for MiMA
@@ -4140,81 +4148,97 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 
 #	if landmaskEC == None: this doesn't work.. why?
 
-	ax[0].plot(P_ctl_1d,(P_1d - P_ctl_1d),'g.', label = sfc)
+	ax[0].plot(P_ctl_1d,(P_1d - P_ctl_1d),'k.', label = sfc)
 	ax[0].set_xlabel("P control (mm/d)",fontsize = lge)
 	ax[0].tick_params(labelsize = lge)
 	ax[0].legend(fontsize = lge)
 	ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
-	ax[0].set_xlim(-1.,precipitation_avg_ctl.max())
+	ax[0].set_xlim(-1.,precipitation_avg_ctl.max()+1.)
+	ax[0].spines['top'].set_visible(False)
+	ax[0].spines['right'].set_visible(False)
 
 	[k,dy,r,p,stderr] = linreg(P_ctl_1d[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
 	x1 = np.linspace(np.min((P_ctl_1d)[mask]),np.max((P_ctl_1d)[mask]),500)
 	y = k*x1 + dy
-	ax[0].plot(x1,y,'g-')
+	ax[0].plot(x1,y,'k-')
 	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
 
 	ax[1].set_xlabel("T change (K)",fontsize = lge)
-	ax[1].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'r.', label = sfc)
+	ax[1].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'c.', label = sfc)
 	ax[1].tick_params(labelsize = lge)
 	ax[1].legend(fontsize = lge)
-	ax[1].set_ylabel('P change (mm/d)', fontsize = lge)
-	ax[1].set_xlim(0.,(tsurf_avg-tsurf_avg_ctl).max())
+#	ax[1].set_ylabel('P change (mm/d)', fontsize = lge)
+	ax[1].set_xlim(np.min((T_1d - T_ctl_1d)[mask])-0.5,np.max((T_1d - T_ctl_1d)[mask])+0.5)
 
 	[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
-	x1 = np.linspace(0.,np.max((T_1d - T_ctl_1d)[mask]),500)
+	x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask]),np.max((T_1d - T_ctl_1d)[mask]),500)
 	y = k*x1 + dy
-	ax[1].plot(x1,y,'r-')
-	ax[1].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
-
-
-
-
-# plots west and east spearately and delta p vs delta t for both 
-	# fig, ax = plt.subplots(1,3, sharey = True, figsize=(25,10))
-	# maskEC = ~np.isnan(P_ctl_1d_E)
-	# maskWC = ~np.isnan(P_ctl_1d_W)
-
-	# ax[0].plot(P_ctl_1d_W,(P_1d_W - P_ctl_1d_W),'b.', label = 'West C.')
-	# ax[0].set_xlabel("P control (mm/d)",fontsize = lge)
-	# ax[0].tick_params(labelsize = lge)
-	# ax[0].legend(fontsize = lge)
-	# ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
-	# ax[0].set_xlim(-1.,precipitation_avg_ctl.max())
-
-	# [k,dy,r,p,stderr] = linreg(P_ctl_1d_W[maskWC],(P_1d_W - P_ctl_1d_W)[maskWC]) # aa = 8.4, dq = -32
-	# x1 = np.linspace(np.min((P_ctl_1d_W)[maskWC]),np.max((P_ctl_1d_W)[maskWC]),500)
-	# y = k*x1 + dy
-	# ax[0].plot(x1,y,'b-')
-	# ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
-
-	# ax[1].plot(P_ctl_1d_E,(P_1d_E - P_ctl_1d_E),'r.', label = 'East C.')
-	# ax[1].set_xlabel("P control (mm/d)",fontsize = lge)
-	# ax[1].tick_params(labelsize = lge)
-	# ax[1].legend(fontsize = lge)
-	# ax[1].set_xlim(-1.,precipitation_avg_ctl.max())
-
-	# [k,dy,r,p,stderr] = linreg(P_ctl_1d_E[maskEC],(P_1d_E - P_ctl_1d_E)[maskEC]) # aa = 8.4, dq = -32
-	# x1 = np.linspace(np.min((P_ctl_1d_E)[maskEC]),np.max((P_ctl_1d_E)[maskEC]),500)
-	# y = k*x1 + dy
-	# ax[1].plot(x1,y,'r-')
-	# ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
-
-	# ax[2].set_xlabel("T change (K)",fontsize = lge)
-	# ax[2].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'g.', label = 'both')
-	# ax[2].tick_params(labelsize = lge)
-	# ax[2].legend(fontsize = lge)
-	# ax[2].set_ylabel('P change (mm/d)', fontsize = lge)
-	# ax[2].set_xlim(0.,(tsurf_avg-tsurf_avg_ctl).max())
-
-	# [k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
-	# x1 = np.linspace(0.,np.max((T_1d - T_ctl_1d)[mask]),500)
-	# y = k*x1 + dy
-	# ax[2].plot(x1,y,'g-')
-	# ax[2].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
-
+	ax[1].plot(x1,y,'c-')
+	ax[1].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.5,0.05), xycoords='axes fraction', fontsize = med)
+	ax[1].spines['top'].set_visible(False)
+	ax[1].spines['right'].set_visible(False)
 
 #	fig.show()
 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Delta_P_vs_Delta_T_and_P_control_'+str(runmin)+'-'+str(runmax)+'_'+sfc+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
+
+
+
+# # plots west and east spearately and delta p vs delta t for both 
+# 	fig, ax = plt.subplots(1,3, sharey = True, figsize=(25,10))
+# 	maskEC = ~np.isnan(P_ctl_1d_E)
+# 	maskWC = ~np.isnan(P_ctl_1d_W)
+
+# 	ax[0].plot(P_ctl_1d_W,(P_1d_W - P_ctl_1d_W),'b.', label = 'West C.')
+# 	ax[0].set_xlabel("P control (mm/d)",fontsize = lge)
+# 	ax[0].tick_params(labelsize = lge)
+# 	ax[0].legend(fontsize = lge)
+# 	ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
+# 	ax[0].set_xlim(-1.,precipitation_avg_ctl.max())
+
+# 	ax[0].spines['top'].set_visible(False)
+# 	ax[0].spines['right'].set_visible(False)
+
+# 	[k,dy,r,p,stderr] = linreg(P_ctl_1d_W[maskWC],(P_1d_W - P_ctl_1d_W)[maskWC]) # aa = 8.4, dq = -32
+# 	x1 = np.linspace(np.min((P_ctl_1d_W)[maskWC]),np.max((P_ctl_1d_W)[maskWC]),500)
+# 	y = k*x1 + dy
+# 	ax[0].plot(x1,y,'b-')
+# 	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+# 	ax[1].plot(P_ctl_1d_E,(P_1d_E - P_ctl_1d_E),'r.', label = 'East C.')
+# 	ax[1].set_xlabel("P control (mm/d)",fontsize = lge)
+# 	ax[1].tick_params(labelsize = lge)
+# 	ax[1].legend(fontsize = lge)
+# 	ax[1].set_xlim(-1.,precipitation_avg_ctl.max())
+
+# 	[k,dy,r,p,stderr] = linreg(P_ctl_1d_E[maskEC],(P_1d_E - P_ctl_1d_E)[maskEC]) # aa = 8.4, dq = -32
+# 	x1 = np.linspace(np.min((P_ctl_1d_E)[maskEC]),np.max((P_ctl_1d_E)[maskEC]),500)
+# 	y = k*x1 + dy
+# 	ax[1].plot(x1,y,'r-')
+# 	ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+# 	ax[1].spines['top'].set_visible(False)
+# 	ax[1].spines['right'].set_visible(False)
+
+# 	ax[2].set_xlabel("T change (K)",fontsize = lge)
+# 	ax[2].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'g.', label = 'both')
+# 	ax[2].tick_params(labelsize = lge)
+# 	ax[2].legend(fontsize = lge)
+# #	ax[2].set_ylabel('P change (mm/d)', fontsize = lge)
+# 	ax[2].set_xlim(np.min((T_1d - T_ctl_1d)[mask])-1.,np.max((T_1d - T_ctl_1d)[mask])+1.)
+
+# 	[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
+# 	x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask])-.5,np.max((T_1d - T_ctl_1d)[mask])+.5,500)
+# 	y = k*x1 + dy
+# 	ax[2].plot(x1,y,'g-')
+# 	ax[2].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+# 	ax[2].spines['top'].set_visible(False)
+# 	ax[2].spines['right'].set_visible(False)
+
+# #	fig.show()
+# 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP_vs_Pctl_and_DeltaT_EACHCONTINENT_3panels', bbox_inches ='tight', dpi=100)
+
+
 
 	fig2, ax2 = plt.subplots(1,2, sharey = False, figsize=(25,10))
 
@@ -4236,13 +4260,22 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 	x1 = np.linspace(np.min((P_ctl_1d-E_ctl_1d)[mask]),np.max((P_ctl_1d-E_ctl_1d)[mask]),500)
 	y = k*x1 + dy
 	ax2[0].plot(x1,y,'k-')
-	ax2[0].annotate('k = '+str("%.2f" % k)+', dy = '+str("%.2f" % dy)+', r = '+str("%.2f" % r+', p = '+str(p)), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+	ax2[0].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
 
 	[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - E_1d - (P_ctl_1d-E_ctl_1d))[mask]) # aa = 8.4, dq = -32
 	x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask]),np.max((T_1d - T_ctl_1d)[mask]),500)
 	y = k*x1 + dy
 	ax2[1].plot(x1,y,'r-')
-	ax2[1].annotate('k = '+str("%.2f" % k)+', dy = '+str("%.2f" % dy)+', r = '+str("%.2f" % r+', p = '+str(p)), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+	ax2[1].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+
+	ax2[0].spines['top'].set_visible(False)
+	ax2[0].spines['right'].set_visible(False)
+
+	ax2[1].spines['top'].set_visible(False)
+	ax2[1].spines['right'].set_visible(False)
+
 
 #	fig2.show()
 	fig2.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Delta_P-E_vs_Delta_T_and_P-E_control_'+str(runmin)+'-'+str(runmax)+'_'+sfc+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)

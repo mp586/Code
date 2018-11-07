@@ -15,14 +15,22 @@ GFDL_BASE = os.environ['GFDL_BASE']
 sys.path.insert(0, os.path.join(GFDL_BASE,'src/extra/python/scripts'))
 import cell_area as ca
 
+
+
+
 ctl_model = input('Enter model 1 name as string ')
 if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
     control_model = 'Isca_DATA'
 elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
+HPC = input('Data in ISCA_HPC ? Yes or No? ')
+control_dir = input('Enter control directory from exp 1 as string ')
+if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+    control_dir= control_model + '/ISCA_HPC/' + control_dir
+else: 
+    control_dir= control_model + '/' + control_dir
 
-control_dir= control_model + '/' + input('Enter control directory from exp 1 as string ')
 #print control_dir
 ctl_runmin=input('Enter runmin number for exp 1 ')  # Should be a January month for seasonal variables to be correct
 ctl_runmax=input('Enter runmax number for comparison 1 ')
@@ -31,20 +39,22 @@ ctl_timeseries_max = input('Enter end of ctl timeseries month for exp 1 ')
 model = input('Enter model exp 1 ')
 if (model == 'Isca') or (model == 'isca'): 
     model_data = 'Isca_DATA'
-    output_dir = 'Isca'
+    output_dir1 = 'Isca'
 elif (model == 'gfdl') or (model == 'GFDL'):
     model_data = 'GFDL_DATA'
-    output_dir = ''
+    output_dir1 = ''
 
-testdir= input('Enter perturbed data directory name as string for exp 1 ')
-exp1_name = testdir 
+HPC = input('Data in ISCA_HPC ? Yes or No? ')
+testdir_in1= input('Enter perturbed data directory name as string for exp 1 ')
 runmin=input('Enter runmin number for exp 1 ')  # Should be a January month for seasonal variables to be correct
 runmax=input('Enter runmax number for exp 1 ')
-
-
-outdir = output_dir + '/' + testdir
-outdir_saving = outdir
-testdir = model_data + '/' + testdir
+if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+    exp1_name = 'ISCA_HPC_'+testdir_in1
+    testdir = model_data + '/ISCA_HPC/' + testdir_in1
+    testdir_in1 = '/ISCA_HPC/' + testdir_in1
+else: 
+    exp1_name = testdir_in1
+    testdir = model_data + '/' + testdir_in1
 
 land = input('Which landmask? ')
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
@@ -120,8 +130,13 @@ if (ctl_model == 'Isca') or (ctl_model == 'isca'):
 elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
+HPC = input('Data in ISCA_HPC ? Yes or No? ')
+control_dir = input('Enter control directory from exp 2 as string ')
+if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+    control_dir= control_model + '/ISCA_HPC/' + control_dir
+else: 
+    control_dir= control_model + '/' + control_dir
 
-control_dir= control_model + '/' + input('Enter control directory from exp 2 as string ')
 #print control_dir
 ctl_runmin=input('Enter runmin number for exp 2 ')  # Should be a January month for seasonal variables to be correct
 ctl_runmax=input('Enter runmax number for comparison 2 ')
@@ -135,14 +150,24 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     model_data = 'GFDL_DATA'
     output_dir = ''
 
+
+HPC = input('Data in ISCA_HPC ? Yes or No? ')
 testdir= input('Enter perturbed data directory name as string for exp 2 ')
-exp2_name = testdir
 runmin=input('Enter runmin number for exp 2 ')  # Should be a January month for seasonal variables to be correct
 runmax=input('Enter runmax number for exp 2 ')
+if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+    exp2_name = 'ISCA_HPC_'+testdir
+    testdir = model_data + '/ISCA_HPC/' + testdir
+else: 
+    exp2_name = testdir
+    testdir = model_data + '/' + testdir
 
 
-outdir = output_dir + '/' + testdir
-testdir = model_data + '/' + testdir
+if not os.path.exists('/scratch/mp586/Code/Graphics/'+output_dir1+'/'+testdir_in1+'/comparison_to_'+exp2_name):
+    os.mkdir('/scratch/mp586/Code/Graphics/'+output_dir1+'/'+testdir_in1+'/comparison_to_'+exp2_name)
+outdir_saving = output_dir1+'/'+testdir_in1+'/comparison_to_'+exp2_name
+print('Will save figures to '+outdir_saving)
+
 
 # Read in variables 
 
@@ -187,7 +212,8 @@ DSH2 = sphum - sphum_ctl
 
 
 
-
-any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DT2_avg - DT1_avg),area_array,'K','$\Delta$_$T_S$_'+exp2_name+'-'+exp1_name,'tempdiff',landmaskxr, minval = -5., maxval = 5.)
-any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DP2_avg - DP1_avg),area_array,'mm/d','$\Delta$_$P_S$_'+exp2_name+'-'+exp1_name,'rainnorm',landmaskxr, minval = -2., maxval = 2.)
-any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DE2_avg - DE1_avg),area_array,'mm/d','$\Delta$_$E_S$_'+exp2_name+'-'+exp1_name,'rainnorm',landmaskxr, minval = -1., maxval = 1.)
+any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DT2_avg - DT1_avg),area_array,'K','$\Delta$_$T_S$_difference','tempdiff',landmaskxr, minval = -5., maxval = 5., save_title = 'Delta_TS_')
+any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DP2_avg - DP1_avg),area_array,'mm/d','$\Delta$_P_difference','rainnorm',landmaskxr, minval = -2., maxval = 2., save_title = 'Delta_P_')
+any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DE2_avg - DE1_avg),area_array,'mm/d','$\Delta$_E_difference','rainnorm',landmaskxr, minval = -1., maxval = 1., save_title = 'Delta_E_')
+any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DRH2_avg - DRH1_avg),area_array,'%','$\Delta$_rh_lev'+str(level)+'difference','rainnorm',landmaskxr, minval = -4., maxval = 4., save_title = 'Delta_rh_lev'+str(level))
+any_configuration_plot(outdir_saving,runmin,runmax,-90.,90.,(DSH2_avg - DSH1_avg),area_array,'kg/kg','$\Delta$_sphum_lev'+str(level)+'_difference','rainnorm',landmaskxr, minval = -0.001, maxval = 0.001, save_title = 'Delta_sphum_lev'+str(level))
