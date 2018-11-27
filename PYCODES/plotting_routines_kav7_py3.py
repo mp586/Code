@@ -2,7 +2,6 @@ from netCDF4 import Dataset
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-from mpl_toolkits.basemap import Basemap, cm, shiftgrid, addcyclic
 import xarray as xr
 import pandas as pd
 import os
@@ -14,6 +13,8 @@ from scipy import signal
 GFDL_BASE = os.environ['GFDL_BASE']
 from scipy import stats
 from scipy.stats import linregress as linreg
+import cartopy.crs as ccrs
+from cartopy.util import add_cyclic_point
 
 
 class MidpointNormalize(colors.Normalize):
@@ -2208,7 +2209,7 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
 
     plt.show()
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True):
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=0.,save_fig=True, steps = 21):
 # plotting only the zonal average next to the map 
 # currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
     plt.close()
@@ -2234,17 +2235,17 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 
     fig = plt.figure(figsize = (25,10))
 
-    ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
+    ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3, projection = ccrs.PlateCarree())
 
 
-    m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
+#    m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
 #    m = Basemap(projection='cyl',llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c') works, but not with kav7 projection
     array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
     zonavg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
     meravg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-30.,maxlat=30.,axis=0)
 
-    lons_128 = lons # non-cyclic lons, i.e. lenght = 128
+#    lons_128 = lons # non-cyclic lons, i.e. lenght = 128
     # #newline to replace shiftgrid line which is causing trouble - Doesn't work perfectly
     # lons, array = m.shiftdata(lons, datain = array, lon_0=0.)
     # array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
@@ -2252,23 +2253,11 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
     array = np.asarray(array) #- This line fixes the problem!
     #the following line caused DataType error all of a sudden... Doesnt' accept xarray as input array for shiftgrid anymore.
 
-    array, lons = addcyclic(array, lons)
-    array,lons = shiftgrid(np.max(lons)-180.,array,lons,start=False,cyclic=np.max(lons))
-# shiftgrid lons0 (first entry) is the longitude in lons which should correspond with the center longitude of the map. start = False --> lonsin is the end latitude, not the beginning.
-    # this doesn't work for some reason
-    #array, lons = shiftgrid(np.max(lons)-100.,array,lons,start=True,cyclic=np.max(lons))
-
+    array, lons = add_cyclic_point(np.asarray(array), np.asarray(lons))
     array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
-    m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-    m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
-
     lon, lat = np.meshgrid(lons, lats)
-    xi, yi = m(lon, lat)
-
-    dlons = lons[100] - lons[99]
-    dlats = lats[60] - lats[59]
-
+#    xi, yi = m(lon, lat)
 
     if minval==None and maxval==None:
             minval = array.min()
@@ -2284,53 +2273,40 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
             minval = - minval
 
 
-    if palette=='rainnorm':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG',vmin=minval, vmax=maxval)
-    elif palette == 'PE_scale':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='bwr_r',vmin=minval, vmax=maxval)
-    elif palette == 'raindefault':
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG)
-    elif palette=='temp':
-            cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
-#           cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
+    v = np.linspace(minval, maxval, steps)
 
+    if palette=='rainnorm':
+#	    cs = plt.pcolor(array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
+	    cs = plt.contourf(array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
+    elif palette == 'PE_scale':
+	    cs = plt.contourf(array.sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
+    elif palette == 'raindefault':
+	    cs = plt.contourf(array.sel(lat=selected_lats), cmap=plt.cplt.BrBG, extend = 'both')
+    elif palette=='temp':
+	    cs = plt.pcolor(array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cplt.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+#	    cs = plt.pcolor(array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cplt.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
+    elif palette=='temp0':
+            cs = plt.contourf(array.sel(lat=selected_lats), v, cmap=plt.cplt.RdBu_r, extend = 'both')
     elif palette=='fromwhite': 
-            pal = plt.cm.Blues
-            pal.set_under('w',None)
-            cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	    cs = plt.contourf(array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+	    # pal = plt.cplt.Blues
+	    # pal.set_under('w',None)
+	    # cs = plt.pcolormesh(array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
 
     elif palette=='bucket': 
-            pal = plt.cm.Greens
-            pal.set_under('w',None)
-            cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	    cs = plt.contourf(array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
 
     elif palette=='tempdiff': 
-            cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), 
-                      norm=MidpointNormalize(midpoint=0), cmap=plt.cm.RdBu_r, 
-                      vmin = -maxval,
-                      vmax = maxval)
+	    cs = plt.contourf(array.sel(lat=selected_lats), v, cmap=plt.cplt.RdBu_r, extend = 'both')
     elif palette=='slp':
-            cs = m.pcolor(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.coolwarm,vmin=minval,vmax=maxval)
-
-
-
+	    cs = plt.contourf(array.sel(lat=selected_lats), v, cmap=plt.cplt.coolwarm, extend = 'both')
     else:
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats))
-
-
-    if nmb_contours != 0:  # add contours 
-            cont = m.contour(xi,yi,array,nmb_contours,cmap='PuBu_r', linewidth=5)
-            if cont>=1.:
-                    plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
-            else:
-                    plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
-
-
+        cs = plt.pcolor(array.sel(lat=selected_lats))
 
 # Add Colorbar
-    cbar = m.colorbar(cs, location='bottom', pad="10%") # usually on right 
-    cbar.set_label(units, size=med)
-    cbar.ax.tick_params(labelsize=small) 
+    # cbar = plt.colorbar(cs, location='bottom', pad="10%") # usually on right 
+    # cbar.set_label(units, size=med)
+    # cbar.ax.tick_params(labelsize=small) 
 
     # sns.palplot(sns.color_palette("BrBG", 7))
 
@@ -2338,12 +2314,11 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 
 # Add rectangles
 #    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-    landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
-
-    landmask, lons_cyclic = addcyclic(landmask, landlons)
+#    landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    landmask, lons_cyclic = add_cyclic_point(np.asarray(landmask), np.asarray(landlons))
 
     if np.any(landmask != 0.):
-            m.contour(xi,yi,landmask, 1)
+            plt.contour(landmask, 1)
 
     plt.title(title, size=lge)
 
