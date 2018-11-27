@@ -1,14 +1,14 @@
 from netCDF4 import Dataset
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.basemap import Basemap, cm
+#from mpl_toolkits.basemap import Basemap, cm
 import xarray as xr
 import pandas as pd
 import os
 
 import sys
 sys.path.insert(0, '/scratch/mp586/Code/PYCODES')
-from plotting_routines_kav7_py3 import *
+from plotting_routines_py3 import *
 import stats as st
 
 GFDL_BASE = os.environ['GFDL_BASE']
