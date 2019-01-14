@@ -2327,7 +2327,7 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 
 
     if nmb_contours != 0:  # add contours 
-	    cont = m.contour(xi,yi,array,nmb_contours,cmap='PuBu_r', linewidth=5)
+	    cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=5)
 	    if cont>=1.:
 		    plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
 	    else:
@@ -4135,12 +4135,6 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 		E_ctl_1d = np.asarray(E_avg_ctl).flatten()
 		T_ctl_1d = np.asarray(T_avg_ctl).flatten()
 
-		P_ctl_1d_E = np.asarray(precipitation_avg_ctl.where(landmaskEC == 1.)).flatten()
-		P_1d_E = np.asarray(precipitation_avg.where(landmaskEC == 1.)).flatten()
-
-		P_ctl_1d_W = np.asarray(precipitation_avg_ctl.where(landmaskWC == 1.)).flatten()
-		P_1d_W = np.asarray(precipitation_avg.where(landmaskWC == 1.)).flatten()
-
 
 	mask = ~np.isnan(rh_ctl_1d)
 
@@ -4183,60 +4177,68 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 
 
 
-# # plots west and east spearately and delta p vs delta t for both 
-# 	fig, ax = plt.subplots(1,3, sharey = True, figsize=(25,10))
-# 	maskEC = ~np.isnan(P_ctl_1d_E)
-# 	maskWC = ~np.isnan(P_ctl_1d_W)
+ # plots west and east spearately and delta p vs delta t for both 
+	if landmaskEC: 
+		fig, ax = plt.subplots(1,3, sharey = True, figsize=(25,10))
 
-# 	ax[0].plot(P_ctl_1d_W,(P_1d_W - P_ctl_1d_W),'b.', label = 'West C.')
-# 	ax[0].set_xlabel("P control (mm/d)",fontsize = lge)
-# 	ax[0].tick_params(labelsize = lge)
-# 	ax[0].legend(fontsize = lge)
-# 	ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
-# 	ax[0].set_xlim(-1.,precipitation_avg_ctl.max())
+		P_ctl_1d_E = np.asarray(precipitation_avg_ctl.where(landmaskEC == 1.)).flatten()
+		P_1d_E = np.asarray(precipitation_avg.where(landmaskEC == 1.)).flatten()
 
-# 	ax[0].spines['top'].set_visible(False)
-# 	ax[0].spines['right'].set_visible(False)
+		P_ctl_1d_W = np.asarray(precipitation_avg_ctl.where(landmaskWC == 1.)).flatten()
+		P_1d_W = np.asarray(precipitation_avg.where(landmaskWC == 1.)).flatten()
 
-# 	[k,dy,r,p,stderr] = linreg(P_ctl_1d_W[maskWC],(P_1d_W - P_ctl_1d_W)[maskWC]) # aa = 8.4, dq = -32
-# 	x1 = np.linspace(np.min((P_ctl_1d_W)[maskWC]),np.max((P_ctl_1d_W)[maskWC]),500)
-# 	y = k*x1 + dy
-# 	ax[0].plot(x1,y,'b-')
-# 	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+		maskEC = ~np.isnan(P_ctl_1d_E)
+		maskWC = ~np.isnan(P_ctl_1d_W)
 
-# 	ax[1].plot(P_ctl_1d_E,(P_1d_E - P_ctl_1d_E),'r.', label = 'East C.')
-# 	ax[1].set_xlabel("P control (mm/d)",fontsize = lge)
-# 	ax[1].tick_params(labelsize = lge)
-# 	ax[1].legend(fontsize = lge)
-# 	ax[1].set_xlim(-1.,precipitation_avg_ctl.max())
+		ax[0].plot(P_ctl_1d_W,(P_1d_W - P_ctl_1d_W),'b.', label = 'West C.')
+		ax[0].set_xlabel("P control (mm/d)",fontsize = lge)
+		ax[0].tick_params(labelsize = lge)
+		ax[0].legend(fontsize = lge)
+		ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
+		ax[0].set_xlim(-1.,precipitation_avg_ctl.max())
 
-# 	[k,dy,r,p,stderr] = linreg(P_ctl_1d_E[maskEC],(P_1d_E - P_ctl_1d_E)[maskEC]) # aa = 8.4, dq = -32
-# 	x1 = np.linspace(np.min((P_ctl_1d_E)[maskEC]),np.max((P_ctl_1d_E)[maskEC]),500)
-# 	y = k*x1 + dy
-# 	ax[1].plot(x1,y,'r-')
-# 	ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+		ax[0].spines['top'].set_visible(False)
+		ax[0].spines['right'].set_visible(False)
 
-# 	ax[1].spines['top'].set_visible(False)
-# 	ax[1].spines['right'].set_visible(False)
+		[k,dy,r,p,stderr] = linreg(P_ctl_1d_W[maskWC],(P_1d_W - P_ctl_1d_W)[maskWC]) # aa = 8.4, dq = -32
+		x1 = np.linspace(np.min((P_ctl_1d_W)[maskWC]),np.max((P_ctl_1d_W)[maskWC]),500)
+		y = k*x1 + dy
+		ax[0].plot(x1,y,'b-')
+		ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
 
-# 	ax[2].set_xlabel("T change (K)",fontsize = lge)
-# 	ax[2].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'g.', label = 'both')
-# 	ax[2].tick_params(labelsize = lge)
-# 	ax[2].legend(fontsize = lge)
-# #	ax[2].set_ylabel('P change (mm/d)', fontsize = lge)
-# 	ax[2].set_xlim(np.min((T_1d - T_ctl_1d)[mask])-1.,np.max((T_1d - T_ctl_1d)[mask])+1.)
+		ax[1].plot(P_ctl_1d_E,(P_1d_E - P_ctl_1d_E),'r.', label = 'East C.')
+		ax[1].set_xlabel("P control (mm/d)",fontsize = lge)
+		ax[1].tick_params(labelsize = lge)
+		ax[1].legend(fontsize = lge)
+		ax[1].set_xlim(-1.,precipitation_avg_ctl.max())
 
-# 	[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
-# 	x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask])-.5,np.max((T_1d - T_ctl_1d)[mask])+.5,500)
-# 	y = k*x1 + dy
-# 	ax[2].plot(x1,y,'g-')
-# 	ax[2].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+		[k,dy,r,p,stderr] = linreg(P_ctl_1d_E[maskEC],(P_1d_E - P_ctl_1d_E)[maskEC]) # aa = 8.4, dq = -32
+		x1 = np.linspace(np.min((P_ctl_1d_E)[maskEC]),np.max((P_ctl_1d_E)[maskEC]),500)
+		y = k*x1 + dy
+		ax[1].plot(x1,y,'r-')
+		ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
 
-# 	ax[2].spines['top'].set_visible(False)
-# 	ax[2].spines['right'].set_visible(False)
+		ax[1].spines['top'].set_visible(False)
+		ax[1].spines['right'].set_visible(False)
 
-# #	fig.show()
-# 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP_vs_Pctl_and_DeltaT_EACHCONTINENT_3panels', bbox_inches ='tight', dpi=100)
+		ax[2].set_xlabel("T change (K)",fontsize = lge)
+		ax[2].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'g.', label = 'both')
+		ax[2].tick_params(labelsize = lge)
+		ax[2].legend(fontsize = lge)
+	 #	ax[2].set_ylabel('P change (mm/d)', fontsize = lge)
+		ax[2].set_xlim(np.min((T_1d - T_ctl_1d)[mask])-1.,np.max((T_1d - T_ctl_1d)[mask])+1.)
+
+		[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
+		x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask])-.5,np.max((T_1d - T_ctl_1d)[mask])+.5,500)
+		y = k*x1 + dy
+		ax[2].plot(x1,y,'g-')
+		ax[2].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+		ax[2].spines['top'].set_visible(False)
+		ax[2].spines['right'].set_visible(False)
+
+	 #	fig.show()
+		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP_vs_Pctl_and_DeltaT_EACHCONTINENT_3panels', bbox_inches ='tight', dpi=100)
 
 
 
