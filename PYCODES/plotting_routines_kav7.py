@@ -2338,7 +2338,6 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
     cbar.set_label(units, size=med)
     cbar.ax.tick_params(labelsize=med) 
     cbar.set_clim(minval, maxval)
-    # sns.palplot(sns.color_palette("BrBG", 7))
 
 # Read landmask
 
@@ -2384,7 +2383,7 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 		    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
 	    else: 
 		    fig.show()
-    return fig
+#    return fig
 
 
 def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True):
@@ -2770,8 +2769,11 @@ def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,uni
 
 	if np.any(landmask != 0.):
 		m.contour(xi,yi,landmask, 1)
-
-	if palette=='rainnorm':
+	if minval==None and maxval==None:
+		minval = array.min()
+		maxval = array.max()
+		minval = np.absolute(minval)
+		maxval = np.absolute(maxval)
 
 		if maxval >= minval:
 			minval = - maxval
@@ -2779,32 +2781,77 @@ def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,uni
 			maxval = minval
 			minval = - minval
 
-		cs = m.pcolor(xi,yi,array,
-			      norm=MidpointNormalize(midpoint=0.),
-			      cmap='BrBG',vmin=minval, vmax=maxval)
+	v = np.linspace(minval,maxval,21) # , endpoint=True)
+
+	if palette=='rainnorm':
+		cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 	elif palette == 'PE_scale':
-		cs = m.pcolor(xi,yi,array,norm=MidpointNormalize(midpoint=0.),cmap='bwr_r',vmin=minval, vmax=maxval)
+		cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
 	elif palette == 'raindefault':
-		cs = m.pcolor(xi,yi,array, 
-			      cmap=plt.cm.BrBG)
-
-	elif palette=='temp': 
-		cs = m.pcolor(xi,yi,array, 
-			      norm=MidpointNormalize(midpoint=273.15), 
-			      cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),
-			      vmax=maxval) 
-
+		cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
+	elif palette=='temp':
+		cs = m.pcolor(xi,yi,array,norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+	elif palette=='temp0':
+		cs = m.contourf(xi,yi,array, v, cmap=plt.cm.RdBu_r, extend = 'both')
 	elif palette=='fromwhite': 
-		pal = plt.cm.Blues
-		pal.set_under('w',None)
-		cs = m.pcolormesh(xi,yi,array,
-				  cmap=pal,vmin=0,vmax=maxval)
-
+		cs = m.contourf(xi, yi, array, v, cmap = 'Blues', extend = 'max')
+	elif palette=='bucket': 
+		cs = m.contourf(xi, yi, array, v, cmap = 'Greens', extend = 'max')
+	elif palette=='tempdiff': 
+		cs = m.contourf(xi,yi,array, v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='slp':
+		cs = m.contourf(xi,yi,array, v, cmap=plt.cm.coolwarm, extend = 'both')
 	else:
 		cs = m.pcolor(xi,yi,array)
 
-	cbar = m.colorbar(cs, location='right', pad="10%")
-	cbar.set_label(units)
+	nmb_contours = 10.
+	if nmb_contours != 0:  # add contours 
+		cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=5)
+	if cont>=1.:
+		plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
+	else:
+		plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
+
+# Add Colorbar
+	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
+	cbar.set_label(units, size=med)
+	cbar.ax.tick_params(labelsize=med) 
+	cbar.set_clim(minval, maxval)
+
+	# if palette=='rainnorm':
+
+	# 	if maxval >= minval:
+	# 		minval = - maxval
+	# 	else: 
+	# 		maxval = minval
+	# 		minval = - minval
+
+	# 	cs = m.pcolor(xi,yi,array,
+	# 		      norm=MidpointNormalize(midpoint=0.),
+	# 		      cmap='BrBG',vmin=minval, vmax=maxval)
+	# elif palette == 'PE_scale':
+	# 	cs = m.pcolor(xi,yi,array,norm=MidpointNormalize(midpoint=0.),cmap='bwr_r',vmin=minval, vmax=maxval)
+	# elif palette == 'raindefault':
+	# 	cs = m.pcolor(xi,yi,array, 
+	# 		      cmap=plt.cm.BrBG)
+
+	# elif palette=='temp': 
+	# 	cs = m.pcolor(xi,yi,array, 
+	# 		      norm=MidpointNormalize(midpoint=273.15), 
+	# 		      cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),
+	# 		      vmax=maxval) 
+
+	# elif palette=='fromwhite': 
+	# 	pal = plt.cm.Blues
+	# 	pal.set_under('w',None)
+	# 	cs = m.pcolormesh(xi,yi,array,
+	# 			  cmap=pal,vmin=0,vmax=maxval)
+
+	# else:
+	# 	cs = m.pcolor(xi,yi,array)
+
+	# cbar = m.colorbar(cs, location='right', pad="10%")
+    # cbar.set_label(units)
 
 	Q = ax.quiver(xi[::3,::3], yi[::3,::3], uwind[::3,::3], vwind[::3,::3], units='width')
 	ax.quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
@@ -3751,7 +3798,7 @@ def area_integral(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,fact
 
 
 def mass_streamfunction(testdir,model,runmin,runmax,v='vcomp', a=6376.0e3, g=9.8):
-    """Calculate the mass streamfunction for the atmosphere.
+    """Calculate][] the mass streamfunction for the atmosphere.
     Based on a vertical integral of the meridional wind.
     Ref: Physics of Climate, Peixoto & Oort, 1992.  p158.
     Parameters
@@ -4314,4 +4361,139 @@ def make_var_seasonal(var):
 
 	return(var,var_avg,var_seasonal_avg,var_month_avg,time)
 
+
+
+def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,maxval,veclen=10,units_numerator = 'm', units_denom = 's',save = False):
+
+	
+# convert omega to w, although seems like numbers are way too big, see Code/Graphics/Isca/ISCA_HPC/two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm/attempt_vertical_winds.png
+# g = 9.81
+# Rspec = 287.058
+# wcomp_avg_ctl = omega_avg_ctl * temp_avg_ctl * Rspec / (pfull * g)
+
+	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+	fig, ax = plt.subplots(figsize = (25,10))
+
+# if fig, ax = plt.subplots(0,0, figsize = (25,10)) then ax is a numpy array --> can't do quiver plot on it
+	lons = uwind.lon
+	lats = uwind.lat
+	pres = wwind.pres_lev
+	# uwind, lons_cyclic = addcyclic(uwind, lons)
+	# wwind, lons_cyclic = addcyclic(wwind, lons)
+
+	# uwind = np.asarray(uwind)
+	# wwind = np.asarray(wwind)
+	# uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,uwind,lons_cyclic,start=False,
+	# 			   cyclic=np.max(lons_cyclic))
+	# wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,wwind,lons_cyclic,start=False,
+	# 			   cyclic=np.max(lons_cyclic))  
+
+	# array, lons_cyclic = addcyclic(array, lons)
+	# array = np.asarray(array)
+	# array, lons_shift = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,
+	# 				 start=False,cyclic=np.max(lons_cyclic))
+	
+	lons_shift = lons 
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	# landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	# landmask, landlons = addcyclic(landmask, landlons)
+
+	X, Z = np.meshgrid(lons_shift, pres)
+
+	# if np.any(landmask != 0.):
+	#     m.contour(xi,yi,landmask, 1)
+	if minval==None and maxval==None:
+		minval = array.min()
+		maxval = array.max()
+		minval = np.absolute(minval)
+		maxval = np.absolute(maxval)
+
+		if maxval >= minval:
+			minval = - maxval
+		else: 
+			maxval = minval
+			minval = - minval
+
+	v = np.linspace(minval,maxval,21) # , endpoint=True)
+
+	v = np.linspace(minval,maxval,21)
+	cset1 = plt.contourf(X, Z, array, v, cmap='BrBG', extend = 'both')
+	cbar = plt.colorbar(cset1)
+	plt.xlabel('Longitude E')
+	plt.ylabel('Pressure (Pa)')
+
+
+	wwind_tropmean = wwind.sel(lat=slice(-5.,0.)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(-5.,0.)).mean(dim='lat')
+	
+	Q = ax.quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], units='width')
+	qk = ax.quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+
+	plt.gca().invert_yaxis()
+
+	if save == True:
+		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.png', dpi=100) # if add bbox_inches = 'tight' the quiverkey is not saved!
+
+	return fig
+
+
+# vertical omega profile 
+
+# plt.figure()
+# v = np.linspace(- omega_avg.max(), omega_avg.max(), 41)
+# cset = plt.contourf(X, Z, omega_avg.sel(lat = slice(-30.,30.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both')
+# cont = plt.contour(X, Z, omega_avg_ctl.sel(lat = slice(-30.,30.)).mean(dim = 'lat'), 20, colors = 'k', linewidth=5)
+# cbar = plt.colorbar(cset)
+# clabel = plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=12)
+# plt.gca().invert_yaxis()
+# plt.show()
+
+# # vertical profiles of omega: 3 panels with avg, control and diff between the two plus contours of eg rh, sphum or the contours of the background 
+
+# fig, ax = plt.subplots(3,1, sharey = True, figsize = (10,40))
+# v = np.linspace(- temp_avg.max(), temp_avg.max(), 61)
+# cset = ax[0].contourf(X, Z, temp_avg.sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='RdBu_r', extend = 'both') # Two continents
+# ax[1].contourf(X, Z, temp_avg_ctl.sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='RdBu_r', extend = 'both') # America 
+# ax[2].contourf(X, Z, (temp_avg - temp_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='RdBu_r', extend = 'both') # Two Cs - America 
+# # cont0 = ax[0].contour(X, Z, rh_avg.sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5)
+# # cont1 = ax[1].contour(X, Z, rh_avg_ctl.sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# # cont2 = ax[2].contour(X, Z, (rh_avg - rh_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# cbar = fig.colorbar(cset, orientation = 'horizontal')
+# # cbar.set_label('Temp (K)')
+# # clabel = ax[0].clabel(cont0, inline=2, fmt='%1.1f',fontsize=12)
+# # clabel = ax[1].clabel(cont1, inline=2, fmt='%1.1f',fontsize=12)
+# # clabel = ax[2].clabel(cont2, inline=2, fmt='%1.1f',fontsize=12)
+# ax[0].set_title('Two continents control')
+# ax[1].set_title('America control')
+# ax[2].set_title('Two continents minus America')
+# # ax[0].quiver(X[::3,::3], Z[::3,::3], (ucomp_avg.sel(lat=slice(-30.30)).mean(dim='lat'))[::3,::3], 0, units='width')
+
+# fig.gca().invert_yaxis()
+
+
+
+# # for plotting climate change simulation A, B and A-B
+
+
+# fig, ax = plt.subplots(3,1, sharey = True, figsize = (10,40))
+# v = np.linspace(- np.abs((omega1_avg - omega1_avg_ctl).max()), np.abs((omega1_avg - omega1_avg_ctl).max()), 41)
+# cset = ax[0].contourf(X, Z, (omega2_avg - omega2_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two continents
+# ax[1].contourf(X, Z, (omega1_avg - omega1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # America 
+# ax[2].contourf(X, Z, (omega2_avg - omega2_avg_ctl - omega1_avg + omega1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two Cs - America 
+# cont0 = ax[0].contour(X, Z, (rh2_avg - rh1_avg).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5)
+# cont1 = ax[1].contour(X, Z, (rh2_avg_ctl - rh1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# cont2 = ax[2].contour(X, Z, (rh1_avg - rh1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# cbar = fig.colorbar(cset, orientation = 'horizontal')
+# cbar.set_label('Omega (Pa/s)')
+# clabel = ax[0].clabel(cont0, inline=2, fmt='%1.1f',fontsize=12)
+# clabel = ax[1].clabel(cont1, inline=2, fmt='%1.1f',fontsize=12)
+# clabel = ax[2].clabel(cont2, inline=2, fmt='%1.1f',fontsize=12)
+# ax[0].set_title('Two continents perturbed - control')
+# ax[1].set_title('America perturbed - control ')
+# ax[2].set_title('Two continents - America perturbed minus control')
 
