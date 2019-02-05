@@ -2214,160 +2214,181 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
 
     plt.show()
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None):
+
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None):
 
 
 
 
 # plotting only the zonal average next to the map 
 # currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
-    plt.close()
+	plt.close()
 
-    if save_title == None: 
-	    save_title = plot_title
+	if array2 is None:
+		array = array1
+	else:
+		array = array1
+		ctl_array = array2
 
-    small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-    med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-    lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	if save_title == None: 
+		save_title = plot_title
 
-    lats=array.lat
-    lons=array.lon
-    
-    # why is this not working anymore when land areas are selected ? worked in commit d110990e
-    minlatindex=np.asarray(np.where(lats>=minlat))[0,0]
-    maxlatreverseindex=np.asarray(np.where(lats[::-1]<=maxlat))[0,0] 
-    selected_lats=lats[minlatindex:(lats.size-maxlatreverseindex)+1]
+	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
-    landlats = np.asarray(landmaskxr.lat)
-    landlons = np.asarray(landmaskxr.lon)
+	lats=array.lat
+	lons=array.lon
+	
+	# why is this not working anymore when land areas are selected ? worked in commit d110990e
+	minlatindex=np.asarray(np.where(lats>=minlat))[0,0]
+	maxlatreverseindex=np.asarray(np.where(lats[::-1]<=maxlat))[0,0] 
+	selected_lats=lats[minlatindex:(lats.size-maxlatreverseindex)+1]
 
-    landmask = np.asarray(landmaskxr)
+	landlats = np.asarray(landmaskxr.lat)
+	landlons = np.asarray(landmaskxr.lon)
 
-
-    fig = plt.figure(figsize = (25,10))
-
-    ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
+	landmask = np.asarray(landmaskxr)
 
 
-    m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
+	fig = plt.figure(figsize = (25,10))
+
+	ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
+
+
+	m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
 #    m = Basemap(projection='cyl',llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c') works, but not with kav7 projection
-    array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+	array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
-    zonavg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
-    meravg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-30.,maxlat=30.,axis=0)
+	zonavg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
+	meravg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-30.,maxlat=30.,axis=0)
 
-    lons_128 = lons # non-cyclic lons, i.e. lenght = 128
-    # #newline to replace shiftgrid line which is causing trouble - Doesn't work perfectly
-    # lons, array = m.shiftdata(lons, datain = array, lon_0=0.)
-    # array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+	lons_128 = lons # non-cyclic lons, i.e. lenght = 128
+	# #newline to replace shiftgrid line which is causing trouble - Doesn't work perfectly
+	# lons, array = m.shiftdata(lons, datain = array, lon_0=0.)
+	# array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
-    array = np.asarray(array) #- This line fixes the problem!
-    #the following line caused DataType error all of a sudden... Doesnt' accept xarray as input array for shiftgrid anymore.
+	array = np.asarray(array) #- This line fixes the problem!
+	#the following line caused DataType error all of a sudden... Doesnt' accept xarray as input array for shiftgrid anymore.
 
-    array, lons = addcyclic(array, lons)
-    array,lons = shiftgrid(np.max(lons)-180.,array,lons,start=False,cyclic=np.max(lons))
-# shiftgrid lons0 (first entry) is the longitude in lons which should correspond with the center longitude of the map. start = False --> lonsin is the end latitude, not the beginning.
-    # this doesn't work for some reason
-    #array, lons = shiftgrid(np.max(lons)-100.,array,lons,start=True,cyclic=np.max(lons))
+	array, lons_cyclic = addcyclic(array, lons)
+	array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
 
-    array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+	array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
-    m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-    m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+	# shiftgrid lons0 (first entry) is the longitude in lons which should correspond with the center longitude of the map. start = False --> lonsin is the end latitude, not the beginning.
+	# this doesn't work for some reason
+	#array, lons = shiftgrid(np.max(lons)-100.,array,lons,start=True,cyclic=np.max(lons))
 
-    lon, lat = np.meshgrid(lons, lats)
-    xi, yi = m(lon, lat)
+	if array2 is not None: 
+		ctl_array = np.asarray(ctl_array)
+		ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+		ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+		ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
-    dlons = lons[100] - lons[99]
-    dlats = lats[60] - lats[59]
+	lons = lons_cyclic
+
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+
+	lon, lat = np.meshgrid(lons, lats)
+	xi, yi = m(lon, lat)
+
+	dlons = lons[100] - lons[99]
+	dlats = lats[60] - lats[59]
 
 
-    if minval==None and maxval==None:
-	    minval = array.min()
-	    maxval = array.max()
-    
-	    minval = np.absolute(minval)
-	    maxval = np.absolute(maxval)
+	if minval==None and maxval==None:
+		minval = array.min()
+		maxval = array.max()
+	
+		minval = np.absolute(minval)
+		maxval = np.absolute(maxval)
 
-	    if maxval >= minval:
-		    minval = - maxval
-	    else: 
-		    maxval = minval
-		    minval = - minval
+		if maxval >= minval:
+			minval = - maxval
+		else: 
+			maxval = minval
+			minval = - minval
 
-    v = np.linspace(minval,maxval,steps) # , endpoint=True)
+	v = np.linspace(minval,maxval,steps) # , endpoint=True)
 
-    if palette=='rainnorm':
+	if palette=='rainnorm':
 #	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
-    elif palette == 'PE_scale':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
-    elif palette == 'raindefault':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
-    elif palette=='temp':
-	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
+	elif palette == 'PE_scale':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
+	elif palette == 'raindefault':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
+	elif palette=='temp':
+		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
 #	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
-    elif palette=='temp0':
-            cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
-    elif palette=='fromwhite': 
-	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
-	    # pal = plt.cm.Blues
-	    # pal.set_under('w',None)
-	    # cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	elif palette=='temp0':
+			cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='fromwhite': 
+		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+		# pal = plt.cm.Blues
+		# pal.set_under('w',None)
+		# cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
 
-    elif palette=='bucket': 
-	    cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
+	elif palette=='bucket': 
+		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
 
-    elif palette=='tempdiff': 
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
-    elif palette=='slp':
-	    cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
-    else:
-        cs = m.pcolor(xi,yi,array.sel(lat=selected_lats))
+	elif palette=='tempdiff': 
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='slp':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
+	else:
+		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats))
 
 
-    if nmb_contours != 0:  # add contours 
-	    cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=5)
-	    if cont>=1.:
-		    plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
-	    else:
-		    plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
+	if nmb_contours != 0:  # add contours 
+		if array2 is not None:
+			cont = m.contour(xi,yi,ctl_array,np.int(nmb_contours), colors = 'k', linewidth=5) # If I don't add the int(nmb_contours) it can be
+			#misinterpreted to use the specified number as the contour level! (i.e. array like!)
+		else: 
+			cont = m.contour(xi,yi,array,np.int(nmb_contours), colors = 'k', linewidth=5)
+
+		if cont>=1.:
+			plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
+		else:
+			plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
 # Add Colorbar
-    cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
-    cbar.set_label(units, size=med)
-    cbar.ax.tick_params(labelsize=med) 
-    cbar.set_clim(minval, maxval)
+	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
+	cbar.set_label(units, size=med)
+	cbar.ax.tick_params(labelsize=med) 
+	cbar.set_clim(minval, maxval)
 
 # Read landmask
 
 # Add rectangles
 #    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-    landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
 
-    landmask, lons_cyclic = addcyclic(landmask, landlons)
+	landmask, lons_cyclic = addcyclic(landmask, landlons)
 
-    if np.any(landmask != 0.):
-	    m.contour(xi,yi,landmask, 1)
+	if np.any(landmask != 0.):
+		m.contour(xi,yi,landmask, 1)
 
-    plt.title(plot_title, size=lge)
+	plt.title(plot_title, size=lge)
 
-    
-    if month_annotate >= 1:
-	    plt.annotate('Month #'+str(month_annotate), xy=(0.15,0.8), xycoords='figure fraction')
-	    return fig
+	
+	if month_annotate >= 1:
+		plt.annotate('Month #'+str(month_annotate), xy=(0.15,0.8), xycoords='figure fraction')
+		return fig
 
-    else:
+	else:
    
-	    ax2 = plt.subplot2grid((5,8), (0,6), rowspan = 3)
+		ax2 = plt.subplot2grid((5,8), (0,6), rowspan = 3)
 
-	    plt.plot(zonavg_thin,lats)
-	    plt.ylabel('Latitude', size=med)
-	    plt.xlabel(units, size=med)
-	    ax2.yaxis.tick_right()
-	    ax2.yaxis.set_label_position('right')
-	    ax2.tick_params(axis='both', which='major', labelsize=small)
-	    ax2.invert_xaxis()
+		plt.plot(zonavg_thin,lats)
+		plt.ylabel('Latitude', size=med)
+		plt.xlabel(units, size=med)
+		ax2.yaxis.tick_right()
+		ax2.yaxis.set_label_position('right')
+		ax2.tick_params(axis='both', which='major', labelsize=small)
+		ax2.invert_xaxis()
 
 # 	    ax3 = plt.subplot2grid((5,8), (4,1), colspan = 4)
 # 	    plt.plot(lons_128,meravg_thin)
@@ -2375,15 +2396,17 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array,area_array,u
 # 	    plt.ylabel(title+' ('+units+') 30S-30N')
 # #	    plt.tight_layout()
 
-	    manager = plt.get_current_fig_manager()
-	    manager.window.showMaximized()
+		manager = plt.get_current_fig_manager()
+		manager.window.showMaximized()
 #	    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
 
-	    if save_fig == True:
-		    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
-	    else: 
-		    fig.show()
+		if save_fig == True:
+			plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
+		else: 
+			fig.show()
 #    return fig
+
+
 
 
 def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True):
@@ -4377,33 +4400,34 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 
 	fig, ax = plt.subplots(figsize = (25,10))
 
-# if fig, ax = plt.subplots(0,0, figsize = (25,10)) then ax is a numpy array --> can't do quiver plot on it
 	lons = uwind.lon
 	lats = uwind.lat
 	pres = wwind.pres_lev
-	# uwind, lons_cyclic = addcyclic(uwind, lons)
-	# wwind, lons_cyclic = addcyclic(wwind, lons)
+	presar = array.pres_lev
+	uwind, lons_cyclic = addcyclic(uwind, lons)
+	wwind, lons_cyclic = addcyclic(wwind, lons)
 
-	# uwind = np.asarray(uwind)
-	# wwind = np.asarray(wwind)
-	# uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,uwind,lons_cyclic,start=False,
-	# 			   cyclic=np.max(lons_cyclic))
-	# wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,wwind,lons_cyclic,start=False,
-	# 			   cyclic=np.max(lons_cyclic))  
+	uwind = np.asarray(uwind)
+	wwind = np.asarray(wwind)
+	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,uwind,lons_cyclic,start=False,
+				   cyclic=np.max(lons_cyclic))
+	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,wwind,lons_cyclic,start=False,
+				   cyclic=np.max(lons_cyclic))  
 
-	# array, lons_cyclic = addcyclic(array, lons)
-	# array = np.asarray(array)
-	# array, lons_shift = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,
-	# 				 start=False,cyclic=np.max(lons_cyclic))
+	array, lons_cyclic = addcyclic(array, lons)
+	array = np.asarray(array)
+	array, lons_shift = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,
+					 start=False,cyclic=np.max(lons_cyclic))
 	
-	lons_shift = lons 
-	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	array = xr.DataArray(array,coords=[presar,lons_shift],dims=['pres','lon'])
 	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
 	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
+	Xar, Zar = np.meshgrid(lons_shift, presar)
 	X, Z = np.meshgrid(lons_shift, pres)
+
 
 	# if np.any(landmask != 0.):
 	#     m.contour(xi,yi,landmask, 1)
@@ -4422,19 +4446,18 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 	v = np.linspace(minval,maxval,21) # , endpoint=True)
 
 	v = np.linspace(minval,maxval,21)
-	cset1 = plt.contourf(X, Z, array, v, cmap='BrBG', extend = 'both')
+	cset1 = plt.contourf(Xar, Zar, array, v, cmap='BrBG', extend = 'both')
 	cbar = plt.colorbar(cset1)
 	plt.xlabel('Longitude E')
 	plt.ylabel('Pressure (Pa)')
+	plt.gca().invert_yaxis()
 
 
-	wwind_tropmean = wwind.sel(lat=slice(-5.,0.)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(-5.,0.)).mean(dim='lat')
+	wwind_tropmean = wwind.sel(lat=slice(-10.,10.)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(-10.,10.)).mean(dim='lat')
 	
 	Q = ax.quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], units='width')
 	qk = ax.quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-
-	plt.gca().invert_yaxis()
 
 	if save == True:
 		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.png', dpi=100) # if add bbox_inches = 'tight' the quiverkey is not saved!
@@ -4477,17 +4500,17 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 
 
 
-# # for plotting climate change simulation A, B and A-B
+# for plotting climate change simulation A, B and A-B
 
 
 # fig, ax = plt.subplots(3,1, sharey = True, figsize = (10,40))
 # v = np.linspace(- np.abs((omega1_avg - omega1_avg_ctl).max()), np.abs((omega1_avg - omega1_avg_ctl).max()), 41)
-# cset = ax[0].contourf(X, Z, (omega2_avg - omega2_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two continents
-# ax[1].contourf(X, Z, (omega1_avg - omega1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # America 
-# ax[2].contourf(X, Z, (omega2_avg - omega2_avg_ctl - omega1_avg + omega1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two Cs - America 
-# cont0 = ax[0].contour(X, Z, (rh2_avg - rh1_avg).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5)
-# cont1 = ax[1].contour(X, Z, (rh2_avg_ctl - rh1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
-# cont2 = ax[2].contour(X, Z, (rh1_avg - rh1_avg_ctl).sel(lat = slice(-10.,10.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# cset = ax[0].contourf(X, Z, (omega2_avg - omega2_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two continents
+# ax[1].contourf(X, Z, (omega1_avg - omega1_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # America 
+# ax[2].contourf(X, Z, (omega2_avg - omega2_avg_ctl - omega1_avg + omega1_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), v, cmap='BrBG', extend = 'both') # Two Cs - America 
+# cont0 = ax[0].contour(X, Z, (rh2_avg - rh2_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5)
+# cont1 = ax[1].contour(X, Z, (rh1_avg - rh1_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
+# cont2 = ax[2].contour(X, Z, (rh2_avg - rh2_avg_ctl - rh1_avg + rh1_avg_ctl).sel(lat = slice(-10.,-5.)).mean(dim = 'lat'), 10, colors = 'k', linewidth=5) 
 # cbar = fig.colorbar(cset, orientation = 'horizontal')
 # cbar.set_label('Omega (Pa/s)')
 # clabel = ax[0].clabel(cont0, inline=2, fmt='%1.1f',fontsize=12)
@@ -4496,4 +4519,5 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 # ax[0].set_title('Two continents perturbed - control')
 # ax[1].set_title('America perturbed - control ')
 # ax[2].set_title('Two continents - America perturbed minus control')
+# fig.gca().invert_yaxis()
 

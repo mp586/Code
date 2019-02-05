@@ -84,6 +84,8 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 [ucomp1,ucomp1_avg,ucomp1_seasonal_avg,ucomp1_month_avg,ucomp1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'ucomp','m/s')
 [ucomp1_ctl,ucomp1_avg_ctl,ucomp1_seasonal_avg_ctl,ucomp1_month_avg_ctl,ucomp1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
 
+[temp1,temp1_avg,temp1_seasonal_avg,temp1_month_avg,temp1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'temp','K')
+[temp1_ctl,temp1_avg_ctl,temp1_seasonal_avg_ctl,temp1_month_avg_ctl,temp1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
 
 
 ################ read in data from exp 2 ###############################
@@ -148,6 +150,10 @@ level = input('Which Level? ')
 [ucomp2,ucomp2_avg,ucomp2_seasonal_avg,ucomp2_month_avg,ucomp2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'ucomp','m/s')
 [ucomp2_ctl,ucomp2_avg_ctl,ucomp2_seasonal_avg_ctl,ucomp2_month_avg_ctl,ucomp2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
 
+[temp2,temp2_avg,temp2_seasonal_avg,temp2_month_avg,temp2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'temp','K')
+[temp2_ctl,temp2_avg_ctl,temp2_seasonal_avg_ctl,temp2_month_avg_ctl,temp2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
+
+
 ucomp2_ctl_zonavg = np.expand_dims(ucomp2_avg_ctl.mean(dim = 'lon'), axis = 2)
 ucomp2_ctl_zonavg = np.repeat(ucomp2_ctl_zonavg, 128, axis = 2)
 np.shape(ucomp2_ctl_zonavg)
@@ -164,3 +170,33 @@ vert_horiz_winds(outdir,runmin,runmax,'u w*80',(((ucomp2_avg - ucomp2_avg_ctl) -
 
 #this needs to produce vectors that are at a 45 degree angle - angle in quiver has to be set to 'uv' (which is the default) or not set at all duh. Wasn't working because I had set angle to 'xy' so that it would invert the yaxis. Instead can just feed the info in reversed omega coords! 
 vert_horiz_winds(outdir,runmin,runmax,'u w*80',(ucomp2_avg),ucomp2_avg,((rh2_avg).sel(lat = slice(-10.,10.))).mean(dim = 'lat'),0,80.,veclen=10,units_numerator = 'Pa m', units_denom = 's s',save = False)
+
+
+g = 9.81
+Rspec = 287.058
+pfull = temp1.pres_lev
+pfull = np.expand_dims(pfull, axis = 1)
+pfull = np.expand_dims(pfull, axis = 2)
+pfull = np.repeat(pfull, 64, axis=1)
+pfull = np.repeat(pfull, 128, axis = 2)
+pres_lev = temp1.pres_lev
+pfull = xr.DataArray(pfull, coords = [pres_lev, temp1.lat, temp1.lon], dims = ['pres_lev','lat','lon'])
+wcomp1_avg_ctl = - (omega1_avg_ctl * temp1_avg_ctl * Rspec)/(pfull * g)
+wcomp2_avg_ctl = - (omega2_avg_ctl * temp2_avg_ctl * Rspec)/(pfull * g)
+wcomp1_avg = - (omega1_avg * temp1_avg * Rspec)/(pfull * g)
+wcomp2_avg = - (omega2_avg * temp2_avg * Rspec)/(pfull * g)
+
+#conversion following https://www.ncl.ucar.edu/Document/Functions/Contributed/omega_to_w.shtml
+
+
+ucomp2_zonavg = np.expand_dims(ucomp2_avg.mean(dim = 'lon'), axis = 2)
+ucomp2_zonavg = np.repeat(ucomp2_zonavg, 128, axis = 2)
+np.shape(ucomp2_zonavg)
+
+
+wcomp2_zonavg = np.expand_dims(wcomp2_avg.mean(dim = 'lon'), axis = 2)
+wcomp2_zonavg = np.repeat(wcomp2_zonavg, 128, axis = 2)
+np.shape(wcomp2_zonavg)
+
+vert_horiz_winds(outdir,runmin,runmax,'u w*80',(((ucomp2_avg - ucomp2_avg_ctl) - (ucomp1_avg - ucomp1_avg_ctl)))[::-1,:,:],(((wcomp2_avg - wcomp2_avg_ctl) - (wcomp1_avg - wcomp1_avg_ctl))*80.)[::-1,:,:],((rh2_avg - rh2_avg_ctl) - (rh1_avg - rh1_avg_ctl)).sel(lat = slice(-10.,10.)).mean(dim = 'lat'),-10.,10.,veclen=5,units_numerator = 'm', units_denom = 's',save = False)
+
