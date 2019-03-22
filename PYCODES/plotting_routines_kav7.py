@@ -1,3 +1,4 @@
+# NB don't use lanmdaskxr as argument for .where, only use landmask (np array) -- otherwise empty!
 from netCDF4 import Dataset
 import numpy as np
 import matplotlib
@@ -14,6 +15,7 @@ from scipy import signal
 GFDL_BASE = os.environ['GFDL_BASE']
 from scipy import stats
 from scipy.stats import linregress as linreg
+from matplotlib.patches import Rectangle
 
 class MidpointNormalize(colors.Normalize):
 	"""
@@ -636,7 +638,7 @@ def globavg_var_timeseries_selected_points__6hrly_severalvars(outdir,testdir,mod
 
 
 
-def globavg_var_timeseries_total_and_land_perturbed(testdir,model,area_array,varname,runmin,runmax,factor,landmask,spinup_dir,spinup_model,spinup_runmin, spinup_runmax,minlat=-90.,maxlat=90.,select='all'):
+def globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,varname,runmin,runmax,factor,landmask,spinup_dir,spinup_model,spinup_runmin, spinup_runmax,minlat=-90.,maxlat=90.,select='all'):
     
 #	""" Plots and returns timeseries of global average for specified variable """
 # factor is needed to convert eg precip from kg/s to mm/day 
@@ -728,8 +730,8 @@ def globavg_var_timeseries_total_and_land_perturbed(testdir,model,area_array,var
 	plt.ylabel('Global average')
 	plt.legend()
 	plt.grid(b=True)
-	plt.show()    
-	return(timeseries)
+	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/tsurf_timeseries.png', bbox_inches='tight', dpi=100)
+
 
 
 
@@ -2344,10 +2346,9 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 
 	if nmb_contours != 0:  # add contours 
 		if array2 is not None:
-			cont = m.contour(xi,yi,ctl_array,np.int(nmb_contours), colors = 'k', linewidth=5) # If I don't add the int(nmb_contours) it can be
-			#misinterpreted to use the specified number as the contour level! (i.e. array like!)
+			cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 		else: 
-			cont = m.contour(xi,yi,array,np.int(nmb_contours), colors = 'k', linewidth=5)
+			cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=2)
 
 		if cont>=1.:
 			plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
@@ -2402,6 +2403,9 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 
 		if save_fig == True:
 			plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
+			plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.svg', format = 'svg', bbox_inches='tight')
+			
+
 		else: 
 			fig.show()
 #    return fig
@@ -2739,7 +2743,7 @@ def winds_at_heightlevel(uwind,vwind,level,array,palette,units,minval,maxval,lan
 
 
 	
-def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,units,minval,maxval,landmaskxr,veclen=10,level=39, units_numerator = 'm', units_denom = 's',save = False):
+def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,units,minval,maxval,landmaskxr,veclen=10,level=39, units_numerator = 'm', units_denom = 's',save = False, nmb_contours = 0):
 
 # Plots every third wind vector at specified height level
 # onto a world map of the 'array' which could be e.g. precip
@@ -2827,13 +2831,12 @@ def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,uni
 	else:
 		cs = m.pcolor(xi,yi,array)
 
-	nmb_contours = 10.
 	if nmb_contours != 0:  # add contours 
 		cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=5)
-	if cont>=1.:
-		plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
-	else:
-		plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
+		if nmb_contours>=1.:
+			plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
+		else:
+			plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
 # Add Colorbar
 	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
@@ -4246,6 +4249,43 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Delta_P_vs_Delta_T_and_P_control_'+str(runmin)+'-'+str(runmax)+'_'+sfc+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
 
 
+	fig, ax = plt.subplots(1,2, sharey = True, figsize=(25,10))
+
+#	if landmaskEC == None: this doesn't work.. why?
+
+	ax[0].plot(P_ctl_1d - E_ctl_1d,(P_1d - P_ctl_1d),'k.', label = sfc)
+	ax[0].set_xlabel("P-E control (mm/d)",fontsize = lge)
+	ax[0].tick_params(labelsize = lge)
+	ax[0].legend(fontsize = lge)
+	ax[0].set_ylabel('P change (mm/d)', fontsize = lge)
+	ax[0].set_xlim(-1.,precipitation_avg_ctl.max()+1.)
+	ax[0].spines['top'].set_visible(False)
+	ax[0].spines['right'].set_visible(False)
+
+	[k,dy,r,p,stderr] = linreg((P_ctl_1d - E_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
+	x1 = np.linspace(np.min((P_ctl_1d - E_ctl_1d)[mask]),np.max((P_ctl_1d - E_ctl_1d)[mask]),500)
+	y = k*x1 + dy
+	ax[0].plot(x1,y,'k-')
+	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+	ax[1].set_xlabel("T change (K)",fontsize = lge)
+	ax[1].plot((T_1d - T_ctl_1d),(P_1d - P_ctl_1d),'c.', label = sfc)
+	ax[1].tick_params(labelsize = lge)
+	ax[1].legend(fontsize = lge)
+#	ax[1].set_ylabel('P change (mm/d)', fontsize = lge)
+	ax[1].set_xlim(np.min((T_1d - T_ctl_1d)[mask])-0.5,np.max((T_1d - T_ctl_1d)[mask])+0.5)
+
+	[k,dy,r,p,stderr] = linreg((T_1d - T_ctl_1d)[mask],(P_1d - P_ctl_1d)[mask]) # aa = 8.4, dq = -32
+	x1 = np.linspace(np.min((T_1d - T_ctl_1d)[mask]),np.max((T_1d - T_ctl_1d)[mask]),500)
+	y = k*x1 + dy
+	ax[1].plot(x1,y,'c-')
+	ax[1].annotate('r = '+str("%.2f" % r) +', p = '+str("%.5f" % p), xy=(0.5,0.05), xycoords='axes fraction', fontsize = med)
+	ax[1].spines['top'].set_visible(False)
+	ax[1].spines['right'].set_visible(False)
+
+#	fig.show()
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Delta_P_vs_Delta_T_and_P-E_control_'+str(runmin)+'-'+str(runmax)+'_'+sfc+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
+
 
  # plots west and east spearately and delta p vs delta t for both 
 	if landmaskEC: 
@@ -4403,7 +4443,7 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 	lons = uwind.lon
 	lats = uwind.lat
 	pres = wwind.pres_lev
-	presar = array.pres_lev
+	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -4448,16 +4488,17 @@ def vert_horiz_winds(outdir,runmin,runmax,plt_title,uwind,wwind,array,minval,max
 	v = np.linspace(minval,maxval,21)
 	cset1 = plt.contourf(Xar, Zar, array, v, cmap='BrBG', extend = 'both')
 	cbar = plt.colorbar(cset1)
+	cbar.set_label('$\Delta RH$ (%)')
 	plt.xlabel('Longitude E')
-	plt.ylabel('Pressure (Pa)')
+	plt.ylabel('Pressure (hPa)')
 	plt.gca().invert_yaxis()
 
-
-	wwind_tropmean = wwind.sel(lat=slice(-10.,10.)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(-10.,10.)).mean(dim='lat')
+	wwind_tropmean = wwind.sel(lat=slice(-10.,-5.)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(-10.,-5.)).mean(dim='lat')
 	
-	Q = ax.quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], units='width')
-	qk = ax.quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+	Q = ax.quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], units='width') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	qk = ax.quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+
 
 	if save == True:
 		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.png', dpi=100) # if add bbox_inches = 'tight' the quiverkey is not saved!
