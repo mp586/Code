@@ -374,64 +374,64 @@ dprlpgg = ((bb * prconm * dttrop) + (ff * prconm.mean() * drelgg)) / (1. - (bb *
 # plt.plot([-0.1,0.1],[-0.1,0.1],'k',linewidth=3)
 
 
-# Figure for Marianne's paper.
+# # Figure for Marianne's paper.
 
 
-plt.clf()
-plt.figure(figsize=[6,6])
+# plt.clf()
+# plt.figure(figsize=[6,6])
 
-plt.subplot(2,2,1)
-plt.plot([-0.1,0.15],[0.,0.],'k--',linewidth=3)
-plt.plot([0.,0.],[-0.1,0.15],'k--',linewidth=3)
-plt.plot([-0.1,0.15],[-0.1,0.15],'k',linewidth=3)
-plt.plot(drelgg[:,0:15],drel[:,0:15],'b.',alpha=0.75) # West
-plt.plot(drelgg[:,29:50],drel[:,29:50],'r.',alpha=0.75) # East
-plt.title('(a) $\Delta r$ from $\Delta q$')
-plt.xlabel('$\Delta r_{pred}$')
-plt.ylabel('$\Delta r$')
-plt.xlim(-0.1,0.15)
-plt.ylim(-0.1,0.15)
+# plt.subplot(2,2,1)
+# plt.plot([-0.1,0.15],[0.,0.],'k--',linewidth=3)
+# plt.plot([0.,0.],[-0.1,0.15],'k--',linewidth=3)
+# plt.plot([-0.1,0.15],[-0.1,0.15],'k',linewidth=3)
+# plt.plot(drelgg[:,0:15],drel[:,0:15],'b.',alpha=0.75) # West
+# plt.plot(drelgg[:,29:50],drel[:,29:50],'r.',alpha=0.75) # East
+# plt.title('(a) $\Delta r$ from $\Delta q$')
+# plt.xlabel('$\Delta r_{pred}$')
+# plt.ylabel('$\Delta r$')
+# plt.xlim(-0.1,0.15)
+# plt.ylim(-0.1,0.15)
 
-plt.subplot(2,2,2)
-plt.plot([0.,0.],[-1.,2.],'k--',linewidth=3)
-plt.plot([-1.,2.],[0.,0.],'k--',linewidth=3)
-plt.plot([-1.,2.],[-1.,2.],'k',linewidth=3)
-plt.plot(dprlpgg[:,0:15],dpr[:,0:15],'b.',alpha=0.75) # West
-plt.plot(dprlpgg[:,29:50],dpr[:,29:50],'r.',alpha=0.75) # East
-plt.title('(b) $\Delta P$ from $\Delta q$')
-plt.xlabel('$\Delta P_{pred}$')
-plt.ylabel('$\Delta P$')
-plt.xlim(-1.,2.)
-plt.ylim(-1.,2.)
+# plt.subplot(2,2,2)
+# plt.plot([0.,0.],[-1.,2.],'k--',linewidth=3)
+# plt.plot([-1.,2.],[0.,0.],'k--',linewidth=3)
+# plt.plot([-1.,2.],[-1.,2.],'k',linewidth=3)
+# plt.plot(dprlpgg[:,0:15],dpr[:,0:15],'b.',alpha=0.75) # West
+# plt.plot(dprlpgg[:,29:50],dpr[:,29:50],'r.',alpha=0.75) # East
+# plt.title('(b) $\Delta P$ from $\Delta q$')
+# plt.xlabel('$\Delta P_{pred}$')
+# plt.ylabel('$\Delta P$')
+# plt.xlim(-1.,2.)
+# plt.ylim(-1.,2.)
 
-plt.subplot(2,2,3)
-plt.plot([-0.1,0.15],[0.,0.],'k--',linewidth=3)
-plt.plot([0.,0.],[-0.1,0.15],'k--',linewidth=3)
-plt.plot([-0.1,0.15],[-0.1,0.15],'k',linewidth=3)
-plt.plot(drelbcgg[:,0:15],drel[:,0:15],'b.',alpha=0.75) # West
-plt.plot(drelbcgg[:,29:50],drel[:,29:50],'r.',alpha=0.75) # East
-plt.title('(c) $\Delta r$ from $\Delta q_M$')
-plt.xlabel('$\Delta r_{pred}$')
-plt.ylabel('$\Delta r$')
-plt.xlim(-0.1,0.15)
-plt.ylim(-0.1,0.15)
+# plt.subplot(2,2,3)
+# plt.plot([-0.1,0.15],[0.,0.],'k--',linewidth=3)
+# plt.plot([0.,0.],[-0.1,0.15],'k--',linewidth=3)
+# plt.plot([-0.1,0.15],[-0.1,0.15],'k',linewidth=3)
+# plt.plot(drelbcgg[:,0:15],drel[:,0:15],'b.',alpha=0.75) # West
+# plt.plot(drelbcgg[:,29:50],drel[:,29:50],'r.',alpha=0.75) # East
+# plt.title('(c) $\Delta r$ from $\Delta q_M$')
+# plt.xlabel('$\Delta r_{pred}$')
+# plt.ylabel('$\Delta r$')
+# plt.xlim(-0.1,0.15)
+# plt.ylim(-0.1,0.15)
 
-plt.subplot(2,2,4)
-plt.plot([0.,0.],[-1.,2.],'k--',linewidth=3)
-plt.plot([-1.,2.],[0.,0.],'k--',linewidth=3)
-plt.plot([-1.,2.],[-1.,2.],'k',linewidth=3)
-plt.plot(dprlpbcgg[:,0:15],dpr[:,0:15],'b.',alpha=0.75) # West
-plt.plot(dprlpbcgg[:,29:50],dpr[:,29:50],'r.',alpha=0.75) # East
-plt.title('(d) $\Delta P$ from $\Delta q_M$')
-plt.xlabel('$\Delta P_{pred}$')
-plt.ylabel('$\Delta P$')
-plt.xlim(-1.,2.)
-plt.ylim(-1.,2.)
+# plt.subplot(2,2,4)
+# plt.plot([0.,0.],[-1.,2.],'k--',linewidth=3)
+# plt.plot([-1.,2.],[0.,0.],'k--',linewidth=3)
+# plt.plot([-1.,2.],[-1.,2.],'k',linewidth=3)
+# plt.plot(dprlpbcgg[:,0:15],dpr[:,0:15],'b.',alpha=0.75) # West
+# plt.plot(dprlpbcgg[:,29:50],dpr[:,29:50],'r.',alpha=0.75) # East
+# plt.title('(d) $\Delta P$ from $\Delta q_M$')
+# plt.xlabel('$\Delta P_{pred}$')
+# plt.ylabel('$\Delta P$')
+# plt.xlim(-1.,2.)
+# plt.ylim(-1.,2.)
 
-plt.subplots_adjust(top=0.92, bottom=0.1, left=0.15, right=0.95, hspace=0.4,
-                    wspace=0.4)
+# plt.subplots_adjust(top=0.92, bottom=0.1, left=0.15, right=0.95, hspace=0.4,
+#                     wspace=0.4)
 
-plt.savefig('isca_ideal_realsst_fig2.png')
+# plt.savefig('isca_ideal_realsst_fig2.png')
 
 
 
