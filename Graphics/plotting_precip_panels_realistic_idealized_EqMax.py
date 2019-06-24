@@ -22,7 +22,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'no'
-control_dir = 'full_continents_newbucket_fullnewbucketqflux'
+control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -41,7 +41,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'no'
-testdir_in1= 'full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361'
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -71,11 +71,9 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 
 [net_lhe1,net_lhe1_avg,net_lhe1_seasonal_avg,net_lhe1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 [precipitation1,precipitation1_avg,precipitation1_seasonal_avg,precipitation1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
-[tsurf1,tsurf_avg1,tsurf_seasonal_avg1,tsurf_month_avg1,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
 
 [net_lhe1_ctl,net_lhe1_avg_ctl,net_lhe1_seasonal_avg_ctl,net_lhe1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 [precipitation1_ctl,precipitation1_avg_ctl,precipitation1_seasonal_avg_ctl,precipitation1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'precipitation','mm/d', factor=86400)
-[tsurf1_ctl,tsurf1_avg_ctl,tsurf1_seasonal_avg_ctl,tsurf1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
 
 
 
@@ -88,7 +86,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'no'
-control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax'
+control_dir = 'two_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -107,7 +105,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'no'
-testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361'
+testdir_in1= 'two_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -117,6 +115,16 @@ if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
 else: 
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
+
+land = 'two_continents'
+landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
+
+landmaskid=landfile.variables['land_mask'][:]
+landlats=landfile.variables['lat'][:]
+landlons=landfile.variables['lon'][:]
+# for specified lats
+landmaskxrid=xr.DataArray(landmaskid,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+
 
 [net_lhe2,net_lhe2_avg,net_lhe2_seasonal_avg,net_lhe2_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 [precipitation2,precipitation2_avg,precipitation2_seasonal_avg,precipitation2_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
@@ -143,13 +151,13 @@ lons=array.lon
 
 landlats = np.asarray(landmaskxr.lat)
 landlons = np.asarray(landmaskxr.lon)
-
 landmask = np.asarray(landmaskxr)
+landmaskid = np.asarray(landmaskxrid)
 
 
 fig, axes = plt.subplots(1, 2, figsize = (20, 8))
 
-axes[0].set_title('RC OHT', size = med)
+axes[0].set_title('a) RC EquatorMax', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0])
@@ -197,12 +205,12 @@ ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
 lats=array.lat
 lons=array.lon
 
-landlats = np.asarray(landmaskxr.lat)
-landlons = np.asarray(landmaskxr.lon)
+landlats = np.asarray(landmaskxrid.lat)
+landlons = np.asarray(landmaskxrid.lon)
 
-landmask = np.asarray(landmaskxr)
+landmask = np.asarray(landmaskxrid)
 
-axes[1].set_title('RC EquatorMax', size = med)
+axes[1].set_title('b) 2C EquatorMax', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1])
@@ -249,143 +257,7 @@ cbar = fig.colorbar(cs, orientation = 'horizontal', ax = axes, shrink = 0.4, fra
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361/Pavg_minus_ctl_2panels_RCOHT_vs_RCEqmax_P-Econts_120-480.png', bbox_inches='tight', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361/Pavg_minus_ctl_2panels_RCOHT_vs_RCEqmax_P-Econts_120-480.svg', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361/Pavg_minus_ctl_2panels_RCEqmax_vs_2CEqmax_P-Econts_120-480.png', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361/Pavg_minus_ctl_2panels_RCEqmax_vs_2CEqmax_P-Econts_120-480.svg', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_EqMax_plus_2pt52K_and_2xCO2_spinup_361/Pavg_minus_ctl_2panels_RCEqmax_vs_2CEqmax_P-Econts_120-480.pdf', bbox_inches='tight', dpi=100)
 
-
-
-
-########## plotting one panel for SST changes and P changes ######
-
-############ plotting ##############
-
-small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 22 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 26 #largefonts 22 # smallfonts 18 # medfonts = 20
-
-v = np.linspace(-2.,2.,21)
-nmb_contours = [-2.,1.,2.]
-
-# South America Only 
-
-array = precipitation1_avg - precipitation1_avg_ctl
-ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr.lat)
-landlons = np.asarray(landmaskxr.lon)
-
-landmask = np.asarray(landmaskxr)
-
-
-fig, axes = plt.subplots(1, 2, figsize = (25,10))
-
-axes[0].set_title('a) $\Delta P$ and $(P-E)_{ctl}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-cbar = fig.colorbar(cs, orientation = 'horizontal', ax = axes[0], shrink = 0.8) # usually on right 
-cbar.set_label('mm/d', size=med)
-cbar.ax.tick_params(labelsize=med)
-
-land = 'all_continents'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
-
-
-
-array = tsurf_avg1 - tsurf1_avg_ctl
-v = np.linspace(-6.,6.,21)
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr.lat)
-landlons = np.asarray(landmaskxr.lon)
-
-landmask = np.asarray(landmaskxr)
-
-axes[1].set_title('b) $\Delta T_S$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,1], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='RdBu_r', extend = 'both')
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-
-# Add Colorbar
-cbar = fig.colorbar(cs, orientation = 'horizontal', ax = axes[1], shrink = 0.8) # usually on right 
-cbar.set_label('K', size=med)
-cbar.ax.tick_params(labelsize=med)
-
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361/P_avg_minus_ctl_P-E_conts_DeltaT_120-480.png', bbox_inches='tight', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361/P_avg_minus_ctl_P-E_conts_DeltaT_120-480.pdf', bbox_inches='tight', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fullnewbucketqflux_2xCO2_spinup361/P_avg_minus_ctl_P-E_conts_DeltaT_120-480.svg', bbox_inches='tight', dpi=100)

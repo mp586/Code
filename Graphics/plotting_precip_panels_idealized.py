@@ -218,7 +218,7 @@ fig, axes = plt.subplots(2,2, figsize = (20,12))
 fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
 
 
-axes[0,0].set_title('America only (AM)', size = med)
+axes[0,0].set_title('(a) America only (AM)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
@@ -271,7 +271,7 @@ landlons = np.asarray(landmaskxrA.lon)
 
 landmask = np.asarray(landmaskxrA)
 
-axes[0,1].set_title('Africa only (AF)', size = med)
+axes[0,1].set_title('(b) Africa only (AF)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
@@ -327,7 +327,7 @@ landlons = np.asarray(landmaskxr2C.lon)
 landmask = np.asarray(landmaskxr2C)
 
 
-axes[1,0].set_title('Two continents (2C)', size = med)
+axes[1,0].set_title('(c) Two continents (2C)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
@@ -384,7 +384,7 @@ landmask1 = np.asarray(landmaskxrSA)
 landmask2 = np.asarray(landmaskxrA)
 
 
-axes[1,1].set_title('2C - AM', size = med)
+axes[1,1].set_title('(d) 2C - AM', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])

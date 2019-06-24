@@ -79,7 +79,7 @@ plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax)
 
 [tsurf,tsurf_avg,tsurf_seasonal_avg,tsurf_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
 [precipitation,precipitation_avg,precipitation_seasonal_avg,precipitation_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
-[bucket_depth,bucket_depth_avg,bucket_depth_seasonal_avg,bucket_depth_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'bucket_depth','m')
+# [bucket_depth,bucket_depth_avg,bucket_depth_seasonal_avg,bucket_depth_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'bucket_depth','m')
 
 # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
 [net_sw,net_sw_avg,net_sw_seasonal_avg,net_sw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_sw','W/m^2',factor = 1.) # 
@@ -128,9 +128,9 @@ rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,lan
 
 any_configuration_plot(outdir,runmin,runmax,-100.,100.,rh_avg,area_array,'%','rh_avg_level'+str(level),'fromwhite',landmaskxr,nmb_contours=10,minval = 0, maxval = 100)
 
-any_configuration_plot(outdir,runmin,runmax,-100.,100.,landmaskxr,area_array,'','','bucket',landmaskxr,minval = 0., maxval = 1.,steps = 3)
+# any_configuration_plot(outdir,runmin,runmax,-100.,100.,landmaskxr,area_array,'','','bucket',landmaskxr,minval = 0., maxval = 1.,steps = 3)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,bucket_depth_avg.where(landmask==1.),area_array,'m','bucket_depth','bucket',landmaskxr,minval=0.,maxval=.5)
+#  any_configuration_plot(outdir,runmin,runmax,-90.,90.,bucket_depth_avg.where(landmask==1.),area_array,'m','bucket_depth','bucket',landmaskxr,minval=0.,maxval=.5)
 # if runmin == 1:
 #    animated_map(testdir,bucket_depth,'m','bucket depth','bucket_depth','fromwhite',0,runmax-2,0,2)
 #    animated_map(testdir,tsurf,'m','tsurf','tsurf','temp',0,runmax-2,240,310)
@@ -172,11 +172,11 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,slp_avg,area_array,'hPa','slp avg','slp',landmaskxr)
 
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=5,minval=0.,maxval=8.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,nmb_contours=5)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,nmb_contours=5, minval = -40., maxval = 40. )
 
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
 
-exit 
+exit() 
 
 JJA = 'JJA'
 DJF = 'DJF'

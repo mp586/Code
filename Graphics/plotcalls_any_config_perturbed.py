@@ -71,29 +71,32 @@ ocean_sfc_area = np.sum(area_array.where(landmask!=1.))
 
 # for plotting a spin up run ('control') timeseries followed by the timeseries from the perturbed experiment
 globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'t_surf',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max)
-# globavg_var_timeseries_total_and_land_perturbed(testdir,model,area_array,'bucket_depth',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max,select='land')
+#globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'bucket_depth',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max,select='land')
 
 # mass stream function adapted from J Penn
 [msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax)
+plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax, ctl_pert = 'pert')
 
 [msf_ctl,msf_avg_ctl,msf_seasonal_avg_ctl,msf_month_avg_ctl] = mass_streamfunction(control_dir,ctl_model,ctl_runmin,ctl_runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax)
+plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax, ctl_pert = 'ctl')
 
 # Read in variables 
 
 [slp,slp_avg,slp_seasonal_avg,slp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'slp','hPa',factor=10**(-2))
 [tsurf,tsurf_avg,tsurf_seasonal_avg,tsurf_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
-[net_lhe,lhe_flux_avg,lhe_flux_seasonal_avg,lhe_flux_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','W/m2',factor = 1.) # latent heat flux at surface (UP)
+[lhe_flux,lhe_flux_avg,lhe_flux_seasonal_avg,lhe_flux_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','W/m2',factor = 1.) # latent heat flux at surface (UP)
 [net_lhe,net_lhe_avg,net_lhe_seasonal_avg,net_lhe_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 
 [precipitation,precipitation_avg,precipitation_seasonal_avg,precipitation_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
 #[bucket_depth,bucket_depth_avg,bucket_depth_seasonal_avg,bucket_depth_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'bucket_depth','m')
 [rh,rh_avg,rh_seasonal_avg,rh_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'rh','%',level=level)
-[net_sw,net_sw_avg,net_sw_seasonal_avg,net_sw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_sw','W/m^2',factor = 1.) # 
-[net_lw,net_lw_avg,net_lw_seasonal_avg,net_lw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lw','W/m^2',factor = 1.) # 
-[net_t,net_t_avg,net_t_seasonal_avg,net_t_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_t','W/m^2',factor = 1.) # 
+[net_sw,net_sw_avg,net_sw_seasonal_avg,net_sw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_sw','W/m^2',factor = 1.) # Pretty sure this is actually pos. downward! 
+[lw_down,lw_down_avg,lw_down_seasonal_avg,lw_down_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lw','W/m^2',factor = 1.) # 
 #[CIWV,CIWV_avg,CIWV_seasonal_avg,CIWV_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum','kg/kg',level='all')
+[net_t,net_t_avg,net_t_seasonal_avg,net_t_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_t','W/m^2',factor = 1.) # 
+[toa_sw,toa_sw_avg,toa_sw_seasonal_avg,toa_sw_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'toa_sw','W/m^2',factor = 1.) # positive DOWN
+
+
 
 [gph,gph_avg,gph_seasonal_avg,gph_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = 27) # geopotential height at 500 hPa
 [gph_ctl,gph_avg_ctl,gph_seasonal_avg_ctl,gph_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 27) # geopotential height at 500 hPa
@@ -103,13 +106,14 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 [tsurf_ctl,tsurf_avg_ctl,tsurf_seasonal_avg_ctl,tsurf_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
 [lhe_flux_ctl,lhe_flux_avg_ctl,lhe_flux_seasonal_avg_ctl,lhe_flux_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','W/m2',factor = 1.) # latent heat flux at surface (UP)
 [net_lhe_ctl,net_lhe_avg_ctl,net_lhe_seasonal_avg_ctl,net_lhe_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
+[toa_sw_ctl,toa_sw_avg_ctl,toa_sw_seasonal_avg_ctl,toa_sw_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'toa_sw','W/m^2',factor = 1.) # positive DOWN
 
 [precipitation_ctl,precipitation_avg_ctl,precipitation_seasonal_avg_ctl,precipitation_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'precipitation','mm/d', factor=86400)
 #[bucket_depth_ctl,bucket_depth_avg_ctl,bucket_depth_seasonal_avg_ctl,bucket_depth_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'bucket_depth','m')
 [rh_ctl,rh_avg_ctl,rh_seasonal_avg_ctl,rh_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%',level=level)
 # [flux_oceanq_ctl,flux_oceanq_avg_ctl,flux_oceanq_seasonal_avg_ctl,flux_oceanq_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_oceanq','W/m^2')
 [net_sw_ctl,net_sw_avg_ctl,net_sw_seasonal_avg_ctl,net_sw_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_sw','W/m^2',factor = 1.) # 
-[net_lw_ctl,net_lw_avg_ctl,net_lw_seasonal_avg_ctl,net_lw_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lw','W/m^2',factor = 1.) # 
+[lw_down_ctl,lw_down_avg_ctl,lw_down_seasonal_avg_ctl,lw_down_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lw','W/m^2',factor = 1.) # 
 [net_t_ctl,net_t_avg_ctl,net_t_seasonal_avg_ctl,net_t_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_t','W/m^2',factor = 1.) # 
 #[CIWV_ctl,CIWV_avg_ctl,CIWV_seasonal_avg_ctl,CIWV_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level='all')
 
@@ -119,14 +123,107 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 [div,div_avg,div_seasonal_avg,div_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'div','1/sec',level=level)
 [div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=level)
 
+rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+
+
 PE = precipitation - net_lhe
 [PE,PE_avg,PE_seasonal_avg,PE_month_avg,time] = make_var_seasonal(PE)
 PE_ctl = precipitation_ctl - net_lhe_ctl
 [PE_ctl,PE_avg_ctl,PE_seasonal_avg_ctl,PE_month_avg_ctl,time] = make_var_seasonal(PE_ctl)
 
 PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**(-3)) # factor to 
+
 #convert from mm/d to m/d
 #print('P avg - E avg global integral / total sfc area'+str(PE_avg_sum/total_sfc_area))
+
+
+
+# # # # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
+# [olr_ctl,olr_avg_ctl,olr_seasonal_avg_ctl,olr_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'olr','W/m^2',factor = 1.) # 
+# [olr,olr_avg,olr_seasonal_avg,olr_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'olr','W/m^2',factor = 1.) # 
+
+# sigma = 5.67*10**(-8)
+# net_lw_avg = sigma*(tsurf_avg**4) - lw_down_avg # positive upward
+
+# #positive upward: energy input to the atmosphere is pos.
+# SEB_areaavg = - area_weighted_avg(net_sw_avg,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(net_lw_avg,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(lhe_flux_avg,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(net_t_avg,area_array,landmaskxr,option='all_sfcs') # optional, if there is a qflux + area_weighted_avg(flux_oceanq_avg,area_array,landmaskxr,option='ocean')
+# print('SEB (perturbed) in W/m2 = '+str(SEB_areaavg))
+
+# SEB_avg = - net_sw_avg + net_lw_avg + lhe_flux_avg + net_t_avg ##perturbed run 
+# TOA_avg = toa_sw_avg - olr_avg # toa sw pos down!, olr pos up (? yep) 
+
+# N_avg = SEB_avg + TOA_avg #total energy input to the atmosphere 
+
+# [omega,omega_avg,omega_seasonal_avg,omega_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'omega','Pa/s', level = 27) # geopotential height at 500 hPa
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg),area_array,'Pa/s','omega_avg','rainnorm',landmaskxr)
+# globavg_N_avg = area_weighted_avg(N_avg,area_array,landmaskxr,option='all_sfcs')
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg,area_array,'W/m^2','N_avg','rainnorm',landmaskxr, nmb_contours = [-0.05,-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04,0.05], array2 = omega_avg)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg - globavg_N_avg),area_array,'W/m^2','N_avg-globavg_N_avg','rainnorm',landmaskxr, nmb_contours = [-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04], array2 = omega_avg)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg),area_array,'W/m^2','toa_sw_avg','rainnorm',landmaskxr)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(olr_avg),area_array,'W/m^2','olr_avg','rainnorm',landmaskxr)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg),area_array,'W/m^2','net_sw_avg','rainnorm',landmaskxr)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lw_avg),area_array,'W/m^2','net_lw_avg','rainnorm',landmaskxr)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lhe_flux_avg),area_array,'W/m^2','lhe_flux_avg','rainnorm',landmaskxr)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg),area_array,'W/m^2','lhe_flux_avg','rainnorm',landmaskxr)
+
+# net_lw_avg_ctl = sigma*(tsurf_avg_ctl**4) - lw_down_avg_ctl # positive upward
+
+# #positive upward: energy input to the atmosphere is pos.
+# SEB_areaavg_ctl = area_weighted_avg( - net_sw_avg_ctl,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(net_lw_avg_ctl,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(lhe_flux_avg_ctl,area_array,landmaskxr,option='all_sfcs') + area_weighted_avg(net_t_avg_ctl,area_array,landmaskxr,option='all_sfcs') # optional, if there is a qflux + area_weighted_avg(flux_oceanq_avg,area_array,landmaskxr,option='ocean')
+# print('SEB (control) in W/m2 = '+str(SEB_areaavg_ctl))
+
+# SEB_avg_ctl = - net_sw_avg_ctl + net_lw_avg_ctl + lhe_flux_avg_ctl + net_t_avg_ctl ##perturbed run 
+
+# TOA_avg_ctl = toa_sw_avg_ctl - olr_avg_ctl # toa sw pos down!, olr pos up (?) 
+
+# N_avg_ctl = SEB_avg_ctl + TOA_avg_ctl #total energy input to the atmosphere 
+
+# DeltaN = N_avg - N_avg_ctl
+
+# DeltaN_zonalmean = DeltaN.mean('lon')
+# DeltaN_zonalmean = np.expand_dims(DeltaN_zonalmean,axis = 1)
+# DeltaN_zonalmean = np.repeat(DeltaN_zonalmean, 128, axis = 1)
+# DeltaN_zonalmean = xr.DataArray(DeltaN_zonalmean, coords = [N_avg.lat, N_avg.lon], dims = ['lat','lon'])
+
+
+
+# [omega_ctl,omega_avg_ctl,omega_seasonal_avg_ctl,omega_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s', level = 27) # geopotential height at 500 hPa
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg_ctl),area_array,'Pa/s','omega_ctl','rainnorm',landmaskxr)
+# globavg_N_avg_ctl = area_weighted_avg(N_avg_ctl,area_array,landmaskxr,option='all_sfcs')
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg_ctl,area_array,'W/m^2','N_ctl','rainnorm',landmaskxr, nmb_contours = [-0.05,-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04,0.05], array2 = omega_avg_ctl)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg_ctl - globavg_N_avg_ctl),area_array,'W/m^2','N_ctl-globavg_N_ctl','rainnorm',landmaskxr, nmb_contours = [-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04], array2 = omega_avg_ctl)
+
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg - N_avg_ctl,area_array,'W/m^2','N_avg_minus_ctl','rainnorm',landmaskxr, minval = -20., maxval = 20., nmb_contours = [-0.02,-0.002,0.002,0.02], array2 = (omega_avg - omega_avg_ctl))
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg - N_avg_ctl,area_array,'W/m^2','N_avg_minus_ctl_landcbar','rainnorm',landmaskxr, minval = -230., maxval = -170., nmb_contours = [-0.02,-0.002,0.002,0.02], array2 = (omega_avg - omega_avg_ctl))
+
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg - N_avg_ctl) - DeltaN_zonalmean,area_array,'W/m^2','N_avg_minus_ctl_zonalanomalies','rainnorm',landmaskxr, minval = -20., maxval = 20.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg - N_avg_ctl) - DeltaN_zonalmean,area_array,'W/m^2','N_avg_minus_ctl_zonalanomalies_landcbar','rainnorm',landmaskxr, minval = -100., maxval = 0.)
+
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((toa_sw_avg - toa_sw_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','toa_sw_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((olr_avg - olr_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','olr_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((net_sw_avg - net_sw_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','net_sw_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((net_lw_avg - net_lw_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','net_lw_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((sigma*(tsurf_avg**4) - sigma*(tsurf_avg_ctl**4))/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','lw_up_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((lw_down_avg - lw_down_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','lw_down_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((lhe_flux_avg - lhe_flux_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','lhe_flux_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((net_t_avg - net_t_avg_ctl)/(N_avg - N_avg_ctl))*100.,area_array,'% (W/m^2)','sh_flux_avg_minus_ctl_relchange','rainnorm',landmaskxr, minval = -100., maxval = 100.)
+
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg - omega_avg_ctl),area_array,'Pa/s','omega_avg_minus_ctl_500hPa','rainnorm',landmaskxr)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','toa_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(olr_avg - olr_avg_ctl),area_array,'(W/m^2)','olr_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','net_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lw_avg - net_lw_avg_ctl),area_array,'(W/m^2)','net_lw_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(sigma*(tsurf_avg**4) - sigma*(tsurf_avg_ctl**4)),area_array,'(W/m^2)','lw_up_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lw_down_avg - lw_down_avg_ctl),area_array,'(W/m^2)','lw_down_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lhe_flux_avg - lhe_flux_avg_ctl),area_array,'(W/m^2)','lhe_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg - net_t_avg_ctl),area_array,'(W/m^2)','sh_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','net_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -80., maxval = 80.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(SEB_avg - SEB_avg_ctl),area_array,'(W/m^2)','SEB_avg_minus_ctl','rainnorm',landmaskxr, minval = -10., maxval = 10.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg - TOA_avg_ctl),area_array,'(W/m^2)','TOA_avg_minus_ctl','rainnorm',landmaskxr, minval = -10., maxval = 10.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90., - (olr_avg - olr_avg_ctl),area_array,'(W/m^2)','olr_avg_minus_ctl_narrowcbar_posdown','rainnorm',landmaskxr, minval = -10., maxval = 10.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','toa_sw_avg_minus_ctl_narrowcbar','rainnorm',landmaskxr, minval = -10., maxval = 10.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl) - (net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','toa_minus_sfc_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -10., maxval = 10.)
+
 
 
 # landfile=Dataset(os.path.join(GFDL_BASE,'input/square_Africa/land.nc'),mode='r')
@@ -141,6 +238,74 @@ rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipita
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask, sfc='land')
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
 ################################################################################
+
+
+
+
+
+# # Divergence
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg - div_avg_ctl,area_array,'%','div_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg,area_array,'%','div_avg_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg_ctl,area_array,'%','div_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+
+
+# ####### Map plots annual means 
+
+# # Temperature 
+
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl_narrowcbar','tempdiff',landmaskxr, minval = -4., maxval = 4.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl','tempdiff',landmaskxr, minval = -10, maxval = 10.,steps=21)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','$T_S$_avg','temp0',landmaskxr, minval = -45., maxval = 45., steps = 41)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl - 273.15,area_array,'C','$T_S$_ctl','temp0',landmaskxr, minval = -40., maxval = 40., steps = 41)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,((tsurf_avg-tsurf_avg_ctl)/tsurf_avg_ctl)*100.,area_array,'%','$T_S$_avg_minus_ctl_relativechange','tempdiff',landmaskxr)
+
+
+
+# Precipitation - Evaporation
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl),area_array,'mm/day','P-E_avg_minus_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg),area_array,'mm/day','P-E avg','PE_scale',landmaskxr,minval=-2.,maxval=2.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl_widebar','PE_scale',landmaskxr,minval=-5.,maxval=5.)
+
+# Precipitation
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr, minval = 0., maxval = 8., steps = 11)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 8., steps = 11)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr, minval=-2.,maxval=2., nmb_contours = [-2.,0.5,2.], array2 = PE_avg_ctl)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl_widebar','rainnorm',landmaskxr, minval=-4.,maxval=4., nmb_contours = [-2.,0.5,2.], array2 = PE_avg_ctl)
+
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl_narrowbar','rainnorm',landmaskxr, minval=-1.,maxval=1., nmb_contours = [-2.,0.5,2.], array2 = PE_avg_ctl)
+
+any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,precipitation_month_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr, minval = 0., maxval = 8.)
+any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,precipitation_month_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 8.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl_tinybar','fromwhite',landmaskxr,minval = 0., maxval = 2.) 
+any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,(precipitation_month_avg - precipitation_month_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr, minval=-2.,maxval=2.)
+
+
+
+# # Evaporation 
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl','rainnorm',landmaskxr,minval=-2.,maxval=2.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg),area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval=0.,maxval=8.,steps = 11)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg_ctl),area_array,'mm/day','E_ctl','fromwhite',landmaskxr,minval=0.,maxval=8., steps = 11)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl_oceanscale','rainnorm',landmaskxr,minval=-0.5,maxval=0.5)
+
+
+# # Surface energy fluxes 
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'W/m2','SW_avg_minus_ctl','rainnorm',landmaskxr,minval=-4.,maxval=4.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lw_avg - net_lw_avg_ctl),area_array,'W/m2','LW_avg_minus_ctl','rainnorm',landmaskxr,minval=-40.,maxval=40.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg - net_t_avg_ctl),area_array,'W/m2','SH_avg_minus_ctl','rainnorm',landmaskxr,minval=-30.,maxval=30.)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,lhe_flux_avg - lhe_flux_avg_ctl,area_array,'W/m2','lhe_flux_minus_ctl','rainnorm',landmaskxr,minval=-30.,maxval=30.)
+
+# # Random stuff 
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,rh_avg - rh_avg_ctl,area_array,'%','rh_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5, minval=-7., maxval = 7.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(sphum_avg - sphum_avg_ctl)*10**(3.),area_array,'x10^(-3) kg/kg','sphum_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=0, minval=-4, maxval = 4)
+
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(bucket_depth_avg - bucket_depth_avg_ctl),area_array,'mm/day','bucket depth avg minus ctl','rainnorm',landmaskxr)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,CIWV_avg - CIWV_avg_ctl,area_array,'kg/kg','column_IWV_minus_ctl','rainnorm',landmaskxr,nmb_contours=5, minval = -0.05, maxval = 0.05)
+#any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg_ctl,area_array,'W/m^2','ocean_heat_transport_ctl','tempdiff',landmaskxr,minval=-200,maxval=200)
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl).where(landmask==1.),area_array,'mm/day','P-E avg minus ctl','rainnorm',landmaskxr,minval=-0.5,maxval=0.5
+#any_configuration_plot(outdir,runmin,runmax,-90.,90.,((precipitation_avg - precipitation_avg_ctl)/precipitation_avg_ctl)*100.,area_array,'%','P_avg_minus_ctl_relativechange_','rainnorm',landmaskxr,minval=-100.,maxval=100.)
+
+
 
 
 # # Pressures
@@ -165,8 +330,6 @@ rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipita
 # winds_one_level(outdir,ctl_runmin,ctl_runmax,'500hPa_gph_winds_monthlydata_ctl_',ucomp_avg_ctl,vcomp_avg_ctl,gph_avg_ctl,
 # 	'slp','m',5600., 5800.,landmaskxr,veclen=10.,level=27,units_numerator = 'm', units_denom = 's', save = True)
 
-
-
 # [gph,gph_avg,gph_seasonal_avg,gph_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = 37) # geopotential height at 870 hPa
 # [gph_ctl,gph_avg_ctl,gph_seasonal_avg_ctl,gph_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 37) 
 
@@ -174,189 +337,135 @@ rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipita
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg_ctl,area_array,'m','870hPa_geopo_height_ctl','slp',landmaskxr, nmb_contours = 10, minval = 1600, maxval = 1700)
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg - gph_avg_ctl,area_array,'m','870hPa_geopo_height_avg_minus_ctl','slp',landmaskxr, nmb_contours = 8, minval = 14., maxval = 20.)
 
-# # winds + geopoetential height @ 820hPa
-# [ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = 37)
-# [vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = 37)
-# [ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 37)
-# [vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 37)
-
-# winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_avg_minus_ctl_monthlydata_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
-# 	'slp','m',15., 30.,landmaskxr,veclen=10,level=37,units_numerator = 'm', units_denom = 's', save = True)
-# winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_monthlydata_avg_',ucomp_avg,vcomp_avg,gph_avg,
-# 	'slp','m',1600,1700,landmaskxr,veclen=10.,level=37,units_numerator = 'm', units_denom = 's', save = True)
-# winds_one_level(outdir,ctl_runmin,ctl_runmax,'870hPa_gph_winds_monthlydata_ctl_',ucomp_avg_ctl,vcomp_avg_ctl,gph_avg_ctl,
-# 	'slp','m',1600., 1700.,landmaskxr,veclen=10.,level=37,units_numerator = 'm', units_denom = 's', save = True)
 
 
+# winds + geopoetential height @ 820hPa
+[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = 37)
+[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = 37)
+[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 37)
+[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 37)
 
-# [gph,gph_avg,gph_seasonal_avg,gph_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = 15) # geopotential height at 200 hPa
-# [gph_ctl,gph_avg_ctl,gph_seasonal_avg_ctl,gph_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 15) # geopotential height at 200 hPa
+winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_avg_minus_ctl_monthlydata_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
+	'slp','m',15., 30.,landmaskxr,veclen=10,level=37,units_numerator = 'm', units_denom = 's', save = True)
+winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_monthlydata_avg_',ucomp_avg,vcomp_avg,gph_avg,
+	'slp','m',1600,1700,landmaskxr,veclen=10.,level=37,units_numerator = 'm', units_denom = 's', save = True)
+winds_one_level(outdir,ctl_runmin,ctl_runmax,'870hPa_gph_winds_monthlydata_ctl_',ucomp_avg_ctl,vcomp_avg_ctl,gph_avg_ctl,
+	'slp','m',1600., 1700.,landmaskxr,veclen=10.,level=37,units_numerator = 'm', units_denom = 's', save = True)
 
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg,area_array,'m','200hPa_geopo_height_avg','slp',landmaskxr, nmb_contours = 10, minval = 10900, maxval = 11100)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg_ctl,area_array,'m','200hPa_geopo_height_ctl','slp',landmaskxr, nmb_contours = 10, minval = 10900, maxval = 11100)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg - gph_avg_ctl,area_array,'m','200hPa_geopo_height_avg_minus_ctl','slp',landmaskxr, nmb_contours = 8, minval = 180., maxval = 200.)
+[gph,gph_avg,gph_seasonal_avg,gph_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = 15) # geopotential height at 200 hPa
+[gph_ctl,gph_avg_ctl,gph_seasonal_avg_ctl,gph_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 15) # geopotential height at 200 hPa
 
-# # winds + geopoetential height @ 200hPa
-# [ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = 15)
-# [vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = 15)
-# [ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 15)
-# [vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 15)
-
-# winds_one_level(outdir,runmin,runmax,'200hPa_gph_winds_avg_minus_ctl_monthlydata_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
-# 	'slp','m',180., 200.,landmaskxr,veclen=10,level=15,units_numerator = 'm', units_denom = 's', save = True)
-# winds_one_level(outdir,runmin,runmax,'200hPa_gph_winds_monthlydata_avg_',ucomp_avg,vcomp_avg,gph_avg,
-# 	'slp','m',10900,11100,landmaskxr,veclen=10.,level=15,units_numerator = 'm', units_denom = 's', save = True)
-# winds_one_level(outdir,ctl_runmin,ctl_runmax,'200hPa_gph_winds_monthlydata_ctl_',ucomp_avg_ctl,vcomp_avg_ctl,gph_avg_ctl,
-# 	'slp','m',10900., 11100.,landmaskxr,veclen=10.,level=15,units_numerator = 'm', units_denom = 's', save = True)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg,area_array,'m','200hPa_geopo_height_avg','slp',landmaskxr, nmb_contours = 10, minval = 10900, maxval = 11100)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg_ctl,area_array,'m','200hPa_geopo_height_ctl','slp',landmaskxr, nmb_contours = 10, minval = 10900, maxval = 11100)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,gph_avg - gph_avg_ctl,area_array,'m','200hPa_geopo_height_avg_minus_ctl','slp',landmaskxr, nmb_contours = 8, minval = 180., maxval = 200.)
 
 
 
 
-# # Divergence
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg - div_avg_ctl,area_array,'%','div_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg,area_array,'%','div_avg_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,div_avg_ctl,area_array,'%','div_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5)
+# winds + geopoetential height @ 200hPa
+[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = 15)
+[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = 15)
+[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 15)
+[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 15)
+
+winds_one_level(outdir,runmin,runmax,'200hPa_gph_winds_avg_minus_ctl_monthlydata_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
+	'slp','m',180., 200.,landmaskxr,veclen=10,level=15,units_numerator = 'm', units_denom = 's', save = True)
+winds_one_level(outdir,runmin,runmax,'200hPa_gph_winds_monthlydata_avg_',ucomp_avg,vcomp_avg,gph_avg,
+	'slp','m',10900,11100,landmaskxr,veclen=10.,level=15,units_numerator = 'm', units_denom = 's', save = True)
+winds_one_level(outdir,ctl_runmin,ctl_runmax,'200hPa_gph_winds_monthlydata_ctl_',ucomp_avg_ctl,vcomp_avg_ctl,gph_avg_ctl,
+	'slp','m',10900., 11100.,landmaskxr,veclen=10.,level=15,units_numerator = 'm', units_denom = 's', save = True)
 
 
-# ####### Map plots annual means 
-
-# # Temperature 
-
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl_narrowcbar','tempdiff',landmaskxr, minval = -4., maxval = 4.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl','tempdiff',landmaskxr, minval = -6., maxval = 6.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','$T_S$_avg','temp0',landmaskxr, minval = -30., maxval = 30.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl - 273.15,area_array,'C','$T_S$_ctl','temp0',landmaskxr, minval = -30., maxval = 30.)
-# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((tsurf_avg-tsurf_avg_ctl)/tsurf_avg_ctl)*100.,area_array,'%','$T_S$_avg_minus_ctl_relativechange','tempdiff',landmaskxr)
-
-
-
-# # Precipitation - Evaporation
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl),area_array,'mm/day','P-E_avg_minus_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg),area_array,'mm/day','P-E avg','PE_scale',landmaskxr,minval=-2.,maxval=2.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
-
-# Precipitation
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr, minval = 0., maxval = 8., steps = 11)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 8., steps = 11)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg_ctl,area_array,'mm/day','P_ctl_tinybar','fromwhite',landmaskxr,minval = 0., maxval = 2., steps = 11) 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr, minval=-2.,maxval=2., nmb_contours = [-2.,0.5,2.], array2 = PE_avg_ctl)
-
-
-# # Evaporation 
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl','rainnorm',landmaskxr,minval=-2.,maxval=2.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg),area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval=0.,maxval=8.,steps = 11)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg_ctl),area_array,'mm/day','E_ctl','fromwhite',landmaskxr,minval=0.,maxval=8., steps = 11)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lhe_avg - net_lhe_avg_ctl),area_array,'mm/day','E_avg_minus_ctl_oceanscale','rainnorm',landmaskxr,minval=-0.5,maxval=0.5)
-
-
-# # Surface energy fluxes 
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'W/m2','SW_avg_minus_ctl','rainnorm',landmaskxr,minval=-4.,maxval=4.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lw_avg - net_lw_avg_ctl),area_array,'W/m2','LW_avg_minus_ctl','rainnorm',landmaskxr,minval=-40.,maxval=40.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg - net_t_avg_ctl),area_array,'W/m2','SH_avg_minus_ctl','rainnorm',landmaskxr,minval=-30.,maxval=30.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,lhe_flux_avg - lhe_flux_avg_ctl,area_array,'W/m2','lhe_flux_minus_ctl','rainnorm',landmaskxr,minval=-30.,maxval=30.)
-
-# # Random stuff 
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,rh_avg - rh_avg_ctl,area_array,'%','rh_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=5, minval=-7., maxval = 7.)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(sphum_avg - sphum_avg_ctl)*10**(3.),area_array,'x10^(-3) kg/kg','sphum_avg_minus_ctl_lev'+str(level),'rainnorm',landmaskxr,nmb_contours=0, minval=-4, maxval = 4)
-
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(bucket_depth_avg - bucket_depth_avg_ctl),area_array,'mm/day','bucket depth avg minus ctl','rainnorm',landmaskxr)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,CIWV_avg - CIWV_avg_ctl,area_array,'kg/kg','column_IWV_minus_ctl','rainnorm',landmaskxr,nmb_contours=5, minval = -0.05, maxval = 0.05)
-#any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg_ctl,area_array,'W/m^2','ocean_heat_transport_ctl','tempdiff',landmaskxr,minval=-200,maxval=200)
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl).where(landmask==1.),area_array,'mm/day','P-E avg minus ctl','rainnorm',landmaskxr,minval=-0.5,maxval=0.5
-#any_configuration_plot(outdir,runmin,runmax,-90.,90.,((precipitation_avg - precipitation_avg_ctl)/precipitation_avg_ctl)*100.,area_array,'%','P_avg_minus_ctl_relativechange_','rainnorm',landmaskxr,minval=-100.,maxval=100.)
-
-
-exit()
 
 ############################## climatology plots ###############################
 
 
 
+for i in range(0,12):
+    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,PE_month_avg_ctl[i,:,:],
+                                        area_array,'mm/day',
+                                        'PE_avg_ctl','PE_scale',landmaskxr,nmb_contours=10,
+                                        minval = -3., maxval = 3.,month_annotate=(i+1))
+    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
 # for i in range(0,12):
-#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,PE_month_avg_ctl[i,:,:],
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(sphum_month_avg - sphum_month_avg_ctl)[i,:,:],
+#                                         area_array,'kg/kg',
+#                                         'sphum_avg_minus_ctl','rainnorm',landmaskxr,
+#                                         minval = -0.005, maxval = 0.005,month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/q_avg_minus_ctl_lev'+str(level)+'_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(tsurf_month_avg_ctl)[i,:,:],
+#                                         area_array,'K',
+#                                         'T_ctl','temp',landmaskxr,nmb_contours=10,
+#                                         minval = 260., maxval = 310., month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/T_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_sw_month_avg_ctl)[i,:,:],
+#                                         area_array,'W/m2',
+#                                         'SW_ctl','temp',landmaskxr,nmb_contours=10,
+#                                         minval = 260., maxval = 310., month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/SW_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
+
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_lhe_month_avg - net_lhe_month_avg_ctl)[i,:,:],
 #                                         area_array,'mm/day',
-#                                         'PE_avg_ctl','PE_scale',landmaskxr,nmb_contours=10,
+#                                         'E_avg_minus_ctl','rainnorm',landmaskxr,nmb_contours=10,
 #                                         minval = -3., maxval = 3.,month_annotate=(i+1))
-#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(sphum_month_avg - sphum_month_avg_ctl)[i,:,:],
-                                        area_array,'kg/kg',
-                                        'sphum_avg_minus_ctl','rainnorm',landmaskxr,
-                                        minval = -0.005, maxval = 0.005,month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/q_avg_minus_ctl_lev'+str(level)+'_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/E-Ectl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
 
 
 
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(tsurf_month_avg_ctl)[i,:,:],
-                                        area_array,'K',
-                                        'T_ctl','temp',landmaskxr,nmb_contours=10,
-                                        minval = 260., maxval = 310., month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/T_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_sw_month_avg_ctl)[i,:,:],
-                                        area_array,'W/m2',
-                                        'SW_ctl','temp',landmaskxr,nmb_contours=10,
-                                        minval = 260., maxval = 310., month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/SW_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-
-
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_lhe_month_avg - net_lhe_month_avg_ctl)[i,:,:],
-                                        area_array,'mm/day',
-                                        'E_avg_minus_ctl','rainnorm',landmaskxr,nmb_contours=10,
-                                        minval = -3., maxval = 3.,month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/E-Ectl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-
-
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation_month_avg - precipitation_month_avg_ctl)[i,:,:],
-                                        area_array,'mm/day',
-                                        'P_avg_minus_ctl','rainnorm',landmaskxr,nmb_contours=10,
-                                        minval = -3., maxval = 3.,month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P-Pctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_lhe_month_avg_ctl)[i,:,:],
-                                        area_array,'mm/day',
-                                        'E_ctl','fromwhite',landmaskxr,nmb_contours=10,
-                                        minval = 0., maxval = 8., month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/E_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation)[i,:,:],
-                                        area_array,'mm/day',
-                                        'P_ctl','fromwhite',landmaskxr,nmb_contours=10,
-                                        minval = 0., maxval = 8., month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
-
-
-
-
-# any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg_ctl,area_array,'W/m^2','ocean_heat_transport_ctl','tempdiff',landmaskxr,minval=-200,maxval=200)
 
 # for i in range(0,12):
-#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(flux_oceanq_month_avg_ctl)[i,:,:],
-#                                         area_array,'W/m^2',
-#                                         'qflux_ctl','tempdiff',landmaskxr,nmb_contours=5,
-#                                         minval = -100., maxval = 100., month_annotate=(i+1))
-#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qflux_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation_month_avg - precipitation_month_avg_ctl)[i,:,:],
+#                                         area_array,'mm/day',
+#                                         'P_avg_minus_ctl','rainnorm',landmaskxr,nmb_contours=10,
+#                                         minval = -3., maxval = 3.,month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P-Pctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(net_lhe_month_avg_ctl)[i,:,:],
+#                                         area_array,'mm/day',
+#                                         'E_ctl','fromwhite',landmaskxr,nmb_contours=10,
+#                                         minval = 0., maxval = 8., month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/E_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation)[i,:,:],
+#                                         area_array,'mm/day',
+#                                         'P_ctl','fromwhite',landmaskxr,nmb_contours=10,
+#                                         minval = 0., maxval = 8., month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
 
 
-for i in range(0,12):
-    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation_month_avg)[i,:,:],
-                                        area_array,'mm/day',
-                                        'P_avg','fromwhite',landmaskxr,nmb_contours=10,
-                                        minval = 0., maxval = 8., month_annotate=(i+1))
-    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_avg_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
+# # any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg_ctl,area_array,'W/m^2','ocean_heat_transport_ctl','tempdiff',landmaskxr,minval=-200,maxval=200)
+
+# # for i in range(0,12):
+# #     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(flux_oceanq_month_avg_ctl)[i,:,:],
+# #                                         area_array,'W/m^2',
+# #                                         'qflux_ctl','tempdiff',landmaskxr,nmb_contours=5,
+# #                                         minval = -100., maxval = 100., month_annotate=(i+1))
+# #     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qflux_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+
+
+# for i in range(0,12):
+#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(precipitation_month_avg)[i,:,:],
+#                                         area_array,'mm/day',
+#                                         'P_avg','fromwhite',landmaskxr,nmb_contours=10,
+#                                         minval = 0., maxval = 8., month_annotate=(i+1))
+#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_avg_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
 
 
 # for i in range(0,12):
@@ -367,21 +476,21 @@ for i in range(0,12):
 #     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/E_avg_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
 
 
-# for i in range(0,12):
-#     clim_plot = any_configuration_plot(outdir,runmin,runmax,-90.,90.,PE_month_avg[i,:,:],area_array,'mm/day',
-#                                         'PE_avg','PE_scale',landmaskxr,nmb_contours=10,
-#                                         minval = -3., maxval = 3.,month_annotate=(i+1))
-#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_clim'+str(2000+i+1)+'.png',bbox_inches='tight')
+for i in range(0,12):
+    clim_plot = any_configuration_plot(outdir,runmin,runmax,-90.,90.,PE_month_avg[i,:,:],area_array,'mm/day',
+                                        'PE_avg','PE_scale',landmaskxr,nmb_contours=10,
+                                        minval = -3., maxval = 3.,month_annotate=(i+1))
+    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_clim'+str(2000+i+1)+'.png',bbox_inches='tight')
 
-# os.system('convert -delay 100 /scratch/mp586/Code/Graphics/'+outdir+'/PE_clim*.png /scratch/mp586/Code/Graphics/'+outdir+'/PE_clim_animation.gif')
+os.system('convert -delay 100 /scratch/mp586/Code/Graphics/'+outdir+'/PE_clim*.png /scratch/mp586/Code/Graphics/'+outdir+'/PE_clim_animation.gif')
 
 
-# for i in range(0,12):
-#     clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(PE_month_avg - PE_month_avg_ctl)[i,:,:],
-#                                         area_array,'mm/day',
-#                                         'PE_avg_minus_ctl','PE_scale',landmaskxr,nmb_contours=10,
-#                                         minval = -1., maxval = 1.,month_annotate=(i+1))
-#     clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_avg_minus_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
+for i in range(0,12):
+    clim_plot = any_configuration_plot(outdir,ctl_runmin,ctl_runmax,-90.,90.,(PE_month_avg - PE_month_avg_ctl)[i,:,:],
+                                        area_array,'mm/day',
+                                        'PE_avg_minus_ctl','PE_scale',landmaskxr,nmb_contours=10,
+                                        minval = -1., maxval = 1.,month_annotate=(i+1))
+    clim_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/PE_avg_minus_ctl_clim'+str(1000+i+1)+'.png',bbox_inches='tight')
 
 
 # for i in range(0,12):
@@ -489,30 +598,30 @@ deltaq_deltau_month_avg = delta_sphum_month_avg * delta_ucomp_month_avg
 deltaq_deltav_month_avg = delta_sphum_month_avg * delta_vcomp_month_avg
 
 
-for i in range(0,12):
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'qctl_deltau',qctl_du_month_avg[i,:,:],qctl_dv_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'qctl_deltau',qctl_du_month_avg[i,:,:],qctl_dv_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qctl_deltau_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
-    plt.close()
-
-
-
-for i in range(0,12):
-
-    month_plot = winds_one_level(outdir,runmin,runmax,'uctl_deltaq',uctl_dq_month_avg[i,:,:],vctl_dq_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
-
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/uctl_deltaq_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
-    plt.close()
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qctl_deltau_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
 
 
-for i in range(0,12):
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'deltau_deltaq',deltaq_deltau_month_avg[i,:,:],deltaq_deltav_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'uctl_deltaq',uctl_dq_month_avg[i,:,:],vctl_dq_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/deltau_deltaq_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
-    plt.close()
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/uctl_deltaq_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
+#     plt.close()
+
+
+
+# for i in range(0,12):
+
+#     month_plot = winds_one_level(outdir,runmin,runmax,'deltau_deltaq',deltaq_deltau_month_avg[i,:,:],deltaq_deltav_month_avg[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/deltau_deltaq_level='+str(level)+'_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
 
 winds_one_level(outdir,runmin,runmax,'qctl_deltau_monthlydata_avg',qctl_du_month_avg.mean('month'),qctl_dv_month_avg.mean('month'),(PE_month_avg-PE_month_avg_ctl).mean('month'),'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s', save = True)
@@ -565,13 +674,13 @@ winds_one_level(outdir,ctl_runmin,ctl_runmax,'winds_monthlydata_ctl_',ucomp_avg_
 # winds_at_heightlevel((ucomp_avg - ucomp_avg_ctl),(vcomp_avg - vcomp_avg_ctl),30,(precipitation_avg - precipitation_avg_ctl),'rainnorm','mm/d',-2.,2.,landmaskxr,veclen=1.)
 
 
-########## monthly plots 
-for i in range(0,12):
+# ########## monthly plots 
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_avg_minus_ctl_monthlydata_PE_minus_PEctl',(qu_month_avg - qu_ctl_month_avg)[i,:,:],(qv_month_avg - qv_ctl_month_avg)[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_avg_minus_ctl_monthlydata_PE_minus_PEctl',(qu_month_avg - qu_ctl_month_avg)[i,:,:],(qv_month_avg - qv_ctl_month_avg)[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_avg_minus_ctl_clim'+str(1000+i+1)+'.png')
-    plt.close()
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_avg_minus_ctl_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
 
 # for i in range(0,12):
@@ -582,47 +691,47 @@ for i in range(0,12):
 
 
 
-for i in range(0,12):
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_total_avg',(qu_month_avg)[i,:,:],(qv_month_avg)[i,:,:],PE_month_avg[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_total_avg',(qu_month_avg)[i,:,:],(qv_month_avg)[i,:,:],PE_month_avg[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_avg_clim'+str(1000+i+1)+'.png')
-    plt.close()
-
-
-for i in range(0,12):
-
-    month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_total_ctl',(qu_ctl_month_avg)[i,:,:],(qv_ctl_month_avg)[i,:,:],PE_month_avg_ctl[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s')
-
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_ctl_clim'+str(1000+i+1)+'.png')
-    plt.close()
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_avg_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
 
+# for i in range(0,12):
+
+#     month_plot = winds_one_level(outdir,runmin,runmax,'moisture_flux_total_ctl',(qu_ctl_month_avg)[i,:,:],(qv_ctl_month_avg)[i,:,:],PE_month_avg_ctl[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s')
+
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/qu_level='+str(level)+'_ctl_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
 
-for i in range(0,12):
-
-    month_plot = winds_one_level(outdir,runmin,runmax,'winds_avg_minus_ctl_monthlydata_PE_minus_PE_ctl_',(ucomp_month_avg - ucomp_month_avg_ctl)[i,:,:],(vcomp_month_avg - vcomp_month_avg_ctl)[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-2.,2.,landmaskxr,veclen=0.5,level=level,units_numerator = '1', units_denom = '1')
-
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_avg_minus_ctl_monthlydata_level='+str(level)+'_PE_minus_PE_ctl_clim'+str(1000+i+1)+'.png')
-    plt.close()
 
 
-for i in range(0,12):
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'winds_avg_monthlydata_PE_avg_',(ucomp_month_avg)[i,:,:],(vcomp_month_avg)[i,:,:],(PE_month_avg)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=10,level=level,units_numerator = 'm', units_denom = 's')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'winds_avg_minus_ctl_monthlydata_PE_minus_PE_ctl_',(ucomp_month_avg - ucomp_month_avg_ctl)[i,:,:],(vcomp_month_avg - vcomp_month_avg_ctl)[i,:,:],(PE_month_avg-PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-2.,2.,landmaskxr,veclen=0.5,level=level,units_numerator = '1', units_denom = '1')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_avg_monthlydata_level='+str(level)+'_PE_avg_clim'+str(1000+i+1)+'.png')
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_avg_minus_ctl_monthlydata_level='+str(level)+'_PE_minus_PE_ctl_clim'+str(1000+i+1)+'.png')
+#     plt.close()
 
-    plt.close()
 
-for i in range(0,12):
+# for i in range(0,12):
 
-    month_plot = winds_one_level(outdir,runmin,runmax,'winds_ctl_monthlydata_PE_avg_',(ucomp_month_avg_ctl)[i,:,:],(vcomp_month_avg_ctl)[i,:,:],(PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=10,level=level,units_numerator = 'm', units_denom = 's')
+#     month_plot = winds_one_level(outdir,runmin,runmax,'winds_avg_monthlydata_PE_avg_',(ucomp_month_avg)[i,:,:],(vcomp_month_avg)[i,:,:],(PE_month_avg)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=10,level=level,units_numerator = 'm', units_denom = 's')
 
-    month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_ctl_monthlydata_level='+str(level)+'_PE_ctl_clim'+str(1000+i+1)+'.png')
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_avg_monthlydata_level='+str(level)+'_PE_avg_clim'+str(1000+i+1)+'.png')
 
-    plt.close()
+#     plt.close()
+
+# for i in range(0,12):
+
+#     month_plot = winds_one_level(outdir,runmin,runmax,'winds_ctl_monthlydata_PE_avg_',(ucomp_month_avg_ctl)[i,:,:],(vcomp_month_avg_ctl)[i,:,:],(PE_month_avg_ctl)[i,:,:],'PE_scale','mm/d',-4.,4.,landmaskxr,veclen=10,level=level,units_numerator = 'm', units_denom = 's')
+
+#     month_plot.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_ctl_monthlydata_level='+str(level)+'_PE_ctl_clim'+str(1000+i+1)+'.png')
+
+#     plt.close()
 
 ################################################################################################################
 

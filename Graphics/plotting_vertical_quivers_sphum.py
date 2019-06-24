@@ -72,8 +72,8 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 
 [omega1,omega1_avg,omega1_seasonal_avg,omega1_month_avg,omega1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'omega','Pa/s')
 [omega1_ctl,omega1_avg_ctl,omega1_seasonal_avg_ctl,omega1_month_avg_ctl,omega1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
-[rh1_ctl,rh1_avg_ctl,rh1_seasonal_avg_ctl,rh1_month_avg_ctl,rh1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
-[rh1,rh1_avg,rh1_seasonal_avg,rh1_month_avg,rh1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
+# [rh1_ctl,rh1_avg_ctl,rh1_seasonal_avg_ctl,rh1_month_avg_ctl,rh1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
+# [rh1,rh1_avg,rh1_seasonal_avg,rh1_month_avg,rh1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
 [sphum1_ctl,sphum1_avg_ctl,sphum1_seasonal_avg_ctl,sphum1_month_avg_ctl,sphum1_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
 [sphum1,sphum1_avg,sphum1_seasonal_avg,sphum1_month_avg,sphum1_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'sphum','kg/kg')
 
@@ -137,8 +137,8 @@ landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) 
 
 [omega2,omega2_avg,omega2_seasonal_avg,omega2_month_avg,omega2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'omega','Pa/s')
 [omega2_ctl,omega2_avg_ctl,omega2_seasonal_avg_ctl,omega2_month_avg_ctl,omega2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
-[rh2_ctl,rh2_avg_ctl,rh2_seasonal_avg_ctl,rh2_month_avg_ctl,rh2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
-[rh2,rh2_avg,rh2_seasonal_avg,rh2_month_avg,rh2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
+# [rh2_ctl,rh2_avg_ctl,rh2_seasonal_avg_ctl,rh2_month_avg_ctl,rh2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
+# [rh2,rh2_avg,rh2_seasonal_avg,rh2_month_avg,rh2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
 [sphum2_ctl,sphum2_avg_ctl,sphum2_seasonal_avg_ctl,sphum2_month_avg_ctl,sphum2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
 [sphum2,sphum2_avg,sphum2_seasonal_avg,sphum2_month_avg,sphum2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'sphum','kg/kg')
 
@@ -201,8 +201,8 @@ landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) 
 
 [omega3,omega3_avg,omega3_seasonal_avg,omega3_month_avg,omega3_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'omega','Pa/s')
 [omega3_ctl,omega3_avg_ctl,omega3_seasonal_avg_ctl,omega3_month_avg_ctl,omega3_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
-[rh3_ctl,rh3_avg_ctl,rh3_seasonal_avg_ctl,rh3_month_avg_ctl,rh3_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
-[rh3,rh3_avg,rh3_seasonal_avg,rh3_month_avg,rh3_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
+# [rh3_ctl,rh3_avg_ctl,rh3_seasonal_avg_ctl,rh3_month_avg_ctl,rh3_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
+# [rh3,rh3_avg,rh3_seasonal_avg,rh3_month_avg,rh3_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
 [sphum3_ctl,sphum3_avg_ctl,sphum3_seasonal_avg_ctl,sphum3_month_avg_ctl,sphum3_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
 [sphum3,sphum3_avg,sphum3_seasonal_avg,sphum3_month_avg,sphum3_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'sphum','kg/kg')
 
@@ -258,7 +258,7 @@ med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-v = np.linspace(-10.,10.,21) # , endpoint=True)
+v = np.linspace(-.003,.003,21) # , endpoint=True)
 minlat = -10.
 maxlat = 10.
 veclen = 10.
@@ -271,7 +271,7 @@ fig, axes = plt.subplots(2, 2, sharey = True, figsize = (25,25))
 # panel 1: Only South America 
 uwind = (ucomp1_avg - ucomp1_avg_ctl)
 wwind = ((wcomp1_avg - wcomp1_avg_ctl)*8000.)[::-1,:,:]
-array = (rh1_avg - rh1_avg_ctl)
+array = (sphum1_avg - sphum1_avg_ctl)
 lons = uwind.lon 
 lats = uwind.lat
 pres = wwind.pres_lev
@@ -316,7 +316,7 @@ axes[0,0].set_title('(a) America only (AM)', fontsize = med)
 
 uwind = (ucomp3_avg - ucomp3_avg_ctl)
 wwind = ((wcomp3_avg - wcomp3_avg_ctl)*8000.)[::-1,:,:]
-array = (rh3_avg - rh3_avg_ctl)
+array = (sphum3_avg - sphum3_avg_ctl)
 lons = uwind.lon
 lats = uwind.lat
 pres = wwind.pres_lev
@@ -362,7 +362,7 @@ axes[0,1].set_title('(b) Africa only (AF)', fontsize = med)
 
 uwind = (ucomp2_avg - ucomp2_avg_ctl)
 wwind = ((wcomp2_avg - wcomp2_avg_ctl)*8000.)[::-1,:,:]
-array = (rh2_avg - rh2_avg_ctl)
+array = (sphum2_avg - sphum2_avg_ctl)
 lons = uwind.lon
 lats = uwind.lat
 pres = wwind.pres_lev
@@ -409,7 +409,7 @@ axes[1,0].set_title('(c) Two Continents (2C)', fontsize = med)
 
 uwind = ((ucomp2_avg - ucomp2_avg_ctl) - (ucomp1_avg - ucomp1_avg_ctl))[::-1,:,:]
 wwind = (((wcomp2_avg - wcomp2_avg_ctl) - (wcomp1_avg - wcomp1_avg_ctl))*8000.)[::-1,:,:]
-array = (rh2_avg - rh2_avg_ctl) - (rh1_avg - rh1_avg_ctl)
+array = (sphum2_avg - sphum2_avg_ctl) - (sphum1_avg - sphum1_avg_ctl)
 lons = uwind.lon
 lats = uwind.lat
 pres = wwind.pres_lev
@@ -459,7 +459,7 @@ axes[1,1].tick_params(labelsize = small)
 
 cbar = fig.colorbar(cset1,ax=axes)
 cbar.ax.tick_params(labelsize=small)
-cbar.set_label('$\Delta RH$ (%)', size = med)
+cbar.set_label('$\Delta q$ (kg/kg)', size = med)
 
 
 
