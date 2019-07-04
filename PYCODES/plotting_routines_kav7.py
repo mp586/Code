@@ -3727,10 +3727,12 @@ def plot_a_climatology(clim_field,area_array,landmaskxr):
 # 	return globavg, weighted_array #, globint 
 
 
-def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,axis=None):
+def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,axis=None, return_sd = False):
 
-	lats = array.lat
-	lons = array.lon
+### Standard deviation calculated following https://stackoverflow.com/questions/2413522/weighted-standard-deviation-in-numpy
+
+	lats = landmaskxr.lat
+	lons = landmaskxr.lon
 	landmask = np.asarray(landmaskxr)
 	array = xr.DataArray(array, coords=[lats,lons], dims = ['lat','lon'])
 	area_array = xr.DataArray(area_array, coords=[lats,lons], dims = ['lat','lon'])
@@ -3744,10 +3746,13 @@ def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,
 		w_avg = np.average(array, axis=axis, weights=area_array)
 #		w_avg_check = (np.sum(array*area_array))/np.sum(area_array) # is the saame
 #		aquaplanet_plot(-90.,90.,array,'1','all_sfc',0)
+		w_sd = np.average((array - w_avg)**2, axis=axis, weights=area_array)
+
 
 	elif option=='ocean':
 		ma = np.ma.array(array, mask=np.isnan(array.where(landmask!=1.)))
 		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
+		w_sd = np.ma.average((ma - w_avg)**2, axis=axis, weights=area_array)
 
 
 		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
@@ -3759,7 +3764,7 @@ def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,
 	elif option=='land': 
 		ma = np.ma.array(array, mask=np.isnan(array.where(landmask==1.)))
 		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
-
+		w_sd = np.ma.average((ma - w_avg)**2, axis=axis, weights=area_array)
 		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
 
 		# aquaplanet_plot(-90.,90.,ma,'1','land masked array',0)
@@ -3770,7 +3775,10 @@ def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,
 		# xr.DataArray(ml).plot() 
 		# plt.show()
 		# plt.close()
-	return w_avg
+	if return_sd==True:
+		return w_avg, w_sd
+	else:
+		return w_avg
 
 
 

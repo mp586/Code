@@ -138,7 +138,7 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 
 
 
-# # # # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
+# # # # # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
 # [olr_ctl,olr_avg_ctl,olr_seasonal_avg_ctl,olr_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'olr','W/m^2',factor = 1.) # 
 # [olr,olr_avg,olr_seasonal_avg,olr_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'olr','W/m^2',factor = 1.) # 
 

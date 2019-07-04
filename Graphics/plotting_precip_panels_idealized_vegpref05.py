@@ -21,16 +21,16 @@ if (ctl_model == 'Isca') or (ctl_model == 'isca'):
 elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
-HPC = 'no'
-control_dir = 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm'
+HPC = 'yes'
+control_dir = 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=121
-ctl_runmax=481
+ctl_runmin=25
+ctl_runmax=121
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -40,10 +40,10 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     model_data = 'GFDL_DATA'
     output_dir1 = ''
 
-HPC = 'no'
-testdir_in1= 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361'
-runmin=120
-runmax=480
+HPC = 'yes'
+testdir_in1= 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_121'
+runmin=24
+runmax=120
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -86,15 +86,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm'
+control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=121
-ctl_runmax=481
+ctl_runmin=25
+ctl_runmax=121
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -105,9 +105,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361'
-runmin=120
-runmax=480
+testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_121'
+runmin=24
+runmax=120
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -142,15 +142,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_rerun'
+control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=121  # Should be a January month for seasonal variables to be correct
-ctl_runmax=481
+ctl_runmin=25  # Should be a January month for seasonal variables to be correct
+ctl_runmax=121
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -161,9 +161,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_rerun_plus_uniform_warming_and_2xCO2_spinup_361'
-runmin=120
-runmax=480
+testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_121'
+runmin=24
+runmax=120
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -435,7 +435,3 @@ m.contour(xi,yi,landmask2, 1, linestyles = 'dotted')
 cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
-
-#SAVE BY HAND as ....
-#fig.savefig('/scratch/mp586/Code/Graphics/Isca/square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361/Pavg_minus_ctl_4panels_2c_africa_america_P-Econts_120-480_nomerids.png', dpi=100)
-#fig.savefig('/scratch/mp586/Code/Graphics/Isca/square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361/Pavg_minus_ctl_4panels_2c_africa_america_P-Econts_120-480_nomerids.svg', dpi=100)
