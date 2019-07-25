@@ -566,8 +566,8 @@ axes[0].plot([-1.,2.],[0.,0.],color='dimgray',linewidth=1, linestyle = 'dashed')
 axes[0].plot([0.,0.],[-1.,2.],color='dimgray',linewidth=1, linestyle = 'dashed')
 axes[0].scatter(dprlp[:,0:15],dpr[:,0:15],c = markcolor[0], marker = markstyle, s = marksize, label = 'America') # West
 axes[0].scatter(dprlp[:,29:50],dpr[:,29:50],c = markcolor[1], marker = markstyle, s = marksize, label = 'Africa') # East
-axes[0].set_xlabel('$\Delta P_{pred}$', fontsize = lge)
-axes[0].set_ylabel('$\Delta P_{actual}$', fontsize = lge)
+axes[0].set_xlabel('$\Delta P_{pred}$ (mm/d)', fontsize = lge)
+axes[0].set_ylabel('$\Delta P_{actual}$ (mm/d)', fontsize = lge)
 axes[0].set_title('(a) $\Delta P$ from $\Delta r_S$', fontsize = lge)
 axes[0].set_ylim(-1.,2.)
 axes[0].set_xlim(-1.,2.)
@@ -584,7 +584,7 @@ axes[1].plot([-.8,1.8],[-.8,1.8],color='dimgray',linewidth=1)
 axes[1].scatter(dprlpgg[:,0:15],dpr[:,0:15],c = markcolor[0], marker = markstyle, s = marksize) # West
 axes[1].scatter(dprlpgg[:,29:50],dpr[:,29:50],c = markcolor[1], marker = markstyle, s = marksize) # East
 axes[1].set_title('(b) $\Delta P$ from $\Delta q_S$', fontsize = lge)
-axes[1].set_xlabel('$\Delta P_{pred}$', fontsize = lge)
+axes[1].set_xlabel('$\Delta P_{pred}$ (mm/d)', fontsize = lge)
 axes[1].set_xlim(-1.,2.)
 axes[1].set_ylim(-1.,2.)
 axes[1].spines['right'].set_visible(False)
@@ -599,7 +599,7 @@ axes[2].plot([-.8,1.8],[-.8,1.8],color='dimgray',linewidth=1)
 axes[2].scatter(dprlpbcgg[:,0:15],dpr[:,0:15],c = markcolor[0], marker = markstyle, s = marksize) # West
 axes[2].scatter(dprlpbcgg[:,29:50],dpr[:,29:50],c = markcolor[1], marker = markstyle, s = marksize) # East
 axes[2].set_title('(c) $\Delta P$ from $\Delta q_{TH}$', fontsize = lge)
-axes[2].set_xlabel('$\Delta P_{pred}$', fontsize = lge)
+axes[2].set_xlabel('$\Delta P_{pred}$ (mm/d)', fontsize = lge)
 axes[2].set_xlim(-1.,2.)
 axes[2].set_ylim(-1.,2.)
 axes[2].spines['right'].set_visible(False)
@@ -668,12 +668,12 @@ dpprlp_africa, dpprlp_africa_sd = area_weighted_avg(dprlp[:,29:50], area_array[2
 dpprlpgg_africa, dpprlpgg_africa_sd = area_weighted_avg(dprlpgg[:,29:50], area_array[21:43,29:50], landmaskxr[21:43,29:50], 'land', return_sd=True) # could do 'all_sfcs' because selecting only land points anyway -- checked: doesn't makea  difference! 
 dpprlpbcgg_africa, dpprlpbcgg_africa_sd = area_weighted_avg(dprlpbcgg[:,29:50], area_array[21:43,29:50], landmaskxr[21:43,29:50], 'land', return_sd=True) # could do 'all_sfcs' because selecting only land points anyway -- checked: doesn't makea  difference! 
 
-print(dpr_america, dpr_america_sd)
-print(dpprlp_america, dpprlp_america_sd)
-print(dpprlpgg_america, dpprlpgg_america_sd)
-print(dpprlpbcgg_america, dpprlpbcgg_america_sd)
+print('America dp actual = ',dpr_america, dpr_america_sd)
+print('America dp 1 = ',dpprlp_america, dpprlp_america_sd)
+print('America dp 2 = ', dpprlpgg_america, dpprlpgg_america_sd)
+print('America dp 3 = ',dpprlpbcgg_america, dpprlpbcgg_america_sd)
 
-print(dpr_africa, dpr_africa_sd)
-print(dpprlp_africa, dpprlp_africa_sd)
-print(dpprlpgg_africa, dpprlpgg_africa_sd)
-print(dpprlpbcgg_africa, dpprlpbcgg_africa_sd)
+print('Africa dp actual =', dpr_africa, dpr_africa_sd)
+print('Africa dp 1 =', dpprlp_africa, dpprlp_africa_sd)
+print('Africa dp 2 =', dpprlpgg_africa, dpprlpgg_africa_sd)
+print('Africa dp 3 =', dpprlpbcgg_africa, dpprlpbcgg_africa_sd)
