@@ -70,7 +70,7 @@ ocean_sfc_area = np.sum(area_array.where(landmask!=1.))
 #print ('ocean sfc area (*10^14) = '+str(ocean_sfc_area/(10**14)))
 
 # for plotting a spin up run ('control') timeseries followed by the timeseries from the perturbed experiment
-globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'t_surf',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max)
+globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'t_surf',1,runmax,1.,landmaskxr,control_dir,ctl_model,1,ctl_timeseries_max)
 #globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'bucket_depth',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max,select='land')
 
 # mass stream function adapted from J Penn
@@ -132,13 +132,12 @@ PE_ctl = precipitation_ctl - net_lhe_ctl
 [PE_ctl,PE_avg_ctl,PE_seasonal_avg_ctl,PE_month_avg_ctl,time] = make_var_seasonal(PE_ctl)
 
 PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**(-3)) # factor to 
-
 #convert from mm/d to m/d
 #print('P avg - E avg global integral / total sfc area'+str(PE_avg_sum/total_sfc_area))
 
 
 
-# # # # # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
+# # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
 # [olr_ctl,olr_avg_ctl,olr_seasonal_avg_ctl,olr_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'olr','W/m^2',factor = 1.) # 
 # [olr,olr_avg,olr_seasonal_avg,olr_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'olr','W/m^2',factor = 1.) # 
 
@@ -150,7 +149,7 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 # print('SEB (perturbed) in W/m2 = '+str(SEB_areaavg))
 
 # SEB_avg = - net_sw_avg + net_lw_avg + lhe_flux_avg + net_t_avg ##perturbed run 
-# TOA_avg = toa_sw_avg - olr_avg # toa sw pos down!, olr pos up (? yep) 
+# TOA_avg = toa_sw_avg - olr_avg # toa sw pos down!, olr pos up (? yep)  # TOA pos down
 
 # N_avg = SEB_avg + TOA_avg #total energy input to the atmosphere 
 
@@ -224,6 +223,7 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','toa_sw_avg_minus_ctl_narrowcbar','rainnorm',landmaskxr, minval = -10., maxval = 10.)
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl) - (net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','toa_minus_sfc_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -10., maxval = 10.)
 
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg),area_array,'(W/m^2)','TOA_avg','rainnorm',landmaskxr, minval = -100., maxval = 100.)
 
 
 # landfile=Dataset(os.path.join(GFDL_BASE,'input/square_Africa/land.nc'),mode='r')

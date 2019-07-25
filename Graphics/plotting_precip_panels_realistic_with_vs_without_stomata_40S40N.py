@@ -86,15 +86,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'no'
-control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref1'
+control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref1_witholr'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=25
-ctl_runmax=121
+ctl_runmin=121
+ctl_runmax=481
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -105,9 +105,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'no'
-testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_real_spinup_361'
-runmin=24
-runmax=120
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr'
+runmin=120
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -146,7 +146,7 @@ landlons = np.asarray(landmaskxr.lon)
 landmask = np.asarray(landmaskxr)
 
 
-fig, axes = plt.subplots(3,1, figsize = (10,8))
+fig, axes = plt.subplots(3,1, figsize = (25,25))
 
 axes[0].set_title('(a) VP05', size = med)
 #fig = plt.figure()
@@ -292,8 +292,33 @@ cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.5) # usu
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_real_spinup_361/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_24-120.png', bbox_inches='tight', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_real_spinup_361/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_24-120.svg', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_120-480.png', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_120-480.svg', bbox_inches='tight', dpi=100)
 
-# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_real_spinup_361/P-Eavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_120-480.png', bbox_inches='tight', dpi=100)
-# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_real_spinup_361/P-Eavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_120-480.svg', bbox_inches='tight', dpi=100)
+# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_ctl_25-121_pert_24-120.png', bbox_inches='tight', dpi=100)
+# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP05_P-Econts_40S40N_ctl_25-121_pert_24-120.svg', bbox_inches='tight', dpi=100)
+
+
+dP_SB =  (precipitation1_avg - precipitation1_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
+dP_VP05 = (precipitation2_avg - precipitation2_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
+
+dP_SB = np.asarray(dP_SB).flatten()
+dP_VP05 = np.asarray(dP_VP05).flatten()
+
+
+fig, ax = plt.subplots()
+ax.plot(dP_SB, dP_VP05, 'k.')
+ax.set_xlim(-6.,6.)
+ax.set_ylim(-6.,6.)
+ax.set_ylabel('$\Delta P$ (VP05) in mm/d')
+ax.set_xlabel('$\Delta P$ (SB) in mm/d')
+
+mask = ~np.isnan(dP_SB)
+
+[k,dy,r,p,stderr] = linreg(dP_SB[mask],dP_VP05[mask]) # aa = 8.4, dq = -32
+x1 = np.linspace(np.min(dP_SB[mask]),np.max(dP_SB[mask]),500)
+y = k*x1 + dy
+ax.plot(x1,y,'k-')
+ax.annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction')
+
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_witholr/dP_simple_bucket_versus_dP_VP05.png', bbox_inches='tight', dpi=100)
