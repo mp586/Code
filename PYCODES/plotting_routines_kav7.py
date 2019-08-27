@@ -1006,7 +1006,7 @@ def seasonal_4D_variable_daily(testdir,model,runmin,runmax,varname,units):
     lats= nc.variables['lat'][:]
     pres_levs= nc.variables['pfull'][:]
  
-    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin)*30,dtype='datetime64[D]'))]
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin)*25,dtype='datetime64[D]'))]
     var=xr.DataArray(var.values,coords=[time[0],pres_levs,lats,lons],dims=['time','pres_lev','lat','lon'])
     var_avg=var.mean(dim='time')
 
@@ -2422,7 +2422,7 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 
 	fig = plt.figure(figsize = (25,10))
 
-	ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
+ 	ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
 
 
 	m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
@@ -2564,8 +2564,8 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 # 	    plt.ylabel(title+' ('+units+') 30S-30N')
 # #	    plt.tight_layout()
 
-		manager = plt.get_current_fig_manager()
-		manager.window.showMaximized()
+#		manager = plt.get_current_fig_manager()
+#		manager.window.showMaximized()
 #	    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
 
 		if save_fig == True:
@@ -2707,8 +2707,8 @@ def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,ar
 
 	# Read landmask
 
-    manager = plt.get_current_fig_manager()
-    manager.window.showMaximized()
+    # manager = plt.get_current_fig_manager()
+    # manager.window.showMaximized()
 
     if save_fig == True:
 	    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_allmonths.png', format = 'png', bbox_inches='tight')
@@ -2811,8 +2811,7 @@ def animated_map(testdir,outdir,array,units,title,plot_title,palette,imin,imax,m
     # os.system('ffmpeg -f gif -i /scratch/mp586/Code/Graphics/'+testdir+'/'+plot_title+'.gif /scratch/mp586/Code/Graphics/'+testdir+'/'+plot_title+'.mp4')
 
 	
-def winds_at_heightlevel(uwind,vwind,level,array,palette,units,minval,maxval,landmaskxr,landlats,landlons,veclen=10):
-
+def winds_at_heightlevel(uwind,vwind,level,array,palette,units,minval,maxval,landmaskxr,veclen=10):
 # Plots every third wind vector at specified height level
 # onto a map of the 'array' which could be e.g. precip
 
@@ -2821,6 +2820,9 @@ def winds_at_heightlevel(uwind,vwind,level,array,palette,units,minval,maxval,lan
 # array is the underlying plot (e.g. Tsurf, precip, ...)
 # palette is for the underlying plot
 # units are for the underlying plot
+	
+	landlats = landmaskxr.lat
+	landlons = landmaskxr.lon
 	landmask = np.asarray(landmaskxr)
 
 	fig = plt.figure(figsize = (25,10))
