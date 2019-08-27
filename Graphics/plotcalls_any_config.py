@@ -36,7 +36,7 @@ testdir = model_data + '/' + testdir
 
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+input('Which landmask? ')+'/land.nc'),mode='r')
 
-level = input('Which level?')
+level = input('Which level? ')
 landmask=landfile.variables['land_mask'][:]
 landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
@@ -136,21 +136,21 @@ any_configuration_plot(outdir,runmin,runmax,-100.,100.,rh_avg,area_array,'%','rh
 #    animated_map(testdir,tsurf,'m','tsurf','tsurf','temp',0,runmax-2,240,310)
 
 
-globavg_tsurf_w = area_weighted_avg(tsurf_avg,area_array,landmask,'all_sfcs')
+globavg_tsurf_w = area_weighted_avg(tsurf_avg,area_array,landmaskxr,'all_sfcs')
 print('global_temp_unweighted = '+str(tsurf_avg.mean()))
 print('global_temp_weighted = '+str(globavg_tsurf_w))
 
-land_temp_globavg_w = area_weighted_avg(tsurf_avg,area_array,landmask,'land')
-ocean_temp_globavg_w = area_weighted_avg(tsurf_avg,area_array,landmask,'ocean')
+land_temp_globavg_w = area_weighted_avg(tsurf_avg,area_array,landmaskxr,'land')
+ocean_temp_globavg_w = area_weighted_avg(tsurf_avg,area_array,landmaskxr,'ocean')
 print('Area weighted Average temperature over land (global) = '+str(land_temp_globavg_w))
 print('Area weighted Average temperature over ocean (global) = '+str(ocean_temp_globavg_w))
 
-globavg_precipitation_w = area_weighted_avg(precipitation_avg,area_array,landmask,'all_sfcs')
+globavg_precipitation_w = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'all_sfcs')
 print('global_precip_unweighted = '+str(precipitation_avg.mean()))
 print('global_precip_weighted = '+str(globavg_precipitation_w))
 
-land_precip_globavg_w = area_weighted_avg(precipitation_avg,area_array,landmask,'land')
-ocean_precip_globavg_w = area_weighted_avg(precipitation_avg,area_array,landmask,'ocean')
+land_precip_globavg_w = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'land')
+ocean_precip_globavg_w = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'ocean')
 print('Area weighted Average precip over land (global) = '+str(land_precip_globavg_w))
 print('Area weighted Average precip over ocean (global) = '+str(ocean_precip_globavg_w))
 
@@ -161,22 +161,23 @@ PE_avg_sum = area_integral(PE_avg,area_array,landmaskxr,'all_sfcs',factor = 10**
 print('P avg - E avg global integral / total sfc area'+str(PE_avg_sum/total_sfc_area))
 # any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg).where(landmask==1.),area_array,'mm/day','P-E avg','rainnorm',landmaskxr,minval=-2.,maxval=2.)
 
-any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg),area_array,'mm/day','P-E_avg','rainnorm',landmaskxr,nmb_contours=4,minval=-3.,maxval=3.)
+any_configuration_plot(outdir,runmin,runmax,-100.,100.,(PE_avg),area_array,'mm/day','P-E_avg','PE_scale',landmaskxr,minval=-3.,maxval=3.)
 
 # # any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg.where(landmask==1.),area_array,'mm/day','E avg','fromwhite',landmaskxr,nmb_contours=4, minval = 0., maxval = 8.)
 
 #any_configuration_plot(outdir,runmin,runmax,-90.,90.,flux_oceanq_avg,area_array,'W/m^2','ocean_heat_transport','tempdiff',landmaskxr,minval=-200,maxval=200)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,nmb_contours=10,minval = 0., maxval = 8.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,net_lhe_avg,area_array,'mm/day','E_avg','fromwhite',landmaskxr,minval = 0., maxval = 8., steps = 11)
 
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,slp_avg,area_array,'hPa','slp avg','slp',landmaskxr)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,nmb_contours=5,minval=0.,maxval=8.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,nmb_contours=5, minval = -40., maxval = 40. )
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr,minval=0.,maxval=8., steps = 11)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,minval = -40., maxval = 40., steps = 41)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T_widebar','temp0',landmaskxr,minval = -60., maxval = 60., steps = 41)
+
 
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
 
-exit() 
 
 JJA = 'JJA'
 DJF = 'DJF'
@@ -203,6 +204,7 @@ SON = 'SON'
 
 [ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,ucomp_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'ucomp','m/s')
 [vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,vcomp_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'vcomp','m/s')
+[temp,temp_avg,temp_seasonal_avg,temp_month_avg,temp_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'temp','K')
 
 
 winds_at_heightlevel(ucomp_avg,vcomp_avg,39,precipitation_avg,'fromwhite','mm/d',0.,8.,landmaskxr)

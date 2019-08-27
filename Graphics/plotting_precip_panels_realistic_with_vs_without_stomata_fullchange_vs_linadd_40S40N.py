@@ -22,7 +22,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'flat_continents_newbucket_fixedSSTs_zonallysymm_commit7bb4387'
+control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -41,8 +41,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'flat_continents_newbucket_fixedSSTs_zonallysymm_corrected_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
-dire = testdir_in1
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_plus_2pt52K_and_2xCO2_spinup_361_commit7bb4387'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -87,7 +86,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
+control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -106,9 +105,10 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_corrected_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_commit7bb4387'
+dire = testdir_in1
 runmin=120
-runmax=480
+runmax=360
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -117,21 +117,38 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'two_continents'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmaskid=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxrid=xr.DataArray(landmaskid,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
-
-
 [net_lhe2,net_lhe2_avg,net_lhe2_seasonal_avg,net_lhe2_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 [precipitation2,precipitation2_avg,precipitation2_seasonal_avg,precipitation2_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
 
 [net_lhe2_ctl,net_lhe2_avg_ctl,net_lhe2_seasonal_avg_ctl,net_lhe2_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
 [precipitation2_ctl,precipitation2_avg_ctl,precipitation2_seasonal_avg_ctl,precipitation2_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'precipitation','mm/d', factor=86400)
+
+
+
+
+model = 'isca'
+if (model == 'Isca') or (model == 'isca'): 
+    model_data = 'Isca_DATA'
+    output_dir1 = 'Isca'
+elif (model == 'gfdl') or (model == 'GFDL'):
+    model_data = 'GFDL_DATA'
+    output_dir1 = ''
+
+HPC = 'yes'
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonallysymm_corrected_vegpref05_commit7bb4387'
+dire = testdir_in1
+runmin=120
+runmax=360
+if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+    exp1_name = 'ISCA_HPC/'+testdir_in1
+    testdir = model_data + '/ISCA_HPC/' + testdir_in1
+    testdir_in1 = '/ISCA_HPC/' + testdir_in1
+else: 
+    exp1_name = testdir_in1
+    testdir = model_data + '/' + testdir_in1
+
+[net_lhe3,net_lhe3_avg,net_lhe3_seasonal_avg,net_lhe3_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
+[precipitation3,precipitation3_avg,precipitation3_seasonal_avg,precipitation3_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
 
 ############ plotting ##############
 
@@ -142,26 +159,27 @@ lge = 24 #largefonts 22 # smallfonts 18 # medfonts = 20
 v = np.linspace(-2.,2.,21)
 nmb_contours = [-2.,1.,2.]
 
-# South America Only 
+# RC 
 
-array = precipitation1_avg - precipitation1_avg_ctl
-ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+array = precipitation2_avg  - precipitation2_avg_ctl
+#array = precipitation2_avg - net_lhe2_avg - (precipitation2_avg_ctl - net_lhe2_avg_ctl)
+ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
 
 lats=array.lat
 lons=array.lon
 
 landlats = np.asarray(landmaskxr.lat)
 landlons = np.asarray(landmaskxr.lon)
+
 landmask = np.asarray(landmaskxr)
-landmaskid = np.asarray(landmaskxrid)
 
 
-fig, axes = plt.subplots(1, 2, figsize = (20, 8))
+fig, axes = plt.subplots(3,1, figsize = (25,15))
 
-axes[0].set_title('(a) FCVP05', size = med)
+axes[0].set_title('(a) Full Change', size = med)
 #fig = plt.figure()
 
-m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0])
+m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
@@ -176,7 +194,7 @@ ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic
 ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
 lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawparallels(np.arange(-40.,40.,20.),labels=[1,0,0,0], fontsize=small)
 m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
 
 lon, lat = np.meshgrid(lons, lats)
@@ -198,23 +216,22 @@ landmask, lons_cyclic = addcyclic(landmask, landlons)
 if np.any(landmask != 0.):
     m.contour(xi,yi,landmask, 1)
 
-# Africa Only 
+# RC07
 
-array = precipitation2_avg - precipitation2_avg_ctl
-ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
+# array = precipitation1_avg - net_lhe1_avg - ( precipitation1_avg_ctl - net_lhe1_avg_ctl)
+array = precipitation1_avg - precipitation1_avg_ctl + precipitation3_avg - precipitation1_avg_ctl
 
 lats=array.lat
 lons=array.lon
 
-landlats = np.asarray(landmaskxrid.lat)
-landlons = np.asarray(landmaskxrid.lon)
+landlats = np.asarray(landmaskxr.lat)
+landlons = np.asarray(landmaskxr.lon)
 
-landmask = np.asarray(landmaskxrid)
+landmask = np.asarray(landmaskxr)
 
-axes[1].set_title('(b) 2CVP05', size = med)
+axes[1].set_title('(b) Linear addition', size = med)
 #fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1])
+m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
@@ -223,14 +240,9 @@ array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=F
 
 array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
 lons = lons_cyclic
 
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawparallels(np.arange(-40.,40.,20.),labels=[1,0,0,0], fontsize=small)
 m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,1], fontsize=small)
 
 lon, lat = np.meshgrid(lons, lats)
@@ -238,7 +250,6 @@ xi, yi = m(lon, lat)
 
 cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
@@ -252,11 +263,58 @@ landmask, lons_cyclic = addcyclic(landmask, landlons)
 if np.any(landmask != 0.):
     m.contour(xi,yi,landmask, 1)
 
+# array =  (precipitation2_avg - net_lhe2_avg - (precipitation2_avg_ctl - net_lhe2_avg_ctl)) - (precipitation1_avg - net_lhe1_avg - ( precipitation1_avg_ctl - net_lhe1_avg_ctl))
+array =  (precipitation2_avg - precipitation2_avg_ctl) - (precipitation1_avg - precipitation1_avg_ctl + precipitation3_avg - precipitation1_avg_ctl)
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxr.lat)
+landlons = np.asarray(landmaskxr.lon)
+
+landmask = np.asarray(landmaskxr)
+
+axes[2].set_title('(c) Full minus linear addition', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-40.,40.,20.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
 
 # Add Colorbar
-cbar = fig.colorbar(cs, orientation = 'horizontal', ax = axes, shrink = 0.4, fraction = 0.2) # usually on right 
+cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.5) # usually on right 
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2panels_idealized_flat_VP05_120-480.png', bbox_inches='tight', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2panels_idealized_flat_VP05_120-480.svg', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_fullchange_vs_linear_addition_40S40N_120-480.png', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_fullchange_vs_linear_addition_40S40N_120-480.svg', bbox_inches='tight', dpi=100)
+
+# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref02_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP02_P-Econts_40S40N_ctl_25-121_pert_24-120.png', bbox_inches='tight', dpi=100)
+# fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref02_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP02_P-Econts_40S40N_ctl_25-121_pert_24-120.svg', bbox_inches='tight', dpi=100)

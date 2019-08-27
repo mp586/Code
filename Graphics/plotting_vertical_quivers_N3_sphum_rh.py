@@ -23,15 +23,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
+control_dir = 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=25
-ctl_runmax=121
+ctl_runmin=121
+ctl_runmax=481
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -42,9 +42,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121'
-runmin=24
-runmax=120
+testdir_in1= 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref0_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+runmin=120
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -86,24 +86,6 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 
 ################ read in data from exp 2 ###############################
 
-
-ctl_model = 'isca'
-if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
-    control_model = 'Isca_DATA'
-elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
-    control_model = 'GFDL_DATA'
-
-HPC = 'yes'
-control_dir = 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
-if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    control_dir= control_model + '/ISCA_HPC/' + control_dir
-else: 
-    control_dir= control_model + '/' + control_dir
-
-#print control_dir
-ctl_runmin=25
-ctl_runmax=121
-
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
     model_data = 'Isca_DATA'
@@ -113,9 +95,10 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref08_plus_uniform_warming_and_2xCO2_spinup_121'
-runmin=24
-runmax=120
+testdir_in1= 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+dire = testdir_in1
+runmin=120
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -135,17 +118,12 @@ landmaskxr2C=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']
 
 
 [omega2,omega2_avg,omega2_seasonal_avg,omega2_month_avg,omega2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'omega','Pa/s')
-[omega2_ctl,omega2_avg_ctl,omega2_seasonal_avg_ctl,omega2_month_avg_ctl,omega2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
-[rh2_ctl,rh2_avg_ctl,rh2_seasonal_avg_ctl,rh2_month_avg_ctl,rh2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
 [rh2,rh2_avg,rh2_seasonal_avg,rh2_month_avg,rh2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'rh','%')
-[sphum2_ctl,sphum2_avg_ctl,sphum2_seasonal_avg_ctl,sphum2_month_avg_ctl,sphum2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
 [sphum2,sphum2_avg,sphum2_seasonal_avg,sphum2_month_avg,sphum2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'sphum','kg/kg')
 
 [ucomp2,ucomp2_avg,ucomp2_seasonal_avg,ucomp2_month_avg,ucomp2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'ucomp','m/s')
-[ucomp2_ctl,ucomp2_avg_ctl,ucomp2_seasonal_avg_ctl,ucomp2_month_avg_ctl,ucomp2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
 
 [temp2,temp2_avg,temp2_seasonal_avg,temp2_month_avg,temp2_annual_avg,time]=seasonal_4D_variable(testdir,model,runmin,runmax,'temp','K')
-[temp2_ctl,temp2_avg_ctl,temp2_seasonal_avg_ctl,temp2_month_avg_ctl,temp2_annual_avg_ctl,time]=seasonal_4D_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
 
 
 ################ read in data from exp 3 ###############################
@@ -174,7 +152,6 @@ pfull = np.repeat(pfull, 128, axis = 2)
 pres_lev = temp1.pres_lev
 pfull = xr.DataArray(pfull, coords = [pres_lev, temp1.lat, temp1.lon], dims = ['pres_lev','lat','lon'])
 wcomp1_avg_ctl = - (omega1_avg_ctl * temp1_avg_ctl * Rspec)/(pfull * g)
-wcomp2_avg_ctl = - (omega2_avg_ctl * temp2_avg_ctl * Rspec)/(pfull * g)
 wcomp1_avg = - (omega1_avg * temp1_avg * Rspec)/(pfull * g)
 wcomp2_avg = - (omega2_avg * temp2_avg * Rspec)/(pfull * g)
 
@@ -191,329 +168,334 @@ wcomp2_avg = - (omega2_avg * temp2_avg * Rspec)/(pfull * g)
 small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
 med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
-
-
-v = np.linspace(-10.,10.,21) # , endpoint=True)
-minlat = -10.
-maxlat = 10.
 veclen = 10.
 units_numerator = 'm'
 units_denom = 's'
 shiftby = 180. # = 180. --> 0 degrees in the middle, = 105. --> idealized continents overlap realistic ones 
 
+vertmult = 3000
 
 
+list_minlats = [-10.,-5., 0., -30.]
+list_maxlats = [10., 0., 5., 30.]
+for i in range(len(list_maxlats)): 
 
-fig, axes = plt.subplots(3, 1, sharey = True, figsize = (15,20))
+    v = np.linspace(-10.,10.,21) # , endpoint=True)
+    minlat = list_minlats[i]
+    maxlat = list_maxlats[i]
 
+    fig, axes = plt.subplots(3, 1, sharey = True, figsize = (15,20))
 
-# panel 1: Only South America 
-uwind = (ucomp1_avg - ucomp1_avg_ctl)
-wwind = ((wcomp1_avg - wcomp1_avg_ctl)*8000.)[::-1,:,:]
-array = (rh1_avg - rh1_avg_ctl)
-lons = uwind.lon 
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+
+    # panel 1: Only South America 
+    uwind = (ucomp1_avg - ucomp1_avg_ctl)
+    wwind = ((wcomp1_avg - wcomp1_avg_ctl)*vertmult)[::-1,:,:]
+    array = (rh1_avg - rh1_avg_ctl)
+    lons = uwind.lon 
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
+
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))  
+
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+    				 start=False,cyclic=np.max(lons_cyclic))
+
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))  
-
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-				 start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
+    cset1 = axes[0].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
+    axes[0].set_title('(a) N3 VP0', fontsize = med)
+    # Africa Only 
 
-cset1 = axes[0].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
-axes[0].set_ylabel('Pressure (hPa)', fontsize = med)
+    uwind = (ucomp2_avg - ucomp1_avg_ctl)
+    wwind = ((wcomp2_avg - wcomp1_avg_ctl)*vertmult)[::-1,:,:]
+    array = (rh2_avg - rh1_avg_ctl)
+    lons = uwind.lon
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
 
-Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0].set_title('(a) N3 VP0', fontsize = med)
-# Africa Only 
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))  
 
-uwind = (ucomp2_avg - ucomp2_avg_ctl)
-wwind = ((wcomp2_avg - wcomp2_avg_ctl)*8000.)[::-1,:,:]
-array = (rh2_avg - rh2_avg_ctl)
-lons = uwind.lon
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+    				 start=False,cyclic=np.max(lons_cyclic))
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))  
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-				 start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
+    cset1 = axes[1].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-cset1 = axes[1].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
+    Q = axes[1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    #qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+    axes[1].set_title('(b) N3 VP05', fontsize = med)
 
+    # Two continents - America 
 
-Q = axes[1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-#qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1].set_title('(b) N3 VP08', fontsize = med)
+    uwind = ((ucomp1_avg - ucomp1_avg_ctl) - (ucomp2_avg - ucomp1_avg_ctl))[::-1,:,:]
+    wwind = (((wcomp1_avg - wcomp1_avg_ctl) - (wcomp2_avg - wcomp1_avg_ctl))*vertmult)[::-1,:,:]
+    array = (rh1_avg - rh1_avg_ctl) - (rh2_avg - rh1_avg_ctl)
+    lons = uwind.lon
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
 
-# Two continents - America 
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+    			   cyclic=np.max(lons_cyclic))  
 
-uwind = ((ucomp1_avg - ucomp1_avg_ctl) - (ucomp2_avg - ucomp2_avg_ctl))[::-1,:,:]
-wwind = (((wcomp1_avg - wcomp1_avg_ctl) - (wcomp2_avg - wcomp2_avg_ctl))*8000.)[::-1,:,:]
-array = (rh1_avg - rh1_avg_ctl) - (rh2_avg - rh2_avg_ctl)
-lons = uwind.lon
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+    				 start=False,cyclic=np.max(lons_cyclic))
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-			   cyclic=np.max(lons_cyclic))  
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-				 start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
+    cset1 = axes[2].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
+    axes[2].set_xlabel('Longitude E', fontsize = med)
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    Q = axes[2].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    qk = axes[2].quiverkey(Q, 0.87, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+    axes[2].set_title('(d) N3 VP0 - VP05', fontsize = med)
 
-cset1 = axes[2].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
-axes[2].set_xlabel('Longitude E', fontsize = med)
+    fig.gca().invert_yaxis()
 
-Q = axes[2].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-qk = axes[2].quiverkey(Q, 0.87, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[2].set_title('(d) N3 VP0 - VP08', fontsize = med)
+    cbar = fig.colorbar(cset1,ax=axes)
+    cbar.ax.tick_params(labelsize=small)
+    cbar.set_label('$\Delta RH$ (%)', size = med)
+    for j in range(3):
+        axes[j].set_ylabel('Pressure (hPa)', fontsize = med)
+        axes[j].tick_params(labelsize = small)
 
-fig.gca().invert_yaxis()
-axes[0].tick_params(labelsize = small)
-axes[1].tick_params(labelsize = small)
-axes[2].tick_params(labelsize = small)
 
-cbar = fig.colorbar(cset1,ax=axes)
-cbar.ax.tick_params(labelsize=small)
-cbar.set_label('$\Delta RH$ (%)', size = med)
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121/w8000_quivers_2cases_deltarh_24-120_10S-10N_lgefonts_nonshift.png')
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121/w8000_quivers_2cases_deltarh_24-120_10S-10N_lgefonts_nonshift.svg')
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_quivers_2cases_deltarh_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.png')
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_quivers_2cases_deltarh_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.svg')
 
-plt.close('all')
+    plt.close('all')
 
 
 
 
-v = np.linspace(-.003,.003,21) # , endpoint=True)
+    v = np.linspace(-.003,.003,21) # , endpoint=True)
 
 
 
-fig, axes = plt.subplots(3, 1, sharey = True, figsize = (15,20))
+    fig, axes = plt.subplots(3, 1, sharey = True, figsize = (15,20))
 
 
-# panel 1: Only South America 
-uwind = (ucomp1_avg - ucomp1_avg_ctl)
-wwind = ((wcomp1_avg - wcomp1_avg_ctl)*8000.)[::-1,:,:]
-array = (sphum1_avg - sphum1_avg_ctl)
-lons = uwind.lon 
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+    # panel 1: Only South America 
+    uwind = (ucomp1_avg - ucomp1_avg_ctl)
+    wwind = ((wcomp1_avg - wcomp1_avg_ctl)*vertmult)[::-1,:,:]
+    array = (sphum1_avg - sphum1_avg_ctl)
+    lons = uwind.lon 
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))  
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))  
 
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-                 start=False,cyclic=np.max(lons_cyclic))
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+                     start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-cset1 = axes[0].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
-axes[0].set_ylabel('Pressure (hPa)', fontsize = med)
+    cset1 = axes[0].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
 
-Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0].set_title('(a) N3 VP0', fontsize = med)
-# Africa Only 
+    Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
+    axes[0].set_title('(a) N3 VP0', fontsize = med)
+    # Africa Only 
 
-uwind = (ucomp2_avg - ucomp2_avg_ctl)
-wwind = ((wcomp2_avg - wcomp2_avg_ctl)*8000.)[::-1,:,:]
-array = (sphum2_avg - sphum2_avg_ctl)
-lons = uwind.lon
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+    uwind = (ucomp2_avg - ucomp1_avg_ctl)
+    wwind = ((wcomp2_avg - wcomp1_avg_ctl)*vertmult)[::-1,:,:]
+    array = (sphum2_avg - sphum1_avg_ctl)
+    lons = uwind.lon
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))  
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))  
 
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-                 start=False,cyclic=np.max(lons_cyclic))
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+                     start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-cset1 = axes[1].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
+    cset1 = axes[1].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
 
 
-Q = axes[1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-#qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1].set_title('(b) N3 VP08', fontsize = med)
+    Q = axes[1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    #qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+    axes[1].set_title('(b) N3 VP05', fontsize = med)
 
-# Two continents - America 
+    # Two continents - America 
 
-uwind = ((ucomp1_avg - ucomp1_avg_ctl) - (ucomp2_avg - ucomp2_avg_ctl))[::-1,:,:]
-wwind = (((wcomp1_avg - wcomp1_avg_ctl) - (wcomp2_avg - wcomp2_avg_ctl))*8000.)[::-1,:,:]
-array = (sphum1_avg - sphum1_avg_ctl) - (sphum2_avg - sphum2_avg_ctl)
-lons = uwind.lon
-lats = uwind.lat
-pres = wwind.pres_lev
-presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
-uwind, lons_cyclic = addcyclic(uwind, lons)
-wwind, lons_cyclic = addcyclic(wwind, lons)
+    uwind = ((ucomp1_avg - ucomp1_avg_ctl) - (ucomp2_avg - ucomp1_avg_ctl))[::-1,:,:]
+    wwind = (((wcomp1_avg - wcomp1_avg_ctl) - (wcomp2_avg - wcomp1_avg_ctl))*vertmult)[::-1,:,:]
+    array = (sphum1_avg - sphum1_avg_ctl) - (sphum2_avg - sphum1_avg_ctl)
+    lons = uwind.lon
+    lats = uwind.lat
+    pres = wwind.pres_lev
+    presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+    uwind, lons_cyclic = addcyclic(uwind, lons)
+    wwind, lons_cyclic = addcyclic(wwind, lons)
 
-uwind = np.asarray(uwind)
-wwind = np.asarray(wwind)
-uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))
-wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-               cyclic=np.max(lons_cyclic))  
+    uwind = np.asarray(uwind)
+    wwind = np.asarray(wwind)
+    uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))
+    wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+                   cyclic=np.max(lons_cyclic))  
 
-array, lons_cyclic = addcyclic(array, lons)
-array = np.asarray(array)
-array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-                 start=False,cyclic=np.max(lons_cyclic))
+    array, lons_cyclic = addcyclic(array, lons)
+    array = np.asarray(array)
+    array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+                     start=False,cyclic=np.max(lons_cyclic))
 
-array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
-uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
-# landmask, landlons = addcyclic(landmask, landlons)
+    array = xr.DataArray(array,coords=[presar,lats,lons_shift],dims=['pres','lat','lon'])
+    uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+    # landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, landlons = addcyclic(landmask, landlons)
 
 
-Xar, Zar = np.meshgrid(lons_shift, presar)
-X, Z = np.meshgrid(lons_shift, pres)
+    Xar, Zar = np.meshgrid(lons_shift, presar)
+    X, Z = np.meshgrid(lons_shift, pres)
 
 
-wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+    array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-cset1 = axes[2].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
-axes[2].set_xlabel('Longitude E', fontsize = med)
+    cset1 = axes[2].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
+    axes[2].set_xlabel('Longitude E', fontsize = med)
 
-Q = axes[2].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-qk = axes[2].quiverkey(Q, 0.87, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[2].set_title('(d) N3 VP0 - VP08', fontsize = med)
+    Q = axes[2].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+    qk = axes[2].quiverkey(Q, 0.87, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+    axes[2].set_title('(d) N3 VP0 - VP05', fontsize = med)
 
-fig.gca().invert_yaxis()
-axes[0].tick_params(labelsize = small)
-axes[1].tick_params(labelsize = small)
-axes[2].tick_params(labelsize = small)
+    fig.gca().invert_yaxis()
 
-cbar = fig.colorbar(cset1,ax=axes)
-cbar.ax.tick_params(labelsize=small)
-cbar.set_label('$\Delta sphum$ (kg/kg)', size = med)
+    cbar = fig.colorbar(cset1,ax=axes)
+    cbar.ax.tick_params(labelsize=small)
+    cbar.set_label('$\Delta sphum$ (kg/kg)', size = med)
+    for j in range(3):
+        axes[j].set_ylabel('Pressure (hPa)', fontsize = med)
+        axes[j].tick_params(labelsize = small)
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121/w8000_quivers_2cases_deltasphum_24-120_10S-10N_lgefonts_nonshift.png')
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121/w8000_quivers_2cases_deltasphum_24-120_10S-10N_lgefonts_nonshift.svg')
 
-plt.close('all')
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_quivers_2cases_deltasphum_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.png')
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_quivers_2cases_deltasphum_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.svg')
+
+
+    plt.close('all')
 

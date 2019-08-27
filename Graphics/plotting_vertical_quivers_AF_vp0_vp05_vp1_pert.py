@@ -23,7 +23,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
+control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -42,9 +42,11 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361'
-runmin=120
-runmax=480
+testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+
+dir = testdir_in1
+runmin=60
+runmax=180
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -53,7 +55,7 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'square_Africa'
+land = 'two_continents'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
@@ -86,7 +88,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
+control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -105,9 +107,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref0_plus_uniform_warming_and_2xCO2_spinup_121'
-runmin=24
-runmax=120
+testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref02_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+runmin=60
+runmax=180
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -116,7 +118,7 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'square_Africa'
+land = 'two_continents'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
@@ -146,7 +148,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref1'
+control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -165,9 +167,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_rerun_plus_uniform_warming_and_2xCO2_spinup_361'
-runmin=120
-runmax=480
+testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+runmin=60
+runmax=180
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -176,7 +178,7 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'square_Africa'
+land = 'two_continents'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
@@ -257,7 +259,7 @@ fig, axes = plt.subplots(2, 2, sharey = True, figsize = (30,15))  # for paper, s
 
 # panel 1: Only South America 
 uwind = (ucomp1_avg)
-wwind = ((wcomp1_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp1_avg)*3000.)[::-1,:,:]
 array = (rh1_avg)
 lons = uwind.lon 
 lats = uwind.lat
@@ -298,11 +300,11 @@ axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0,0].set_title('(a) AFVP05', fontsize = med)
+axes[0,0].set_title('(a) 2CVP05', fontsize = med)
 # Africa Only 
 
 uwind = (ucomp2_avg)
-wwind = ((wcomp2_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp2_avg)*3000.)[::-1,:,:]
 array = (rh2_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -343,7 +345,7 @@ cset1 = axes[0,1].contourf(Xar, Zar, array_tropmean, v_abs, cmap='Blues', extend
 
 Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[0,1].set_title('(b) AFVP0', fontsize = med)
+axes[0,1].set_title('(b) 2CVP02', fontsize = med)
 
 cbar = fig.colorbar(cset1,ax=[axes[0,1], axes[0,0]], orientation = 'vertical')
 cbar.ax.tick_params(labelsize=small)
@@ -352,7 +354,7 @@ cbar.set_label('$RH$ (%)', size = med)
 # Two continents 
 
 uwind = (ucomp3_avg)
-wwind = ((wcomp3_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp3_avg)*3000.)[::-1,:,:]
 array = (rh3_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -394,12 +396,12 @@ axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1,0].set_title('(c) AFVP1', fontsize = med)
+axes[1,0].set_title('(c) 2C SB', fontsize = med)
 
 # Two continents - America 
 
 uwind = (ucomp3_avg - ucomp2_avg)[::-1,:,:]
-wwind = ((wcomp3_avg - wcomp2_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp3_avg - wcomp2_avg)*3000.)[::-1,:,:]
 array = (rh3_avg - rh2_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -440,7 +442,7 @@ axes[1,1].set_xlabel('Longitude E', fontsize = med)
 
 Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[1,1].set_title('(d) AFVP1 - AFVP0', fontsize = med)
+axes[1,1].set_title('(d) 2CSB - 2CVP02', fontsize = med)
 
 fig.gca().invert_yaxis()
 axes[0,0].tick_params(labelsize = small)
@@ -453,8 +455,8 @@ cbar.ax.tick_params(labelsize=small)
 cbar.set_label('$\Delta RH$ (%)', size = med)
 
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_VP1-VP0_deltarh_120-480_10S-10N_lgefonts_nonshift.png')
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_VP1-VP0_deltarh_120-480_10S-10N_lgefonts_nonshift.svg')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltarh_60-180_10S-10N_lgefonts_nonshift.png')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltarh_60-180_10S-10N_lgefonts_nonshift.svg')
 
 
 
@@ -481,7 +483,7 @@ fig, axes = plt.subplots(2, 2, sharey = True, figsize = (30,15))  # for paper, s
 
 # panel 1: Only South America 
 uwind = (ucomp1_avg)
-wwind = ((wcomp1_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp1_avg)*3000.)[::-1,:,:]
 array = (sphum1_avg)
 lons = uwind.lon 
 lats = uwind.lat
@@ -522,11 +524,11 @@ axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0,0].set_title('(a) AFVP05', fontsize = med)
-# Africa Only 
+axes[0,0].set_title('(a) 2CVP05', fontsize = med)
+# AMrica Only 
 
 uwind = (ucomp2_avg)
-wwind = ((wcomp2_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp2_avg)*3000.)[::-1,:,:]
 array = (sphum2_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -567,7 +569,7 @@ cset1 = axes[0,1].contourf(Xar, Zar, array_tropmean, v_abs, cmap='Blues', extend
 
 Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[0,1].set_title('(b) AFVP0', fontsize = med)
+axes[0,1].set_title('(b) 2CVP02', fontsize = med)
 
 cbar = fig.colorbar(cset1,ax=[axes[0,1], axes[0,0]], orientation = 'vertical')
 cbar.ax.tick_params(labelsize=small)
@@ -576,7 +578,7 @@ cbar.set_label('$sphum$ (kg/kg)', size = med)
 # Two continents 
 
 uwind = (ucomp3_avg)
-wwind = ((wcomp3_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp3_avg)*3000.)[::-1,:,:]
 array = (sphum3_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -618,12 +620,12 @@ axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1,0].set_title('(c) AFVP1', fontsize = med)
+axes[1,0].set_title('(c) 2CSB', fontsize = med)
 
 # Two continents - America 
 
 uwind = (ucomp3_avg - ucomp2_avg)[::-1,:,:]
-wwind = ((wcomp3_avg - wcomp2_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp3_avg - wcomp2_avg)*3000.)[::-1,:,:]
 array = (sphum3_avg - sphum2_avg)
 lons = uwind.lon
 lats = uwind.lat
@@ -664,7 +666,7 @@ axes[1,1].set_xlabel('Longitude E', fontsize = med)
 
 Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[1,1].set_title('(d) AFVP1 - AFVP0', fontsize = med)
+axes[1,1].set_title('(d) 2CSB - 2CVP02', fontsize = med)
 
 fig.gca().invert_yaxis()
 axes[0,0].tick_params(labelsize = small)
@@ -677,8 +679,8 @@ cbar.ax.tick_params(labelsize=small)
 cbar.set_label('$\Delta sphum$ (kg/kg)', size = med)
 
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_VP1-VP0_deltasphum_120-480_10S-10N_lgefonts_nonshift.png')
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_VP1-VP0_deltasphum_120-480_10S-10N_lgefonts_nonshift.svg')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltasphum_60-180_10S-10N_lgefonts_nonshift.png')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltasphum_60-180_10S-10N_lgefonts_nonshift.svg')
 
 
 
@@ -705,7 +707,7 @@ fig, axes = plt.subplots(2, 2, sharey = True, figsize = (30,15))  # for paper, s
 
 # panel 1: Only South America 
 uwind = (ucomp1_avg)
-wwind = ((wcomp1_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp1_avg)*3000.)[::-1,:,:]
 array = (temp1_avg) - 273.15
 lons = uwind.lon 
 lats = uwind.lat
@@ -746,11 +748,11 @@ axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0,0].set_title('(a) AFVP05', fontsize = med)
-# Africa Only 
+axes[0,0].set_title('(a) 2CVP05', fontsize = med)
+# AMrica Only 
 
 uwind = (ucomp2_avg)
-wwind = ((wcomp2_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp2_avg)*3000.)[::-1,:,:]
 array = (temp2_avg) - 273.15
 lons = uwind.lon
 lats = uwind.lat
@@ -791,7 +793,7 @@ cset1 = axes[0,1].contourf(Xar, Zar, array_tropmean, v_abs, cmap='RdBu_r', exten
 
 Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[0,1].set_title('(b) AFVP0', fontsize = med)
+axes[0,1].set_title('(b) 2CVP02', fontsize = med)
 
 cbar = fig.colorbar(cset1,ax=[axes[0,1], axes[0,0]], orientation = 'vertical')
 cbar.ax.tick_params(labelsize=small)
@@ -800,7 +802,7 @@ cbar.set_label('$temp$ ($^{\circ} C$)', size = med)
 # Two continents 
 
 uwind = (ucomp3_avg)
-wwind = ((wcomp3_avg)*8000.)[::-1,:,:]
+wwind = ((wcomp3_avg)*3000.)[::-1,:,:]
 array = (temp3_avg) - 273.15
 lons = uwind.lon
 lats = uwind.lat
@@ -842,13 +844,13 @@ axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1,0].set_title('(c) AFVP1', fontsize = med)
+axes[1,0].set_title('(c) 2CSB', fontsize = med)
 
 # Two continents - America 
 
-uwind = (ucomp3_avg - ucomp1_avg)[::-1,:,:]
-wwind = ((wcomp3_avg - wcomp1_avg)*8000.)[::-1,:,:]
-array = (temp3_avg - temp1_avg)
+uwind = (ucomp3_avg - ucomp2_avg)[::-1,:,:]
+wwind = ((wcomp3_avg - wcomp2_avg)*3000.)[::-1,:,:]
+array = (temp3_avg - temp2_avg)
 lons = uwind.lon
 lats = uwind.lat
 pres = wwind.pres_lev
@@ -888,7 +890,7 @@ axes[1,1].set_xlabel('Longitude E', fontsize = med)
 
 Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[1,1].set_title('(d) AFVP1 - AFVP05', fontsize = med)
+axes[1,1].set_title('(d) 2CSB - 2CVP02', fontsize = med)
 
 fig.gca().invert_yaxis()
 axes[0,0].tick_params(labelsize = small)
@@ -901,5 +903,5 @@ cbar.ax.tick_params(labelsize=small)
 cbar.set_label('$\Delta temp$ (K)', size = med)
 
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_deltatemp_120-480_10S-10N_lgefonts_nonshift.png')
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_vegetation_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361/w8000_quivers_4cases_deltatemp_120-480_10S-10N_lgefonts_nonshift.svg')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltatemp_60-180_10S-10N_lgefonts_nonshift.png')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dir+'/w3000_quivers_4cases_deltatemp_60-180_10S-10N_lgefonts_nonshift.svg')
