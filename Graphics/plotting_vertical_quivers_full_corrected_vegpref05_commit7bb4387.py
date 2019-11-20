@@ -23,15 +23,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'flat_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref1'
+control_dir = 'full_continents_newbucket_fixedSSTs_zonally_symmetric_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=25
-ctl_runmax=121
+ctl_runmin=121
+ctl_runmax=481
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -42,11 +42,12 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'flat_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361'
-runmin=24
-runmax=120
+testdir_in1= 'full_continents_newbucket_fixedSSTs_zonally_symmetric_corrected_vegpref05_plus_2pt52K_and_2xCO2_spinup_361_commit7bb4387'
+dire = testdir_in1
+runmin=120
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    exp1_name = 'ISCA_HPC_'+testdir_in1
+    exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
     testdir_in1 = '/ISCA_HPC/' + testdir_in1
 else: 
@@ -170,7 +171,7 @@ axes[0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[0].quiver(X[::3,::3], Z[::3,::3], uwind_tropmean[::3,::3], wwind_tropmean[::3,::3], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-axes[0].set_title('Flat continents control', fontsize = med)
+axes[0].set_title('RCVP05 ctl', fontsize = med)
 
 
 
@@ -218,7 +219,7 @@ cset1 = axes[1].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'bot
 
 Q = axes[1].quiver(X[::3,::3], Z[::3,::3], uwind_tropmean[::3,::3], wwind_tropmean[::3,::3], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-axes[1].set_title('Flat continent perturbed', fontsize = med)
+axes[1].set_title('RCVP05 pert', fontsize = med)
 
 # Two continents 
 
@@ -265,7 +266,7 @@ axes[2].set_ylabel('Pressure (hPa)', fontsize = med)
 
 Q = axes[2].quiver(X[::3,::3], Z[::3,::3], uwind_tropmean[::3,::3], wwind_tropmean[::3,::3], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 qk = axes[2].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-axes[2].set_title('Flat continents perturbed - control', fontsize = med)
+axes[2].set_title('RCVP05 pert - ctl', fontsize = med)
 
 fig.gca().invert_yaxis()
 axes[0].tick_params(labelsize = small)
@@ -275,7 +276,7 @@ axes[2].tick_params(labelsize = small)
 cbar = fig.colorbar(cset1,orientation = 'vertical',ax=axes)
 cbar.ax.tick_params(labelsize=small)
 cbar.set_label('$\Delta RH$ (%)', size = med)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/flat_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361/w3000_control_perturbed_delta.png')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w3000_control_perturbed_delta.png')
 
 plt.close()
 
@@ -335,7 +336,7 @@ plt.ylabel('Pressure (hPa)', fontsize = med)
 
 Q = plt.quiver(X[0:10,50:80], Z[0:10,50:80], uwind_tropmean[0:10,50:80], wwind_tropmean[0:10,50:80], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 qk = plt.quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-plt.title('Flat Pert-Control', fontsize = med)
+plt.title('full Pert-Control', fontsize = med)
 
 plt.gca().invert_yaxis()
 plt.tick_params(labelsize = small)
@@ -344,5 +345,5 @@ cbar = plt.colorbar(cset1,orientation = 'vertical')
 cbar.ax.tick_params(labelsize=small)
 cbar.set_label('$\Delta RH$ (%)', size = med)
 
-plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/flat_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref05_plus_2pt52K_and_2xCO2_spinup_361/w3000_perturbed-control_lower_atmosphere.png')
+plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w3000_perturbed-control_lower_atmosphere.png')
 

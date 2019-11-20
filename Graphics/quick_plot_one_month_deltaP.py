@@ -11,8 +11,8 @@ sys.path.insert(0, '/scratch/mp586/Code/PYCODES')
 from plotting_routines_kav7 import *
 import stats as st
 
-nc = Dataset('/scratch/mp586/Isca_DATA/ISCA_HPC/full_continents_newbucket_fixedSSTs_zonally_symmetric/run0001/atmos_monthly.nc')
-nc2 = Dataset('/scratch/mp586/Isca_DATA/ISCA_HPC/full_continents_newbucket_fixedSSTs_zonally_symmetric_commit7bb4387/run0001/atmos_monthly.nc')
+nc = Dataset('/scratch/mp586/Isca_DATA/ISCA_HPC/square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_commitf259310/run0001/atmos_monthly.nc')
+nc2 = Dataset('/scratch/mp586/Isca_DATA/ISCA_HPC/square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387/run0001/atmos_monthly.nc')
 
 p1 = nc.variables['precipitation'][:]
 p2 = nc2.variables['precipitation'][:]
