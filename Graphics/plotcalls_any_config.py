@@ -175,6 +175,9 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,precipitation_avg,area_arra
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T','temp0',landmaskxr,minval = -40., maxval = 40., steps = 41)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','avg_surface_T_widebar','temp0',landmaskxr,minval = -60., maxval = 60., steps = 41)
 
+[omega,omega_avg,omega_seasonal_avg,omega_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'omega','Pa/s',level=level)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,omega_avg,area_array,'Pa/s','omega_avg_lev'+str(level),'rainnorm',landmaskxr)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,ucomp_avg,area_array,'m/s','ucomp_avg_lev'+str(level),'rainnorm',landmaskxr)
 
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg.where(landmask==1.),area_array,'K','avg_surface_T_land','temp',landmaskxr,nmb_contours=5)
 
@@ -209,7 +212,8 @@ SON = 'SON'
 
 winds_at_heightlevel(ucomp_avg,vcomp_avg,39,precipitation_avg,'fromwhite','mm/d',0.,8.,landmaskxr)
 
-#[omega,omega_avg,omega_seasonal_avg,omega_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'omega','Pa/s',level=39)
+[omega,omega_avg,omega_seasonal_avg,omega_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'omega','Pa/s',level=39)
+[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'u_comp','m/s',level=level)
 
 winds_seasons(ucomp_seasonal_avg,vcomp_seasonal_avg,39,precipitation_seasonal_avg,'fromwhite','mm/d',0.,8.,landmaskxr,outdir,runmin,runmax)
 

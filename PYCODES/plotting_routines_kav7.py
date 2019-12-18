@@ -879,6 +879,53 @@ def seasonal_surface_variable(testdir,model,runmin,runmax,varname,units,factor=1
 
     return(var,var_avg,var_seasonal_avg,var_month_avg,time)
 
+
+def seasonal_surface_variable_shift(testdir,model,runmin,runmax,varname,units,factor=1.,level=None): 
+
+    print(varname+' '+str(factor))
+
+    for i in range (runmin,runmax): # excludes last one! i.e. not from 1 - 12 but from 1 - 11!
+        if model=='isca':
+            runnr="{0:04}".format(i)
+        elif model=='gfdl':
+            runnr="{0:03}".format(i)
+        filename = '/scratch/mp586/'+testdir+'/run'+runnr+'/atmos_monthly.nc'
+        nc = Dataset(filename,mode='r')
+              
+        if i==runmin:
+            if (level==None) or (level=='all'):
+                var=xr.DataArray(nc.variables[varname][:]) # only monthly avg for month i
+            else:
+                var=xr.DataArray(nc.variables[varname][:,level,:,:]) # only monthly avg for month i
+
+        else:
+            if (level==None) or (level=='all'): 
+                var_i=xr.DataArray(nc.variables[varname][:])
+                var=xr.concat([var,var_i],'dim_0')
+            else:
+                var_i=xr.DataArray(nc.variables[varname][:,level,:,:])
+                var=xr.concat([var,var_i],'dim_0')
+
+    if level == 'all':
+        var = var.sum('dim_1') # height integral
+    
+    lons= nc.variables['lon'][:]
+    lats= nc.variables['lat'][:]
+    
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))] # has to start at zero so that it gives jan to dec. otherwise (1,12) goes from feb to jan!
+    array = xr.DataArray(var,coords=[time[0],lats,lons],dims=['time','lat','lon'])
+    array = np.asarray(array)
+    array, lons_cyclic = addcyclic(array, lons)
+    array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+    var = xr.DataArray((array)*factor,coords=[time[0],lats,lons_cyclic],dims=['time','lat','lon'])
+    var_avg=var.mean(dim='time')
+    var_seasonal_avg=var.groupby('time.season').mean('time') 
+    var_month_avg=var.groupby('time.month').mean('time')
+
+    return(var,var_avg,var_seasonal_avg,var_month_avg,time)
+
+
+
 def seasonal_surface_variable_6hrly(testdir,model,runmin,runmax,varname,units,factor=1.,level=None): 
 
     print(varname+' '+str(factor))
@@ -2501,7 +2548,8 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 		# pal = plt.cm.Blues
 		# pal.set_under('w',None)
 		# cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
-
+	elif palette=='energy_limit':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu, extend='max')
 	elif palette=='bucket': 
 		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
 
@@ -2580,6 +2628,173 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 #    return fig
 
 
+def any_configuration_plot_noshift(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None):
+
+
+
+
+# plotting only the zonal average next to the map 
+# currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
+	plt.close()
+
+	if array2 is None:
+		array = array1
+	else:
+		array = array1
+		ctl_array = array2
+
+	if save_title == None: 
+		save_title = plot_title
+
+	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+	lats=array.lat
+	lons=array.lon
+	
+	# why is this not working anymore when land areas are selected ? worked in commit d110990e
+	minlatindex=np.asarray(np.where(lats>=minlat))[0,0]
+	maxlatreverseindex=np.asarray(np.where(lats[::-1]<=maxlat))[0,0] 
+	selected_lats=lats[minlatindex:(lats.size-maxlatreverseindex)+1]
+
+	landlats = np.asarray(landmaskxr.lat)
+	landlons = np.asarray(landmaskxr.lon)
+
+	landmask = np.asarray(landmaskxr)
+
+
+	fig = plt.figure(figsize = (25,10))
+
+ 	ax1 = plt.subplot2grid((5,8), (0,1), colspan = 5, rowspan = 3)
+
+
+	m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
+#    m = Basemap(projection='cyl',llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c') works, but not with kav7 projection
+	array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+	zonavg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
+	meravg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-30.,maxlat=30.,axis=0)
+
+	if array2 is not None: 
+		ctl_array = np.asarray(ctl_array)
+
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+
+	lon, lat = np.meshgrid(lons, lats)
+	xi, yi = m(lon, lat)
+
+	dlons = lons[100] - lons[99]
+	dlats = lats[60] - lats[59]
+
+
+	if minval==None and maxval==None:
+		minval = array.min()
+		maxval = array.max()
+	
+		minval = np.absolute(minval)
+		maxval = np.absolute(maxval)
+
+		if maxval >= minval:
+			minval = - maxval
+		else: 
+			maxval = minval
+			minval = - minval
+
+	v = np.linspace(minval,maxval,steps) # , endpoint=True)
+
+	if palette=='rainnorm':
+#	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
+	elif palette == 'PE_scale':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
+	elif palette == 'raindefault':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
+	elif palette=='temp':
+		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+#	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
+	elif palette=='temp0':
+			cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='fromwhite': 
+		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+		# pal = plt.cm.Blues
+		# pal.set_under('w',None)
+		# cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+	elif palette=='energy_limit':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu, extend='max')
+	elif palette=='bucket': 
+		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
+
+	elif palette=='tempdiff': 
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='slp':
+		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
+	else:
+		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats))
+
+
+	if nmb_contours != 0:  # add contours 
+		if array2 is not None:
+			cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+		else: 
+			cont = m.contour(xi,yi,array,nmb_contours, colors = 'k', linewidth=2)
+
+		# if cont>=1.:
+		# 	plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
+		# else:
+		# 	plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
+
+# Add Colorbar
+	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
+	cbar.set_label(units, size=med)
+	cbar.ax.tick_params(labelsize=med) 
+	cbar.set_clim(minval, maxval)
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+	if np.any(landmask != 0.):
+		m.contour(xi,yi,landmask, 1)
+
+	plt.title(plot_title, size=lge)
+
+	
+	if month_annotate >= 1:
+		plt.annotate('Month #'+str(month_annotate), xy=(0.15,0.8), xycoords='figure fraction')
+		return fig
+
+	else:
+   
+		ax2 = plt.subplot2grid((5,8), (0,6), rowspan = 3)
+
+		plt.plot(zonavg_thin,lats)
+		plt.ylabel('Latitude', size=med)
+		plt.xlabel(units, size=med)
+		ax2.yaxis.tick_right()
+		ax2.yaxis.set_label_position('right')
+		ax2.tick_params(axis='both', which='major', labelsize=small)
+		ax2.invert_xaxis()
+
+# 	    ax3 = plt.subplot2grid((5,8), (4,1), colspan = 4)
+# 	    plt.plot(lons_128,meravg_thin)
+# 	    plt.xlabel('Longitude')
+# 	    plt.ylabel(title+' ('+units+') 30S-30N')
+# #	    plt.tight_layout()
+
+#		manager = plt.get_current_fig_manager()
+#		manager.window.showMaximized()
+#	    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
+
+		if save_fig == True:
+			plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
+			plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.svg', format = 'svg', bbox_inches='tight')
+
+
+		else: 
+			fig.show()
+#    return fig
 
 
 def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True, steps = 21):

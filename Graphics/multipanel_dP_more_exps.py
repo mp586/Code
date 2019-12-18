@@ -253,6 +253,49 @@ plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_avg_minus_ctl_
 plt.close()
 
 
+
+fig = plt.figure(figsize = (25,15))
+
+m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-30, urcrnrlon=170)
+
+v = np.linspace(0.,8.,41) # , endpoint=True)
+
+
+for i in range(len(control_sb_dirs)):
+    for j in range(len(pert_list)):
+        testdir = pert_dict[pert_list[j]][i]
+        if testdir != 'x':
+            array = xr.DataArray(precip_ctl_matrix[i,j,:,:],coords=[lats,lons],dims=['lat','lon'])
+            array = np.asarray(array)
+            array, lons_cyclic = addcyclic(array, lons)
+            array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+            lon, lat = np.meshgrid(lons_cyclic, lats)
+            xi, yi = m(lon, lat)
+
+            array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+
+            ax = plt.subplot2grid((len(vp0_dirs),len(pert_dict)), (i,j))
+
+            cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
+
+            landmask,landlons_shift = shiftgrid(np.max(landlons)-180.,landmask_array[i,:,:],landlons,start=False,cyclic=np.max(landlons))
+            landmask, lons_cyclic = addcyclic(landmask, landlons_shift)
+            m.contour(xi,yi,landmask, 1, colors = 'k')
+
+
+plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
+cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
+cbar = plt.colorbar(cs, cax = cb_ax)
+cbar.set_label(units, size = 10)
+cbar.ax.tick_params(labelsize=10)
+
+plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_ctl_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
+plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_ctl_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
+
+
+
 # fig = plt.figure(figsize = (20,10))
 # v = np.linspace(-1.,1.,41) # , endpoint=True)
 
@@ -461,9 +504,9 @@ plt.close()
 precip_change_matrix = xr.DataArray(precip_change_matrix, coords = [control_sb_dirs, pert_list, lats, lons], dims = ['width','exp','lat','lon'])
 AM_mask = landmask_array[4]         
 AF_mask = landmask_array[5]                                  
-dP_AF_SB = precip_change_matrix[5,3,:,:].where(AF_mask == 1.) 
+dP_AF_SB = precip_change_matrix[5,4,:,:].where(AF_mask == 1.) 
 dP_AF_veg = precip_change_matrix[5,2,:,:].where(AF_mask == 1.)
-dP_AM_SB = precip_change_matrix[4,3,:,:].where(AM_mask == 1.) 
+dP_AM_SB = precip_change_matrix[4,4,:,:].where(AM_mask == 1.) 
 dP_AM_veg = precip_change_matrix[4,2,:,:].where(AM_mask == 1.)
                                          
 dP_AF_SB = np.asarray(dP_AF_SB).flatten()        
@@ -512,19 +555,31 @@ plt.savefig('/scratch/mp586/Code/Graphics/d'+variable+'_AM_AF_veg_SB.png', dpi =
 
 plt.close()
 
+small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
-plt.plot(dP_AM_SB, dP_AM_veg, 'c.', markersize = 5., label = 'AM')
-plt.plot(dP_AF_SB, dP_AF_veg, 'm.', markersize = 5., label = 'AF')          
-plt.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgrey')      
-plt.plot(np.linspace(low_lim,up_lim,100),np.zeros((100)), 'dimgrey')                 
-plt.plot(np.zeros((100)), np.linspace(-4.,4.,100), 'dimgrey')                    
-plt.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgrey')                
-plt.legend()                                                                 
-plt.xlim(low_lim,up_lim)                                                         
-plt.ylim(low_lim,up_lim)          
-plt.xlabel(variable+' change SB ('+units+')')     
-plt.ylabel(variable+' change veg 0.5 ('+units+')')
-plt.plot(dP_AM_SB, line_AM_lst, 'c')                                 
-plt.plot(dP_AF_SB, line_AF_lst, 'm') 
+fig, axes = plt.subplots(1,1, figsize = (10,10))
+
+axes.plot(dP_AM_SB, dP_AM_veg, 'c.', markersize = 8., label = 'AM')
+axes.plot(dP_AF_SB, dP_AF_veg, 'm.', markersize = 8., label = 'AF')          
+axes.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgrey')      
+axes.plot(np.linspace(low_lim,up_lim,100),np.zeros((100)), 'dimgrey')                 
+axes.plot(np.zeros((100)), np.linspace(-4.,4.,100), 'dimgrey')                    
+axes.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgrey')                
+axes.legend(fontsize = med)                                                                 
+axes.set_xlim(low_lim,up_lim)                                                         
+axes.set_ylim(low_lim,up_lim)          
+# axes.set_xlabel(variable+' change SB ('+units+')', fontsize = med)     
+# axes.set_ylabel(variable+' change veg 0.5 ('+units+')', fontsize = med)
+axes.set_xlabel('$\Delta P$ SB ('+units+')', fontsize = med)     
+axes.set_ylabel('$\Delta P$ VP05 ('+units+')', fontsize = med)
+
+axes.plot(dP_AM_SB, line_AM_lst, 'c')                                 
+axes.plot(dP_AF_SB, line_AF_lst, 'm') 
+axes.tick_params(labelsize = med)
+axes.spines['right'].set_visible(False)
+axes.spines['top'].set_visible(False)
  
-plt.savefig('/scratch/mp586/Code/Graphics/d'+variable+'_AM_AF_veg_SB_lstonly.png', dpi = 400)
+plt.savefig('/scratch/mp586/Code/Graphics/d'+variable+'_AM_AF_veg_SB_lstonly.png', dpi = 100)
+plt.savefig('/scratch/mp586/Code/Graphics/d'+variable+'_AM_AF_veg_SB_lstonly.pdf', dpi = 400)
