@@ -112,27 +112,27 @@ units_denom = 's'
 fig, ax = plt.subplots(1, 2, figsize = (25,10))
 
 # if fig, ax = plt.subplots(0,0, figsize = (25,10)) then ax is a numpy array --> can't do quiver plot on it
-level = [37, 15]
-minmax = [-5.,5.,-30.,30.]
+level = [37, ]
+minmax = [-30.,30.,-100.,100.]
 nmb_contours = 10
-plt_title = ['a) 870 hPa', 'b) 200hPa']
+plt_title = ['a) 870 hPa', 'b) lev'+str(level[1])]
 j = 0 
 for i in range(2):
 
     m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = ax[i])
 
-    [ucomp1,ucomp1_avg,ucomp1_seasonal_avg,ucomp1_month_avg,ucomp1_annual_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = level[i])
-    [ucomp1_ctl,ucomp1_avg_ctl,ucomp1_seasonal_avg_ctl,ucomp1_month_avg_ctl,ucomp1_annual_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = level[i])
-    [vcomp1,vcomp1_avg,vcomp1_seasonal_avg,vcomp1_month_avg,vcomp1_annual_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = level[i])
-    [vcomp1_ctl,vcomp1_avg_ctl,vcomp1_seasonal_avg_ctl,vcomp1_month_avg_ctl,vcomp1_annual_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = level[i])
-    [gph1,gph1_avg,gph1_seasonal_avg,gph1_month_avg,gph1_annual_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = level[i])
-    [gph1_ctl,gph1_avg_ctl,gph1_seasonal_avg_ctl,gph1_month_avg_ctl,gph1_annual_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = level[i])
+    [ucomp1,ucomp1_avg,ucomp1_seasonal_avg,ucomp1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = level[i])
+    [ucomp1_ctl,ucomp1_avg_ctl,ucomp1_seasonal_avg_ctl,ucomp1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = level[i])
+    [vcomp1,vcomp1_avg,vcomp1_seasonal_avg,vcomp1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = level[i])
+    [vcomp1_ctl,vcomp1_avg_ctl,vcomp1_seasonal_avg_ctl,vcomp1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = level[i])
+    [gph1,gph1_avg,gph1_seasonal_avg,gph1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'height','m', level = level[i])
+    [gph1_ctl,gph1_avg_ctl,gph1_seasonal_avg_ctl,gph1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = level[i])
 
 
 
-    uwind = ((ucomp2_avg - ucomp2_avg_ctl) - (ucomp1_avg - ucomp1_avg_ctl))[level[i],:,:]
-    vwind = ((vcomp2_avg - vcomp2_avg_ctl) - (vcomp1_avg - vcomp1_avg_ctl))[level[i],:,:]
-    array = ((((gph2_avg - gph2_avg_ctl) - (gph1_avg - gph1_avg_ctl))))[level[i],:,:] #*100. # change in gph in percent /(gph2_avg_ctl - gph1_avg_ctl)
+    uwind = ((ucomp1_avg - ucomp1_avg_ctl))
+    vwind = ((vcomp1_avg - vcomp1_avg_ctl))
+    array = (gph1_avg - gph1_avg_ctl) #*100. # change in gph in percent /(gph2_avg_ctl - gph1_avg_ctl)
     lons = uwind.lon
     lats = uwind.lat
     uwind, lons_cyclic = addcyclic(uwind, lons)
@@ -157,7 +157,6 @@ for i in range(2):
     lon, lat = np.meshgrid(lons_shift, lats)
     xi, yi = m(lon, lat)
     m.contour(xi,yi,landmask1, 1, linewidths = 2., colors = 'w')
-    m.contour(xi,yi,landmask2, 1, linestyles = 'dashed', linewidths = 2., colors = 'w')
 
     v = np.linspace(minmax[j], minmax[j+1],21) # , endpoint=True)
 
@@ -178,6 +177,8 @@ for i in range(2):
     ax[i].set_title(plt_title[i], fontsize = med)
 
 qk = plt.quiverkey(Q, 0.87, 0.83, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+
+fig.show()
 
 fig.savefig('/scratch/mp586/Code/Graphics/Isca'+outdir+'/gph_avg_minus_ctl_commit7bb4387.png', bbox_inches = 'tight')
 

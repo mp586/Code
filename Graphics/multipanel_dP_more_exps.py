@@ -23,12 +23,12 @@ import cell_area as ca
 
 mpl.rcParams["lines.linewidth"] = 0.5 # setting linewidth for landmask contour plot doesn't work otherwise 
 
-variable = 'precipitation' # 'bucket_depth' # 'precipitation' # 'flux_lhe' # precipitation # t_surf
+variable = 'flux_lhe' # 'bucket_depth' # 'precipitation' # 'flux_lhe' # precipitation # t_surf
 colormap = 'BrBG' # 'BrBG' # 'BrBG' # 'RdBu_r'
 minval = -2. # -0.05 # -2. # -2. # -10.
 maxval = 2. # 0.05 #  2. # 2. # 10. 
 units ='mm/d' # 'm' # 'mm/d' # 'mm/d' # 'K'
-factor = 86400.# 1. # 86400. # 1./28. # 86400 # 1.
+factor = 1./28.# 1. # 86400. # 1./28. # 86400 # 1.
 low_lim = -4.# -0.1 # -4. # 0.
 up_lim = 4.  # 0.1 # 4. # 5. 
 
@@ -190,8 +190,6 @@ precip_pert_matrix = np.zeros((len(vp0_dirs),len(pert_dict),len(lats),len(lons))
 
 
 
-
-
 for i in range(len(control_sb_dirs)):
     [precipitation_ctl,precipitation_avg_ctl,x,x,x]=seasonal_surface_variable('Isca_DATA/ISCA_HPC/'+control_sb_dirs[i],'isca',121,481,variable,units, factor=factor)
     
@@ -204,12 +202,15 @@ for i in range(len(control_sb_dirs)):
             precip_ctl_matrix[i,j,:,:] = precipitation_avg_ctl
             precip_pert_matrix[i,j,:,:] = precipitation_avg
         
-# small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-# med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-# lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-fig = plt.figure(figsize = (25,15))
+names = ['VP0', 'VP02', 'VP05', 'VP07', 'SB']
+conts = ['3$^{\circ}$','6$^{\circ}$', '12$^{\circ}$', '24$^{\circ}$', 'AM', 'AF','100$^{\circ}$','2AM','2C']
+
+fig = plt.figure(figsize = (22,15))
 
 m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-30, urcrnrlon=170)
 
@@ -219,7 +220,20 @@ v = np.linspace(minval,maxval,41) # , endpoint=True)
 for i in range(len(control_sb_dirs)):
     for j in range(len(pert_list)):
         testdir = pert_dict[pert_list[j]][i]
-        if testdir != 'x':
+        ax = plt.subplot2grid((len(vp0_dirs),len(pert_dict)), (i,j))
+        if i == 0:
+            ax.set_title(names[j], size = med)
+        if j == 0:
+            ax.set_ylabel(conts[i], size = med)
+        if testdir == 'x':
+            ax.xaxis.set_visible(False)
+            # make spines (the box) invisible
+            plt.setp(ax.spines.values(), visible=False)
+            # remove ticks and labels for the left axis
+            ax.tick_params(left=False, labelleft=False)
+            #remove background patch (only needed for non-white background)
+            # ax.patch.set_visible(False)
+        else:
             array = xr.DataArray(precip_change_matrix[i,j,:,:],coords=[lats,lons],dims=['lat','lon'])
             array = np.asarray(array)
             array, lons_cyclic = addcyclic(array, lons)
@@ -229,9 +243,6 @@ for i in range(len(control_sb_dirs)):
             xi, yi = m(lon, lat)
 
             array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-
-            ax = plt.subplot2grid((len(vp0_dirs),len(pert_dict)), (i,j))
 
             cs = m.contourf(xi,yi,array, v, cmap=colormap, extend = 'both')
 
@@ -554,10 +565,6 @@ plt.plot(dP_AF_SB, line_AF_lst, 'k')
 plt.savefig('/scratch/mp586/Code/Graphics/d'+variable+'_AM_AF_veg_SB.png', dpi = 400)
 
 plt.close()
-
-small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 fig, axes = plt.subplots(1,1, figsize = (10,10))
 

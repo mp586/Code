@@ -41,8 +41,8 @@ elif (model == 'gfdl') or (model == 'GFDL'):
 
 HPC = 'yes'
 testdir_in1= 'full_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commitfe93b9d'
-runmin=24
-runmax=96
+runmin=120
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -112,7 +112,7 @@ Ep_estim_ctl = (sw_net_ctl - net_lw_ctl)/28.
 testdir_in1= 'full_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_corrected_vegpref05_plus_uniform_warming_and_2xCO2_spinup_361_commitfe93b9d'
 dire = testdir_in1
 runmin=120
-runmax=324
+runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
