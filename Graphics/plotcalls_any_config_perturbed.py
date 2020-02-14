@@ -189,12 +189,13 @@ DeltaN_zonalmean = xr.DataArray(DeltaN_zonalmean, coords = [N_avg.lat, N_avg.lon
 [omega_ctl,omega_avg_ctl,omega_seasonal_avg_ctl,omega_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s', level = 27) # geopotential height at 500 hPa
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg_ctl),area_array,'Pa/s','omega_ctl','rainnorm',landmaskxr)
 globavg_N_avg_ctl = area_weighted_avg(N_avg_ctl,area_array,landmaskxr,option='all_sfcs')
+deltaN_areawav = area_weighted_avg((N_avg - N_avg_ctl),area_array,landmaskxr,option='all_sfcs')
+
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg_ctl,area_array,'W/m^2','N_ctl','rainnorm',landmaskxr, minval = -70., maxval = 70) #, nmb_contours = [-0.05,-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04,0.05], array2 = omega_avg_ctl)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg_ctl - globavg_N_avg_ctl),area_array,'W/m^2','N_ctl-globavg_N_ctl','rainnorm',landmaskxr) #, nmb_contours = [-0.04,-0.03,-0.02,-0.01,0.,0.01,0.02,0.03,0.04], array2 = omega_avg_ctl)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg - N_avg_ctl,area_array,'W/m^2','N_avg_minus_ctl','rainnorm',landmaskxr, minval = -20., maxval = 20.) #, nmb_contours = [-0.02,-0.002,0.002,0.02], array2 = (omega_avg - omega_avg_ctl))
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg - N_avg_ctl,area_array,'W/m^2','N_avg_minus_ctl','rainnorm',landmaskxr, minval = -20., maxval = 20., text_annotate = str(deltaN_areawav)) #, nmb_contours = [-0.02,-0.002,0.002,0.02], array2 = (omega_avg - omega_avg_ctl))
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,N_avg - N_avg_ctl,area_array,'W/m^2','N_avg_minus_ctl_landcbar','rainnorm',landmaskxr, minval = -100., maxval = 100.) #, nmb_contours = [-0.02,-0.002,0.002,0.02], array2 = (omega_avg - omega_avg_ctl))
-
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg - N_avg_ctl) - DeltaN_zonalmean,area_array,'W/m^2','N_avg_minus_ctl_zonalanomalies','rainnorm',landmaskxr, minval = -20., maxval = 20.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(N_avg - N_avg_ctl) - DeltaN_zonalmean,area_array,'W/m^2','N_avg_minus_ctl_zonalanomalies_landcbar','rainnorm',landmaskxr, minval = -100., maxval = 0.)
 
@@ -211,19 +212,19 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg - omega_avg_ctl)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','flux_toa_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(olr_avg - olr_avg_ctl),area_array,'(W/m^2)','flux_olr_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','flux_net_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','flux_net_sw_avg_minus_ctl_narrowcbar','rainnorm',landmaskxr, minval = -10., maxval = 10.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_lw_avg - net_lw_avg_ctl),area_array,'(W/m^2)','flux_net_lw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(sigma*(tsurf_avg**4) - sigma*(tsurf_avg_ctl**4)),area_array,'(W/m^2)','flux_lw_up_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lw_down_avg - lw_down_avg_ctl),area_array,'(W/m^2)','flux_lw_down_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lhe_flux_avg - lhe_flux_avg_ctl),area_array,'(W/m^2)','flux_lhe_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg - net_t_avg_ctl),area_array,'(W/m^2)','flux_sh_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','flux_net_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(SEB_avg - SEB_avg_ctl),area_array,'(W/m^2)','flux_SEB_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg - TOA_avg_ctl),area_array,'(W/m^2)','flux_TOA_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90., - (olr_avg - olr_avg_ctl),area_array,'(W/m^2)','flux_olr_avg_minus_ctl_narrowcbar_posdown','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','flux_toa_sw_avg_minus_ctl_narrowcbar','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl) - (net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','flux_toa_minus_sfc_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg),area_array,'(W/m^2)','flux_TOA_avg','rainnorm',landmaskxr, minval = -100., maxval = 100.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg),area_array,'(W/m^2)','flux_TOA_avg','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 
 
 if land != 'aquaplanet':
@@ -232,7 +233,9 @@ if land != 'aquaplanet':
 ############# RH change vs P and E changes - scatter plots #####################
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
+dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask)
 ################################################################################
+
 
 
 
@@ -262,8 +265,8 @@ any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,(tsurf_month_avg_
 
 
 # Precipitation - Evaporation
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl),area_array,'mm/day','P-E_avg_minus_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg),area_array,'mm/day','P-E avg','PE_scale',landmaskxr,minval=-2.,maxval=2.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg - PE_avg_ctl),area_array,'mm/day','P-E_avg_minus_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2., array2=PE_avg_ctl)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg),area_array,'mm/day','P-E_avg','PE_scale',landmaskxr,minval=-2.,maxval=2., array2=PE_avg_ctl)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl','PE_scale',landmaskxr,minval=-2.,maxval=2.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl_widebar','PE_scale',landmaskxr,minval=-10.,maxval=10.,steps=21)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(PE_avg_ctl),area_array,'mm/day','P-E_ctl_narrowbar','PE_scale',landmaskxr,minval=-1.,maxval=1.,steps=21)

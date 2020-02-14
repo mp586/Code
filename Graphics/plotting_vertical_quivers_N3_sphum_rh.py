@@ -176,15 +176,15 @@ shiftby = 180. # = 180. --> 0 degrees in the middle, = 105. --> idealized contin
 vertmult = 3000
 
 
-list_minlats = [-10.,-5., 0., -30.]
-list_maxlats = [10., 0., 5., 30.]
+list_minlats = [-10.]#,-5., 0., -30.]
+list_maxlats = [10.]#, 0., 5., 30.]
 for i in range(len(list_maxlats)): 
 
     v = np.linspace(-10.,10.,21) # , endpoint=True)
     minlat = list_minlats[i]
     maxlat = list_maxlats[i]
 
-    fig, axes = plt.subplots(3, 1, sharey = True, figsize = (15,20))
+    fig, axes = plt.subplots(1, 3, sharey = True, figsize = (20,15))
 
 
     # panel 1: Only South America 
@@ -225,7 +225,7 @@ for i in range(len(list_maxlats)):
     uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
     array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-    cset1 = axes[0].contourf(Xar, Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
+    cset1 = axes[0].contourf(Xar[:,], Zar, array_tropmean, v, cmap='BrBG', extend = 'both')
 
     Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
     # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 

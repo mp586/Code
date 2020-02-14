@@ -149,7 +149,7 @@ landmask = np.asarray(landmaskxr)
 
 fig, axes = plt.subplots(3,1, figsize = (25,15))
 
-axes[0].set_title('(a) VP05', size = med)
+axes[0].set_title('(a) CV05', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -254,7 +254,7 @@ landlons = np.asarray(landmaskxr.lon)
 
 landmask = np.asarray(landmaskxr)
 
-axes[2].set_title('(c) VP05 - SB', size = med)
+axes[2].set_title('(c) CV05 - SB', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -319,7 +319,7 @@ fig, ax = plt.subplots()
 ax.plot(dP_SB, dP_VP05, 'k.')
 ax.set_xlim(-6.,6.)
 ax.set_ylim(-6.,6.)
-ax.set_ylabel('$\Delta P$ (VP05) in mm/d')
+ax.set_ylabel('$\Delta P$ (CV05) in mm/d')
 ax.set_xlabel('$\Delta P$ (SB) in mm/d')
 
 mask = ~np.isnan(dP_SB)

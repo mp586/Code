@@ -2433,7 +2433,7 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
     plt.show()
 
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None):
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None, text_annotate=None):
 
 
 
@@ -2479,6 +2479,11 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 	array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 	zonavg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
+	zonavg_thin_ocean = area_weighted_avg(array,area_array,landmaskxr,option = 'ocean',minlat=-90.,maxlat=90.,axis=1)
+	zonavg_thin_land = area_weighted_avg(array,area_array,landmaskxr,option = 'land',minlat=-90.,maxlat=90.,axis=1)
+
+
+
 	meravg_thin = area_weighted_avg(array,area_array,landmaskxr,option = 'all_sfcs',minlat=-30.,maxlat=30.,axis=0)
 
 	lons_128 = lons # non-cyclic lons, i.e. lenght = 128
@@ -2498,11 +2503,15 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 	# this doesn't work for some reason
 	#array, lons = shiftgrid(np.max(lons)-100.,array,lons,start=True,cyclic=np.max(lons))
 
-	if array2 is not None: 
+	if array2 is not None:
+		zonavg_thin_ctl = area_weighted_avg(ctl_array,area_array,landmaskxr,option = 'all_sfcs',minlat=-90.,maxlat=90.,axis=1)
+		zonavg_thin_ocean_ctl = area_weighted_avg(ctl_array,area_array,landmaskxr,option = 'ocean',minlat=-90.,maxlat=90.,axis=1)
+		zonavg_thin_land_ctl = area_weighted_avg(ctl_array,area_array,landmaskxr,option = 'land',minlat=-90.,maxlat=90.,axis=1) 
 		ctl_array = np.asarray(ctl_array)
 		ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
 		ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
 		ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
 
 	lons = lons_cyclic
 
@@ -2555,6 +2564,8 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 
 	elif palette=='tempdiff': 
 		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+	elif palette=='warming': 
+		cs = m.contourf(xi, yi, array.sel(lat = selected_lats), v, cmap = 'Reds', extend = 'max')
 	elif palette=='slp':
 		cs = m.contourf(xi,yi,array.sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
 	else:
@@ -2592,6 +2603,10 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 	plt.title(plot_title, size=lge)
 
 	
+
+	if text_annotate != None:
+		plt.annotate(text_annotate, xy=(0.1,0.1), xycoords='figure fraction')
+
 	if month_annotate >= 1:
 		plt.annotate('Month #'+str(month_annotate), xy=(0.15,0.8), xycoords='figure fraction')
 		return fig
@@ -2599,14 +2614,18 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 	else:
    
 		ax2 = plt.subplot2grid((5,8), (0,6), rowspan = 3)
-
-		plt.plot(zonavg_thin,lats)
+		if array2 is not None:
+			plt.plot(zonavg_thin_land_ctl,lats, 'b--', label = 'land')
+			plt.plot(zonavg_thin_ocean_ctl,lats, 'b',label = 'ocean')
+		plt.plot(zonavg_thin_land,lats, 'k--', label = 'land')
+		plt.plot(zonavg_thin_ocean,lats, 'k',label = 'ocean')
 		plt.ylabel('Latitude', size=med)
 		plt.xlabel(units, size=med)
 		ax2.yaxis.tick_right()
 		ax2.yaxis.set_label_position('right')
 		ax2.tick_params(axis='both', which='major', labelsize=small)
 		ax2.invert_xaxis()
+		ax2.legend()
 
 # 	    ax3 = plt.subplot2grid((5,8), (4,1), colspan = 4)
 # 	    plt.plot(lons_128,meravg_thin)
@@ -4785,7 +4804,6 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 #	fig.show()
 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Delta_P_vs_Delta_T_and_P-E_control_'+str(runmin)+'-'+str(runmax)+'_'+sfc+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
 
-
  # plots west and east spearately and delta p vs delta t for both 
 	if landmaskEC: 
 		fig, ax = plt.subplots(1,3, sharey = True, figsize=(25,10))
@@ -4893,6 +4911,164 @@ def rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,preci
 
 
 	plt.close('all')
+
+
+def dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,landmaskEC=None,landmaskWC=None,sfc='all',minlat=-30.,maxlat=30.):
+	
+
+	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+	
+	rh_avg_all = rh_avg.sel(lat=slice(minlat,maxlat))
+	P_avg_all = precipitation_avg.sel(lat=slice(minlat,maxlat))
+	T_avg_all = tsurf_avg.sel(lat=slice(minlat,maxlat))
+	E_avg_all = net_lhe_avg.sel(lat=slice(minlat,maxlat))
+
+	rh_avg_ctl_all = rh_avg_ctl.sel(lat=slice(minlat,maxlat))
+	P_avg_ctl_all = precipitation_avg_ctl.sel(lat=slice(minlat,maxlat))
+	T_avg_ctl_all = tsurf_avg_ctl.sel(lat=slice(minlat,maxlat))
+	E_avg_ctl_all = net_lhe_avg_ctl.sel(lat=slice(minlat,maxlat))
+
+	rh_1d_all = np.asarray(rh_avg_all).flatten()
+	P_1d_all = np.asarray(P_avg_all).flatten()
+	E_1d_all = np.asarray(E_avg_all).flatten()
+	T_1d_all = np.asarray(T_avg_all).flatten()
+
+	rh_ctl_1d_all = np.asarray(rh_avg_ctl_all).flatten()
+	P_ctl_1d_all = np.asarray(P_avg_ctl_all).flatten()
+	E_ctl_1d_all = np.asarray(E_avg_ctl_all).flatten()
+	T_ctl_1d_all = np.asarray(T_avg_ctl_all).flatten()
+
+		
+	rh_avg_land = rh_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	P_avg_land = precipitation_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	T_avg_land = tsurf_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	E_avg_land = net_lhe_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+
+	rh_avg_ctl_land = rh_avg_ctl.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	P_avg_ctl_land = precipitation_avg_ctl.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	T_avg_ctl_land = tsurf_avg_ctl.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	E_avg_ctl_land = net_lhe_avg_ctl.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+
+	rh_1d_land = np.asarray(rh_avg_land).flatten()
+	P_1d_land = np.asarray(P_avg_land).flatten()
+	E_1d_land = np.asarray(E_avg_land).flatten()
+	T_1d_land = np.asarray(T_avg_land).flatten()
+
+	rh_ctl_1d_land = np.asarray(rh_avg_ctl_land).flatten()
+	P_ctl_1d_land = np.asarray(P_avg_ctl_land).flatten()
+	E_ctl_1d_land = np.asarray(E_avg_ctl_land).flatten()
+	T_ctl_1d_land = np.asarray(T_avg_ctl_land).flatten()
+
+	rh_avg_ocean = rh_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	P_avg_ocean = precipitation_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	T_avg_ocean = tsurf_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	E_avg_ocean = net_lhe_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+
+	rh_avg_ctl_ocean = rh_avg_ctl.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	P_avg_ctl_ocean = precipitation_avg_ctl.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	T_avg_ctl_ocean = tsurf_avg_ctl.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	E_avg_ctl_ocean = net_lhe_avg_ctl.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+
+	rh_1d_ocean = np.asarray(rh_avg_ocean).flatten()
+	P_1d_ocean = np.asarray(P_avg_ocean).flatten()
+	E_1d_ocean = np.asarray(E_avg_ocean).flatten()
+	T_1d_ocean = np.asarray(T_avg_ocean).flatten()
+
+	rh_ctl_1d_ocean = np.asarray(rh_avg_ctl_ocean).flatten()
+	P_ctl_1d_ocean = np.asarray(P_avg_ctl_ocean).flatten()
+	E_ctl_1d_ocean = np.asarray(E_avg_ctl_ocean).flatten()
+	T_ctl_1d_ocean = np.asarray(T_avg_ctl_ocean).flatten()
+
+
+
+	maskoc = ~np.isnan(rh_ctl_1d_ocean)
+	maskla = ~np.isnan(rh_ctl_1d_land)
+
+	fig, ax = plt.subplots(1,2, sharey = True, figsize=(25,10))
+
+#	if landmaskEC == None: this doesn't work.. why?
+
+	ax[0].plot(P_ctl_1d_ocean - E_ctl_1d_ocean,(P_1d_ocean - P_ctl_1d_ocean),'b.', label = 'ocean')
+	ax[0].set_xlabel("P-E control (mm/d)",fontsize = lge)
+	ax[0].tick_params(labelsize = lge)
+	ax[0].legend(fontsize = lge)
+	ax[0].set_ylabel('$\Delta$ P (mm/d)', fontsize = lge)
+	ax[0].set_xlim(-10.,10.)
+	ax[0].set_ylim(-10.,10.)
+	ax[0].spines['top'].set_visible(False)
+	ax[0].spines['right'].set_visible(False)
+
+	[k,dy,r,p,stderr] = linreg((P_ctl_1d_ocean - E_ctl_1d_ocean)[maskoc],(P_1d_ocean - P_ctl_1d_ocean)[maskoc]) # aa = 8.4, dq = -32
+	x1 = np.linspace(-10.,10.,500)
+	y = k*x1 + dy
+	ax[0].plot(x1,y,'b-')
+	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+	ax[1].plot(P_ctl_1d_land - E_ctl_1d_land,(P_1d_land - P_ctl_1d_land),'r.', label = 'land')
+	ax[1].set_xlabel("P-E control (mm/d)",fontsize = lge)
+	ax[1].tick_params(labelsize = lge)
+	ax[1].legend(fontsize = lge)
+	ax[1].set_ylabel('$\Delta$ P (mm/d)', fontsize = lge)
+	ax[1].set_xlim(-10.,10.)
+	ax[1].set_ylim(-10.,10.)
+	ax[1].spines['top'].set_visible(False)
+	ax[1].spines['right'].set_visible(False)
+
+	[k,dy,r,p,stderr] = linreg((P_ctl_1d_land - E_ctl_1d_land)[maskla],(P_1d_land - P_ctl_1d_land)[maskla]) # aa = 8.4, dq = -32
+	x1 = np.linspace(-10.,10.,500)
+	y = k*x1 + dy
+	ax[1].plot(x1,y,'r-')
+	ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP_vs_P-E_control_'+str(runmin)+'-'+str(runmax)+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP_vs_P-E_control_'+str(runmin)+'-'+str(runmax)+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.pdf', bbox_inches='tight', dpi=400)
+
+
+
+
+	fig, ax = plt.subplots(1,2, sharey = True, figsize=(25,10))
+
+#	if landmaskEC == None: this doesn't work.. why?
+
+	ax[0].plot(P_ctl_1d_ocean - E_ctl_1d_ocean,(P_1d_ocean - E_1d_ocean - P_ctl_1d_ocean + E_ctl_1d_ocean),'b.', label = 'ocean')
+	ax[0].set_xlabel("P-E control (mm/d)",fontsize = lge)
+	ax[0].tick_params(labelsize = lge)
+	ax[0].legend(fontsize = lge)
+	ax[0].set_ylabel('$\Delta$ (P-E) (mm/d)', fontsize = lge)
+	ax[0].set_xlim(-10.,10.)
+	ax[0].set_ylim(-10.,10.)
+	ax[0].spines['top'].set_visible(False)
+	ax[0].spines['right'].set_visible(False)
+
+	[k,dy,r,p,stderr] = linreg((P_ctl_1d_ocean - E_ctl_1d_ocean)[maskoc],(P_1d_ocean - E_1d_ocean - P_ctl_1d_ocean + E_ctl_1d_ocean)[maskoc]) # aa = 8.4, dq = -32
+	x1 = np.linspace(-10.,10.,500)
+	y = k*x1 + dy
+	ax[0].plot(x1,y,'b-')
+	ax[0].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+	ax[1].plot(P_ctl_1d_land - E_ctl_1d_land,(P_1d_land - E_1d_land - P_ctl_1d_land + E_ctl_1d_land),'r.', label = 'land')
+	ax[1].set_xlabel("P-E control (mm/d)",fontsize = lge)
+	ax[1].tick_params(labelsize = lge)
+	ax[1].legend(fontsize = lge)
+	ax[1].set_ylabel('$\Delta$ (P-E) (mm/d)', fontsize = lge)
+	ax[1].set_xlim(-10.,10.)
+	ax[1].set_ylim(-10.,10.)
+	ax[1].spines['top'].set_visible(False)
+	ax[1].spines['right'].set_visible(False)
+
+	[k,dy,r,p,stderr] = linreg((P_ctl_1d_land - E_ctl_1d_land)[maskla],(P_1d_land - E_1d_land - P_ctl_1d_land + E_ctl_1d_land)[maskla]) # aa = 8.4, dq = -32
+	x1 = np.linspace(-10.,10.,500)
+	y = k*x1 + dy
+	ax[1].plot(x1,y,'r-')
+	ax[1].annotate('r = '+str("%.2f" % r)+', p = '+str("%.5f" % p), xy=(0.05,0.05), xycoords='axes fraction', fontsize = med)
+
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP-E_vs_P-E_control_'+str(runmin)+'-'+str(runmax)+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/DeltaP-E_vs_P-E_control_'+str(runmin)+'-'+str(runmax)+'_between_'+str(minlat)+'N_and_'+str(maxlat)+'N.pdf', bbox_inches='tight', dpi=400)
+
 
 def land_sea_contrast(array_avg, array_avg_ctl, area_array, landmaskxr, outdir, runmin, runmax, units, plot_title, colorbar, minval = None, maxval = None): 
 
