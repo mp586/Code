@@ -80,6 +80,10 @@ plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax, ctl_pert 
 [msf_ctl,msf_avg_ctl,msf_seasonal_avg_ctl,msf_month_avg_ctl] = mass_streamfunction(control_dir,ctl_model,ctl_runmin,ctl_runmax) # 
 plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax, ctl_pert = 'ctl')
 
+# [CIWV_ctl,CIWV_avg_ctl,CIWV_seasonal_avg_ctl,CIWV_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level='all')
+# any_configuration_plot(outdir,runmin,runmax,-90.,90.,(CIWV_avg_ctl),area_array,'kg/kg','CIWV_ctl','fromwhite',landmaskxr,nmb_contours=0, minval = 0, maxval = 0.011)
+
+
 # Read in variables 
 
 [slp,slp_avg,slp_seasonal_avg,slp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'slp','hPa',factor=10**(-2))
@@ -115,7 +119,7 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 [net_sw_ctl,net_sw_avg_ctl,net_sw_seasonal_avg_ctl,net_sw_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_sw','W/m^2',factor = 1.) # 
 [lw_down_ctl,lw_down_avg_ctl,lw_down_seasonal_avg_ctl,lw_down_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lw','W/m^2',factor = 1.) # 
 [net_t_ctl,net_t_avg_ctl,net_t_seasonal_avg_ctl,net_t_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_t','W/m^2',factor = 1.) # 
-#[CIWV_ctl,CIWV_avg_ctl,CIWV_seasonal_avg_ctl,CIWV_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level='all')
+
 
 [sphum,sphum_avg,sphum_seasonal_avg,sphum_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum','kg/kg',level=level)
 [sphum_ctl,sphum_avg_ctl,sphum_seasonal_avg_ctl,sphum_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level=level)
@@ -174,6 +178,11 @@ print('SEB (control) in W/m2 = '+str(SEB_areaavg_ctl))
 SEB_avg_ctl = - net_sw_avg_ctl + net_lw_avg_ctl + lhe_flux_avg_ctl + net_t_avg_ctl ##perturbed run 
 
 TOA_avg_ctl = toa_sw_avg_ctl - olr_avg_ctl # toa sw pos down!, olr pos up (?) 
+TOA_avg = toa_sw_avg - olr_avg # toa sw pos down!, olr pos up (?) 
+
+deltaTOA_areawav = area_weighted_avg((TOA_avg - TOA_avg_ctl),area_array,landmaskxr,option='all_sfcs')
+
+
 
 N_avg_ctl = SEB_avg_ctl + TOA_avg_ctl #total energy input to the atmosphere 
 
@@ -183,7 +192,6 @@ DeltaN_zonalmean = DeltaN.mean('lon')
 DeltaN_zonalmean = np.expand_dims(DeltaN_zonalmean,axis = 1)
 DeltaN_zonalmean = np.repeat(DeltaN_zonalmean, 128, axis = 1)
 DeltaN_zonalmean = xr.DataArray(DeltaN_zonalmean, coords = [N_avg.lat, N_avg.lon], dims = ['lat','lon'])
-
 
 
 [omega_ctl,omega_avg_ctl,omega_seasonal_avg_ctl,omega_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s', level = 27) # geopotential height at 500 hPa
@@ -219,7 +227,7 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lw_down_avg - lw_down_avg_
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(lhe_flux_avg - lhe_flux_avg_ctl),area_array,'(W/m^2)','flux_lhe_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(net_t_avg - net_t_avg_ctl),area_array,'(W/m^2)','flux_sh_flux_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(SEB_avg - SEB_avg_ctl),area_array,'(W/m^2)','flux_SEB_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg - TOA_avg_ctl),area_array,'(W/m^2)','flux_TOA_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg - TOA_avg_ctl),area_array,'(W/m^2)','flux_TOA_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50., text_annotate = str(deltaTOA_areawav))
 any_configuration_plot(outdir,runmin,runmax,-90.,90., - (olr_avg - olr_avg_ctl),area_array,'(W/m^2)','flux_olr_avg_minus_ctl_narrowcbar_posdown','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl),area_array,'(W/m^2)','flux_toa_sw_avg_minus_ctl_narrowcbar','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ctl) - (net_sw_avg - net_sw_avg_ctl),area_array,'(W/m^2)','flux_toa_minus_sfc_sw_avg_minus_ctl','rainnorm',landmaskxr, minval = -50., maxval = 50.)
@@ -233,7 +241,7 @@ if land != 'aquaplanet':
 ############# RH change vs P and E changes - scatter plots #####################
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
 rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
-dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask)
+# dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask)
 ################################################################################
 
 
