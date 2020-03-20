@@ -1,0 +1,238 @@
+from netCDF4 import Dataset
+import numpy as np
+from matplotlib import pyplot as plt
+from mpl_toolkits.basemap import Basemap, cm
+import xarray as xr
+import pandas as pd
+import os
+
+def globavg_tsurf_timeseries(testdir,runmin,runmax):
+    
+    for i in range (runmin,runmax): # excludes last one! i.e. not from 1 - 12 but from 1 - 11!
+        runnr="{0:03}".format(i)
+        filename = '/scratch/mp586/GFDL_DATA/'+testdir+'/run'+runnr+'/atmos_monthly.nc'
+        nc = Dataset(filename,mode='r')
+        
+        tsurf=nc.variables['t_surf'][:]
+        
+        if i==runmin:
+            timeseries=[tsurf.mean()] # make timeseries be a list, not a float so that I can append later
+            print(type(timeseries))
+        else:
+            timeseries.append(tsurf.mean())
+
+    timeseries=np.asarray(timeseries)
+    #print(timeseries)
+    months=np.linspace(runmin,(runmax-1),timeseries.size)
+    plot1=plt.plot(months,timeseries)
+    plt.title('Tsurf (globavg)')
+    plt.xlabel('Month #')
+    plt.ylabel('Global average tsurf (K)')
+    plt.show()  # just uncommented for now  
+    return(timeseries)
+
+
+def timeavg_precip(testdir,runmin,runmax):
+    
+    plt.close()
+    for i in range (runmin,runmax): # excludes last one! i.e. not from 1 - 12 but from 1 - 11!
+        runnr="{0:03}".format(i)
+        filename = '/scratch/mp586/GFDL_DATA/'+testdir+'/run'+runnr+'/atmos_monthly.nc'
+        nc = Dataset(filename,mode='r')
+              
+        if i==runmin:
+            ccrain=xr.DataArray(nc.variables['convection_rain'][:])+xr.DataArray(nc.variables['condensation_rain'][:]) # only monthly avg for month i
+        else:
+            ccrain_i=xr.DataArray(nc.variables['convection_rain'][:])+xr.DataArray(nc.variables['condensation_rain'][:])
+            ccrain=xr.concat([ccrain,ccrain_i],'dim_0')
+    
+    
+    lons= nc.variables['lon'][:]
+    lats= nc.variables['lat'][:]
+    
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))]
+    ccrain=xr.DataArray(ccrain.values,coords=[time[0],lats,lons],dims=['time','lat','lon'])
+    ccrain_avg=ccrain.mean(dim='time')
+    ccrain_seasonal_avg=ccrain.groupby('time.season').mean('time') 
+
+    plot=tropics_plot(lats,lons,ccrain_avg*86400,'mm/day','Average Rainfall')
+    print(type(plot))
+    JJA='JJA'
+    DJF='DJF'
+    MAM='MAM'
+    SON='SON'
+    #does not work if I write .....sel(season='JJA') because the resulting array has the dimensions (1,nrlats,nrlons), but if I select indirectly using the above definitions, it works!
+    plot=tropics_plot(lats,lons,ccrain_seasonal_avg.sel(season=JJA)*86400,'mm/day','JJA Rainfall')
+   
+
+# this is not producing one panel plot but opens each separately
+    fig=plt.figure()
+    fig.add_subplot(2,2,1)
+    tropics_plot(lats,lons,ccrain_seasonal_avg.sel(season=DJF)*86400,'mm/day','DJF Rainfall')
+    fig.add_subplot(2,2,2)
+    tropics_plot(lats,lons,ccrain_seasonal_avg.sel(season=MAM)*86400,'mm/day','MAM Rainfall')
+    fig.add_subplot(2,2,3)
+  #  tropics_plot(lats,lons,ccrain_seasonal_avg.sel(season=JJA)*86400,'mm/day','JJA Rainfall')
+    fig.add_subplot(2,2,4)
+    tropics_plot(lats,lons,ccrain_seasonal_avg.sel(season=SON)*86400,'mm/day','SON Rainfall')
+# Fine-tune figure; make subplots farther from each other.
+   
+
+
+
+
+
+    return(ccrain,ccrain_avg,ccrain_seasonal_avg,time)
+
+
+def seasonal_variable(testdir,runmin,runmax,variable,units):
+    
+    plt.close()
+    for i in range (runmin,runmax): # excludes last one! i.e. not from 1 - 12 but from 1 - 11!
+        runnr="{0:03}".format(i)
+        filename = '/scratch/mp586/GFDL_DATA/'+testdir+'/run'+runnr+'/atmos_monthly.nc'
+        nc = Dataset(filename,mode='r')
+              
+        if i==runmin:
+            var=xr.DataArray(nc.variables[variable][:]) # only monthly avg for month i
+        else:
+            var_i=xr.DataArray(nc.variables[variable][:])
+            var=xr.concat([var,var_i],'dim_0')
+    
+    
+    lons= nc.variables['lon'][:]
+    lats= nc.variables['lat'][:]
+    
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))]
+    var=xr.DataArray(var.values,coords=[time[0],lats,lons],dims=['time','lat','lon'])
+    var_avg=var.mean(dim='time')
+    var_seasonal_avg=var.groupby('time.season').mean('time') 
+
+    plot=tropics_plot(lats,lons,var_avg,units,'Average '+variable)
+    print(type(plot))
+    JJA='JJA'
+    DJF='DJF'
+    MAM='MAM'
+    SON='SON'
+    #does not work if I write .....sel(season='JJA') because the resulting array has the dimensions (1,nrlats,nrlons), but if I select indirectly using the above definitions, it works!
+    plot=tropics_plot(lats,lons,var_seasonal_avg.sel(season=JJA),units,'JJA '+variable)
+   
+
+# this is not producing one panel plot but opens each separately
+    fig=plt.figure()
+    fig.add_subplot(2,2,1)
+    tropics_plot(lats,lons,var_seasonal_avg.sel(season=DJF),units,'DJF '+variable)
+    fig.add_subplot(2,2,2)
+    tropics_plot(lats,lons,var_seasonal_avg.sel(season=MAM),units,'MAM '+variable)
+    fig.add_subplot(2,2,3)
+   # tropics_plot(lats,lons,var_seasonal_avg.sel(season=JJA),units,'JJA '+variable)
+    fig.add_subplot(2,2,4)
+    tropics_plot(lats,lons,var_seasonal_avg.sel(season=SON),units,'SON '+variable)
+# Fine-tune figure; make subplots farther from each other.
+
+    return(var,var_avg,var_seasonal_avg,time)
+
+
+
+
+
+def tropics_plot(lats,lons,variable,units,title):
+    plt.close()
+    trop_minindex=np.asarray(np.where(lats>=-30.))[0,0]
+    trop_maxreverseindex=np.asarray(np.where(lats[::-1]<=30.))[0,0] # there might be a better way of doing this!
+    tropical_lats=lats[trop_minindex:(lats.size-trop_maxreverseindex)]
+    lon_0 = lons.mean() # trick to find central lon lat (lon from 0 to 360)
+    lat_0 = lats.mean() # ~= 0 because lat from -90 to 90
+
+
+
+    m = Basemap(projection='cyl',llcrnrlat=-30,urcrnrlat=30,\
+            llcrnrlon=0,urcrnrlon=360,resolution='c')
+    m.drawcoastlines()
+#m.fillcontinents(color='coral',lake_color='aqua')
+# draw parallels and meridians.
+    m.drawparallels(np.arange(-30.,31.,30.))
+    m.drawmeridians(np.arange(0.,361.,60.))
+
+
+# Because our lon and lat variables are 1D, 
+# use meshgrid to create 2D arrays 
+# Not necessary if coordinates are already in 2D arrays.
+    lon, lat = np.meshgrid(lons, tropical_lats)
+    xi, yi = m(lon, lat)
+
+   
+    cs = m.pcolor(xi,yi,variable.sel(lat=tropical_lats))
+    
+    
+# Add Colorbar
+    cbar = m.colorbar(cs, location='bottom', pad="10%")
+    cbar.set_label(units)
+
+# Add Title
+    plt.title(title)
+
+
+    #plt.show()
+    return(cs)
+
+
+# runmin=1
+# runmax=360
+# testdir='co2_test_86'
+# temp=globavg_tsurf_timeseries(testdir,runmin,runmax)
+
+
+
+# globavg t after 360 months of spinup : 270K --> yes, depends on model setup, this one is a bit cold.
+
+
+
+runmin=75
+runmax=240
+testdir='full_qflux'
+[ccrain,ccrain_avg,ccrain_seasonal_avg,time]=timeavg_precip(testdir,runmin,runmax)
+[tsurf,tsurf_avg,tsurf_seasonal_avg,time]=seasonal_variable(testdir,runmin,runmax,'t_surf','K')
+[net_sw,net_sw_avg,net_sw_seasonal_avg,time]=seasonal_variable(testdir,runmin,runmax,'flux_sw','W/m^2')
+
+
+JJA='JJA'
+DJF='DJF'
+MAM='MAM'
+SON='SON'
+
+#this is not the normalized cross correlation (values not between -1 and 1)
+from scipy import signal 
+
+corr1=signal.correlate2d(ccrain_seasonal_avg.sel(season=DJF),tsurf_seasonal_avg.sel(season=DJF)) # yields 2D array
+print('Spatial correlation of ccrain and tsurf for DJF ='+str(corr1.mean()))
+
+corr2=signal.correlate2d(ccrain_seasonal_avg.sel(season=JJA),tsurf_seasonal_avg.sel(season=JJA))
+print('Spatial correlation of ccrain and tsurf for JJA ='+str(corr2.mean()))
+
+corr3=signal.correlate2d(ccrain_seasonal_avg.sel(season=JJA),net_sw_seasonal_avg.sel(season=JJA)) # yields 2D array
+print('Spatial correlation of ccrain and net sw for JJA ='+str(corr3.mean()))
+
+corr4=signal.correlate2d(tsurf_seasonal_avg.sel(season=JJA),net_sw_seasonal_avg.sel(season=JJA)) # yields 2D array
+print('Spatial correlation of tsurf and net sw for JJA ='+str(corr4.mean()))
+
+
+#http://stackoverflow.com/questions/6991471/computing-cross-correlation-function
+
+#import cv2 as cv
+
+# resultNp=np.zeros((tsurf_avg.shape[0],tsurf_avg.shape[1]))
+
+# tsurf_cv=cv.fromarray(np.float32(tsurf_seasonal_avg.sel(season=JJA)))
+# ccrain_cv=cv.fromarray(np.float32(ccrain_seasonal_avg.sel(season=JJA)))
+# resultNp_cv=cv.fromarray(np.float32(resultNp))
+
+
+# cv.MatchTemplate(tsurf_cv,ccrain_cv,resultNp_cv,cv.CV_TM_CCORR_NORMED)
+
+# resultNp = np.asarray(resultNp_cv)
+
+# print('Spatial correlation of ccrain and tsurf for JJA ='+str(resultNp.mean()))
+
+
+# this is not working yet does not know fromarray
