@@ -1,0 +1,62 @@
+Description of Variables
+
+hfls : surface_upward_latent_heat_flux 
+hfss : surface_upward_sensible_heat_flux 
+hurs : relative_humidity
+**huss: specific humidity
+**mrro : runoff_flux
+**mrso : soil_moisture_content 
+**mrsls
+*rlds : surface_downwelling_longwave_flux_in_air 
+*rsds : surface_downwelling_shortwave_flux_in_air 
+*rlus : surface_upwelling_longwave_flux_in_air 
+*rsus : surface_upwelling_shortwave_flux_in_air 
+**rsdt : toa_incoming_shortwave_flux 
+**rsut : toa_outgoing_shortwave_flux
+
+**ps : surface_air_pressure 
+evspbl: evaporation
+tas : air_temperature
+pr : precipitation_flux 
+**sfcWind : wind_speed
+
+tran : transpiration
+*gpp : gross primary production
+lai : leaf area index
+
+
+********************RUNS********************
+1pctCO2
+esmControl
+esmFdbk1
+esmFdbk2
+esmFixClim1
+esmFixClim2
+esmHistorical
+esmrcp85
+rcp45
+
+here is how to call up the datset for a variable and get the values
+
+ds = grab_cmip_dataset(cmip6_dict,modelname,runame,varname)
+i.e. ds = grab_cmip_dataset(cmip6_dict,'CanESM2','1pctCO2','hurs')
+
+values from:    ds['hurs'].values
+
+## To loop over models and runs
+
+    #--- Loop over models
+    for md in range(len(modellist)):
+        modelname = modellist[md]
+        print('loading model: ' +modelname)
+
+        #---- Loop over runs    
+        for rn in range(len(runnamelist)):
+            runname = runnamelist[rn]
+            #print('loading run: ' +runname)
+
+            #---- Loop over variables
+            for v in range(len(varlist)):
+                varname = varlist[v]
+                #print('variable: ' +varname)
+                nametag = modelname +'_' +runname +'_' +varname
