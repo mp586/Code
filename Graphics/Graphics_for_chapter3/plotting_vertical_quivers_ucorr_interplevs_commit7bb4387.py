@@ -23,7 +23,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
+control_dir = 'aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -31,7 +31,7 @@ else:
 
 #print control_dir
 ctl_runmin=121
-ctl_runmax=481
+ctl_runmax=241
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -42,10 +42,10 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_South_America_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+testdir_in1= 'square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267' # this needs to be the dark patch simulation
 dire = testdir_in1
 runmin=120
-runmax=480
+runmax=240
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -54,14 +54,6 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'square_South_America'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
 
 area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/GFDL_BASE/GFDL_FORK/GFDLmoistModel/') # added _all because then dx and dy are also returned 
@@ -95,7 +87,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
+control_dir = 'square_South_America_frierson_insolation_newbucket_0qflux_samealbedo_samehcp_landocean_commitd15c267'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -103,7 +95,7 @@ else:
 
 #print control_dir
 ctl_runmin=121
-ctl_runmax=481
+ctl_runmax=241
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -114,9 +106,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+testdir_in1= 'square_South_America_frierson_insolation_newbucket_0qflux_samealbedo_samehcp_landocean_plus_2xCO2_spinup_361_commitd15c267'
 runmin=120
-runmax=480
+runmax=240
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -124,16 +116,6 @@ if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
 else: 
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
-
-land = 'two_AM'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
-
 
 
 [omega2,omega2_avg,omega2_seasonal_avg,omega2_month_avg,omega2_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'omega','Pa/s')
@@ -152,6 +134,74 @@ landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) 
 
 ################ read in data from exp 3 ###############################
 
+# ctl_model = 'isca'
+# if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
+#     control_model = 'Isca_DATA'
+# elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
+#     control_model = 'GFDL_DATA'
+
+# HPC = 'yes'
+# control_dir = ''
+# if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+#     control_dir= control_model + '/ISCA_HPC/' + control_dir
+# else: 
+#     control_dir= control_model + '/' + control_dir
+
+# #print control_dir
+# ctl_runmin=121  # Should be a January month for seasonal variables to be correct
+# ctl_runmax=241
+
+# model = 'isca'
+# if (model == 'Isca') or (model == 'isca'): 
+#     model_data = 'Isca_DATA'
+#     output_dir1 = 'Isca'
+# elif (model == 'gfdl') or (model == 'GFDL'):
+#     model_data = 'GFDL_DATA'
+#     output_dir1 = ''
+
+# HPC = 'yes'
+# testdir_in1= ''
+# runmin=120
+# runmax=240
+# if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
+#     exp1_name = 'ISCA_HPC/'+testdir_in1
+#     testdir = model_data + '/ISCA_HPC/' + testdir_in1
+#     testdir_in1 = '/ISCA_HPC/' + testdir_in1
+# else: 
+#     exp1_name = testdir_in1
+#     testdir = model_data + '/' + testdir_in1
+
+
+
+[omega3,omega3_avg,omega3_seasonal_avg,omega3_month_avg,omega3_annual_avg,time]=[omega2_ctl,omega2_avg_ctl,omega2_seasonal_avg_ctl,omega2_month_avg_ctl,omega2_annual_avg_ctl,time]
+[rh3,rh3_avg,rh3_seasonal_avg,rh3_month_avg,rh3_annual_avg,time]=[rh2_ctl,rh2_avg_ctl,rh2_seasonal_avg_ctl,rh2_month_avg_ctl,rh2_annual_avg_ctl,time]
+[sphum3,sphum3_avg,sphum3_seasonal_avg,sphum3_month_avg,sphum3_annual_avg,time]=[sphum2_ctl,sphum2_avg_ctl,sphum2_seasonal_avg_ctl,sphum2_month_avg_ctl,sphum2_annual_avg_ctl,time]
+[ucomp3,ucomp3_avg,ucomp3_seasonal_avg,ucomp3_month_avg,ucomp3_annual_avg,time]=[ucomp2_ctl,ucomp2_avg_ctl,ucomp2_seasonal_avg_ctl,ucomp2_month_avg_ctl,ucomp2_annual_avg_ctl,time]
+[temp3,temp3_avg,temp3_seasonal_avg,temp3_month_avg,temp3_annual_avg,time]=[temp2_ctl,temp2_avg_ctl,temp2_seasonal_avg_ctl,temp2_month_avg_ctl,temp2_annual_avg_ctl,time]
+
+[omega3_ctl,omega3_avg_ctl,omega3_seasonal_avg_ctl,omega3_month_avg_ctl,omega3_annual_avg_ctl,time]=[omega1_ctl,omega1_avg_ctl,omega1_seasonal_avg_ctl,omega1_month_avg_ctl,omega1_annual_avg_ctl,time]
+[rh3_ctl,rh3_avg_ctl,rh3_seasonal_avg_ctl,rh3_month_avg_ctl,rh3_annual_avg_ctl,time]=[rh1_ctl,rh1_avg_ctl,rh1_seasonal_avg_ctl,rh1_month_avg_ctl,rh1_annual_avg_ctl,time]
+[sphum3_ctl,sphum3_avg_ctl,sphum3_seasonal_avg_ctl,sphum3_month_avg_ctl,sphum3_annual_avg_ctl,time]=[sphum1_ctl,sphum1_avg_ctl,sphum1_seasonal_avg_ctl,sphum1_month_avg_ctl,sphum1_annual_avg_ctl,time]
+[ucomp3_ctl,ucomp3_avg_ctl,ucomp3_seasonal_avg_ctl,ucomp3_month_avg_ctl,ucomp3_annual_avg_ctl,time]=[ucomp1_ctl,ucomp1_avg_ctl,ucomp1_seasonal_avg_ctl,ucomp1_month_avg_ctl,ucomp1_annual_avg_ctl,time]
+[temp3_ctl,temp3_avg_ctl,temp3_seasonal_avg_ctl,temp3_month_avg_ctl,temp3_annual_avg_ctl,time]=[temp1_ctl,temp1_avg_ctl,temp1_seasonal_avg_ctl,temp1_month_avg_ctl,temp1_annual_avg_ctl,time]
+
+# [omega3,omega3_avg,omega3_seasonal_avg,omega3_month_avg,omega3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'omega','Pa/s')
+# [omega3_ctl,omega3_avg_ctl,omega3_seasonal_avg_ctl,omega3_month_avg_ctl,omega3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
+# [rh3_ctl,rh3_avg_ctl,rh3_seasonal_avg_ctl,rh3_month_avg_ctl,rh3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
+# [rh3,rh3_avg,rh3_seasonal_avg,rh3_month_avg,rh3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'rh','%')
+# [sphum3_ctl,sphum3_avg_ctl,sphum3_seasonal_avg_ctl,sphum3_month_avg_ctl,sphum3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
+# [sphum3,sphum3_avg,sphum3_seasonal_avg,sphum3_month_avg,sphum3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum','kg/kg')
+
+# [ucomp3,ucomp3_avg,ucomp3_seasonal_avg,ucomp3_month_avg,ucomp3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s')
+# [ucomp3_ctl,ucomp3_avg_ctl,ucomp3_seasonal_avg_ctl,ucomp3_month_avg_ctl,ucomp3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
+
+# [temp3,temp3_avg,temp3_seasonal_avg,temp3_month_avg,temp3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'temp','K')
+# [temp3_ctl,temp3_avg_ctl,temp3_seasonal_avg_ctl,temp3_month_avg_ctl,temp3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
+
+
+
+################ read in data from exp 4 ###############################
+
 ctl_model = 'isca'
 if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
     control_model = 'Isca_DATA'
@@ -159,15 +209,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
+control_dir = 'square_South_America_frierson_insolation_newbucket_0qflux_commitd15c267'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=121  # Should be a January month for seasonal variables to be correct
-ctl_runmax=481
+ctl_runmin=121
+ctl_runmax=241
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -178,9 +228,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_Africa_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+testdir_in1= 'square_South_America_frierson_insolation_newbucket_0qflux_plus_2xCO2_spinup_361_commitd15c267'
 runmin=120
-runmax=480
+runmax=240
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC/'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -189,29 +239,20 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'square_Africa'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+[omega4,omega4_avg,omega4_seasonal_avg,omega4_month_avg,omega4_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'omega','Pa/s')
+[omega4_ctl,omega4_avg_ctl,omega4_seasonal_avg_ctl,omega4_month_avg_ctl,omega4_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
+[rh4_ctl,rh4_avg_ctl,rh4_seasonal_avg_ctl,rh4_month_avg_ctl,rh4_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
+[rh4,rh4_avg,rh4_seasonal_avg,rh4_month_avg,rh4_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'rh','%')
+[sphum4_ctl,sphum4_avg_ctl,sphum4_seasonal_avg_ctl,sphum4_month_avg_ctl,sphum4_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
+[sphum4,sphum4_avg,sphum4_seasonal_avg,sphum4_month_avg,sphum4_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum','kg/kg')
 
+[ucomp4,ucomp4_avg,ucomp4_seasonal_avg,ucomp4_month_avg,ucomp4_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s')
+[ucomp4_ctl,ucomp4_avg_ctl,ucomp4_seasonal_avg_ctl,ucomp4_month_avg_ctl,ucomp4_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
 
+[temp4,temp4_avg,temp4_seasonal_avg,temp4_month_avg,temp4_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'temp','K')
+[temp4_ctl,temp4_avg_ctl,temp4_seasonal_avg_ctl,temp4_month_avg_ctl,temp4_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
 
-[omega3,omega3_avg,omega3_seasonal_avg,omega3_month_avg,omega3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'omega','Pa/s')
-[omega3_ctl,omega3_avg_ctl,omega3_seasonal_avg_ctl,omega3_month_avg_ctl,omega3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'omega','Pa/s')
-[rh3_ctl,rh3_avg_ctl,rh3_seasonal_avg_ctl,rh3_month_avg_ctl,rh3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'rh','%')
-[rh3,rh3_avg,rh3_seasonal_avg,rh3_month_avg,rh3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'rh','%')
-[sphum3_ctl,sphum3_avg_ctl,sphum3_seasonal_avg_ctl,sphum3_month_avg_ctl,sphum3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
-[sphum3,sphum3_avg,sphum3_seasonal_avg,sphum3_month_avg,sphum3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum','kg/kg')
-
-[ucomp3,ucomp3_avg,ucomp3_seasonal_avg,ucomp3_month_avg,ucomp3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s')
-[ucomp3_ctl,ucomp3_avg_ctl,ucomp3_seasonal_avg_ctl,ucomp3_month_avg_ctl,ucomp3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
-
-[temp3,temp3_avg,temp3_seasonal_avg,temp3_month_avg,temp3_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'temp','K')
-[temp3_ctl,temp3_avg_ctl,temp3_seasonal_avg_ctl,temp3_month_avg_ctl,temp3_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
 
 
 
@@ -243,6 +284,8 @@ wcomp1_avg = - (omega1_avg * temp1_avg * Rspec)/(pfull * g)
 wcomp2_avg = - (omega2_avg * temp2_avg * Rspec)/(pfull * g)
 wcomp3_avg_ctl = - (omega3_avg_ctl * temp3_avg_ctl * Rspec)/(pfull * g)
 wcomp3_avg = - (omega3_avg * temp3_avg * Rspec)/(pfull * g)
+wcomp4_avg_ctl = - (omega4_avg_ctl * temp4_avg_ctl * Rspec)/(pfull * g)
+wcomp4_avg = - (omega4_avg * temp4_avg * Rspec)/(pfull * g)
 
 #conversion following https://www.ncl.ucar.edu/Document/Functions/Contributed/omega_to_w.shtml
 
@@ -253,11 +296,17 @@ wcomp3_avg = - (omega3_avg * temp3_avg * Rspec)/(pfull * g)
 # Panel plot with 4 cases: America only, Africa only, Two continents, and Two continents minus America - climate change for all 
 
 
-quiver_plots_4cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltarh_fct', cmap = 'BrBG', dire, '$\Delta RH$ (%)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, (rh1_avg - rh1_avg_ctl), (rh2_avg - rh2_avg_ctl), (rh3_avg - rh3_avg_ctl), minval=-10., maxval=10., vertmult = 8000, minlat=-10., maxlat=10.)
 
-quiver_plots_4cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltasphum_fct', cmap = 'BrBG', dire, '$\Delta q$ (kg/kg)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, (sphum1_avg - sphum1_avg_ctl), (sphum2_avg - sphum2_avg_ctl), (sphum3_avg - sphum3_avg_ctl), minval=-.003, maxval=.003, vertmult = 8000, minlat=-10., maxlat=10.)
+quiver_plots_4_seperate_cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltarh_fct', dire, 'BrBG', '$\Delta RH$ (%)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, ucomp4_avg, ucomp4_avg_ctl, 
+    wcomp4_avg, wcomp4_avg_ctl, (rh1_avg - rh1_avg_ctl), (rh2_avg - rh2_avg_ctl), (rh3_avg - rh3_avg_ctl), (rh4_avg - rh4_avg_ctl), 'AP-patch - AP', 'AM-same - AP', 'AM-same-2xCO2 ', 'AM-bright-2xCO2 ', minval=-10., maxval=10., vertmult = 3000, minlat=-10., maxlat=10.)
 
-quiver_plots_4cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltatemp_fct', cmap = 'RdBu_r', dire, '$\Delta T$ (K)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, (temp1_avg - temp1_avg_ctl), (temp2_avg - temp2_avg_ctl), (temp3_avg - temp3_avg_ctl), minval=-10., maxval=10., vertmult = 8000, minlat=-10., maxlat=10.)
+
+quiver_plots_4_seperate_cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltasphum_fct', dire, 'BrBG', '$\Delta q$ (kg/kg)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, ucomp4_avg, ucomp4_avg_ctl, 
+    wcomp4_avg, wcomp4_avg_ctl, (sphum1_avg - sphum1_avg_ctl), (sphum2_avg - sphum2_avg_ctl), (sphum3_avg - sphum3_avg_ctl), (sphum4_avg - sphum4_avg_ctl), 'AP-patch - AP', 'AM-same - AP', 'AM-same-2xCO2 ', 'AM-bright-2xCO2 ', minval=-0.003, maxval=0.003, vertmult = 3000, minlat=-10., maxlat=10.)
+
+
+quiver_plots_4_seperate_cases(runmin, runmax, 'ucorr_interplevs_quivers_4cases_deltatemp_fct', dire, 'RdBu_r', '$\Delta T$ (K)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, ucomp4_avg, ucomp4_avg_ctl, 
+    wcomp4_avg, wcomp4_avg_ctl, (temp1_avg - temp1_avg_ctl), (temp2_avg - temp2_avg_ctl), (temp3_avg - temp3_avg_ctl), (temp4_avg - temp4_avg_ctl), 'AP-patch - AP', 'AM-same - AP', 'AM-same-2xCO2 ', 'AM-bright-2xCO2 ', minval=-10., maxval=10., vertmult = 3000, minlat=-10., maxlat=10.)
 
 
 

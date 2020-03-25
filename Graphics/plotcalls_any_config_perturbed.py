@@ -127,7 +127,7 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 [div,div_avg,div_seasonal_avg,div_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'div','1/sec',level=level)
 [div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=level)
 
-# rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
 
 
 PE = precipitation - net_lhe

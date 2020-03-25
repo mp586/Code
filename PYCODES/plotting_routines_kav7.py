@@ -4739,6 +4739,20 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight', dpi=400)
 
 
+	fig, ax = plt.subplots(1,1, sharex = True, figsize=(10,10))
+	ax.plot(P_land_1d,tsurf_land_1d - 273.15,'c.',markersize = 5)
+	ax.set_xlabel("$P$ $(mm/d)$",fontsize = lge)
+	ax.set_ylabel("$T_s$ $(^\circ C)$",fontsize = lge)
+	ax.tick_params(labelsize = med)
+	ax.tick_params(labelsize = med)
+	ax.spines['right'].set_visible(False)
+	ax.spines['top'].set_visible(False)
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight', dpi=400)
+
+
+
 
 	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
 	axes[0].plot(rh_ocean_1d,P_ocean_1d,'b.',label = 'P ocean (tropics)')
@@ -5490,7 +5504,7 @@ def f(p, x):
 
 
 
-def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, array1, array2, array3, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
+def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, array1, array2, array3, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
 
 	small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
 	med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
@@ -5550,7 +5564,7 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, u
 	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[0,0].contourf(X, Z, array_tropmean, v, cmap='BrBG', extend = 'both')
+	cset1 = axes[0,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
 	axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
 	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
@@ -5594,7 +5608,7 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, u
 	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[0,1].contourf(X, Z, array_tropmean, v, cmap='BrBG', extend = 'both')
+	cset1 = axes[0,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
 
 
 	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
@@ -5639,7 +5653,7 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, u
 	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[1,0].contourf(X, Z, array_tropmean, v, cmap='BrBG', extend = 'both')
+	cset1 = axes[1,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
 	axes[1,0].set_xlabel('Longitude E', fontsize = med)
 	axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
@@ -5685,7 +5699,7 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, u
 	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[1,1].contourf(X, Z, array_tropmean, v, cmap='BrBG', extend = 'both')
+	cset1 = axes[1,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
 	axes[1,1].set_xlabel('Longitude E', fontsize = med)
 
 	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
@@ -5708,6 +5722,226 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, u
 	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.svg')
 	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'_400dpi.svg', bbox_inches='tight', dpi = 400)
 
+
+def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, 
+	ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, ucomp4_avg, ucomp4_avg_ctl, 
+	wcomp4_avg, wcomp4_avg_ctl, array1, array2, array3, array4, title_a, title_b, title_c, title_d, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
+
+	small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	veclen = 10.
+	units_numerator = 'm'
+	units_denom = 's'
+	shiftby = 180. # = 180. --> 0 degrees in the middle, = 105. --> idealized continents overlap realistic ones 
+
+
+
+	v = np.linspace(minval, maxval, 21) # , endpoint=True)
+
+	fig, axes = plt.subplots(2, 2, sharey = True, figsize = (30,15))  # for paper, saving figure directly at output
+
+	# panel 1: Only South America 
+	uwind = (ucomp1_avg - ucomp1_avg_ctl) 
+	# [::-1,:,:] #NB: the [::-1,:,:] doesn't do anything, 
+	# because it reads both the values and the pressure levels in reverse, 
+	# so basically double negates -- no effect. The thing that actually 
+	# flips the vectors in the right direction (positive wwind = upwards in the atmosphere) 
+	# is the fact that I assign wwind = -omega. --- see test at the bottom of this script
+	# the important thing is that both ucomp and wwind need to be read in in the same way, either with or without the [::-1,:,:], 
+	# because below I define the X, Z for plotting the quivers based on wwind pressure levels, so if one is read in with 
+	# and the other without then they don't fit together! --> hence the ``ucorr'' in plot titles
+	# from extensive plotting think that the one without [::-1,:,:] on wwind and uwind actually is slightly more correct, but negligible!
+	wwind = ((wcomp1_avg - wcomp1_avg_ctl)*vertmult) # [::-1,:,:]
+	array = array1
+	lons = uwind.lon 
+	lats = uwind.lat
+	pres = wwind.pres_lev
+	uwind, lons_cyclic = addcyclic(uwind, lons)
+	wwind, lons_cyclic = addcyclic(wwind, lons)
+
+	uwind = np.asarray(uwind)
+	wwind = np.asarray(wwind)
+	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))
+	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))  
+
+	array, lons_cyclic = addcyclic(array, lons)
+	array = np.asarray(array)
+	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+	                 start=False,cyclic=np.max(lons_cyclic))
+
+	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	# landmask, landlons = addcyclic(landmask, landlons)
+
+	X, Z = np.meshgrid(lons_shift, pres)
+
+
+	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+
+	cset1 = axes[0,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
+
+	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
+	axes[0,0].set_title('(a) '+title_a, fontsize = med)
+	# Africa Only 
+
+	uwind = (ucomp3_avg - ucomp3_avg_ctl) # [::-1,:,:]
+	wwind = ((wcomp3_avg - wcomp3_avg_ctl)*vertmult)  # [::-1,:,:]
+	array = array3
+	lons = uwind.lon
+	lats = uwind.lat
+	pres = wwind.pres_lev
+	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	uwind, lons_cyclic = addcyclic(uwind, lons)
+	wwind, lons_cyclic = addcyclic(wwind, lons)
+
+	uwind = np.asarray(uwind)
+	wwind = np.asarray(wwind)
+	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))
+	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))  
+
+	array, lons_cyclic = addcyclic(array, lons)
+	array = np.asarray(array)
+	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+	                 start=False,cyclic=np.max(lons_cyclic))
+
+	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	# landmask, landlons = addcyclic(landmask, landlons)
+
+
+	X, Z = np.meshgrid(lons_shift, pres)
+
+
+	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+
+	cset1 = axes[0,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+
+
+	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	#qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+	axes[0,1].set_title('(b) '+title_b, fontsize = med)
+
+	# Two continents 
+
+	uwind = (ucomp2_avg - ucomp2_avg_ctl) # [::-1,:,:]
+	wwind = ((wcomp2_avg - wcomp2_avg_ctl)*vertmult) # [::-1,:,:]
+	array = array2
+	lons = uwind.lon
+	lats = uwind.lat
+	pres = wwind.pres_lev
+	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	uwind, lons_cyclic = addcyclic(uwind, lons)
+	wwind, lons_cyclic = addcyclic(wwind, lons)
+
+	uwind = np.asarray(uwind)
+	wwind = np.asarray(wwind)
+	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))
+	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))  
+
+	array, lons_cyclic = addcyclic(array, lons)
+	array = np.asarray(array)
+	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+	                 start=False,cyclic=np.max(lons_cyclic))
+
+	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	# landmask, landlons = addcyclic(landmask, landlons)
+
+
+	X, Z = np.meshgrid(lons_shift, pres)
+
+
+	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+
+	cset1 = axes[1,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	axes[1,0].set_xlabel('Longitude E', fontsize = med)
+	axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
+
+	Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	#qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+	axes[1,0].set_title('(c) '+title_c, fontsize = med)
+
+	# Two continents - America 
+
+	uwind = (ucomp4_avg - ucomp4_avg_ctl) # [::-1,:,:]
+	wwind = ((wcomp4_avg - wcomp4_avg_ctl)*vertmult) # [::-1,:,:]
+	array = array4
+	lons = uwind.lon
+	lats = uwind.lat
+	pres = wwind.pres_lev
+	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	uwind, lons_cyclic = addcyclic(uwind, lons)
+	wwind, lons_cyclic = addcyclic(wwind, lons)
+
+	uwind = np.asarray(uwind)
+	wwind = np.asarray(wwind)
+	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))
+	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
+	               cyclic=np.max(lons_cyclic))  
+
+	array, lons_cyclic = addcyclic(array, lons)
+	array = np.asarray(array)
+	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
+	                 start=False,cyclic=np.max(lons_cyclic))
+
+	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	# landmask, landlons = addcyclic(landmask, landlons)
+
+
+	X, Z = np.meshgrid(lons_shift, pres)
+
+
+	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+
+	cset1 = axes[1,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	axes[1,1].set_xlabel('Longitude E', fontsize = med)
+
+	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+	axes[1,1].set_title('(d) '+title_d, fontsize = med)
+
+	fig.gca().invert_yaxis()
+	axes[0,0].tick_params(labelsize = small)
+	axes[1,0].tick_params(labelsize = small)
+	axes[0,1].tick_params(labelsize = small)
+	axes[1,1].tick_params(labelsize = small)
+
+	cbar = fig.colorbar(cset1,ax=axes)
+	cbar.ax.tick_params(labelsize=small)
+	cbar.set_label(cbarlabel, size = med)
+
+
+	# Fot paper just direcly save the plot at output
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.png')
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.svg')
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'_400dpi.svg', bbox_inches='tight', dpi = 400)
 
 
 
