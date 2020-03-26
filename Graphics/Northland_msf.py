@@ -42,7 +42,7 @@ def msf_calc(nc_file,v='vcomp', a=6376.0e3, g=9.8):
     vbar = data[v].mean('lon')
     c = 2*np.pi*a*np.cos(vbar.lat*np.pi/180) / g
 # take a diff of half levels, and assign to pfull coordinates
-    dp = xr.DataArray(data_phalf.phalf.diff('phalf').values*100, coords=[('pfull', data.pfull)])
+    dp = xr.DataArray(data_phalf.phalf[::-1].diff('phalf').values*100, coords=[('pfull', data.pfull)])
     msf = (np.cumsum(vbar*dp, axis=vbar.dims.index('pfull')))*c
     # msf[i-runmin] = (np.cumsum(vbar*dp, axis='pfull')*c)
     # why cumsum and not # (np.sum(vbar*dp, axis = vbar.dims.index('pfull')))*c
@@ -82,7 +82,7 @@ def plot_msf(msf,units='10^10 kg/s'):
 	cbar.set_label(units)
 	plt.xlabel('Latitude N')
 	plt.ylabel('Pressure (hPa)')
-	# plt.gca().invert_yaxis()
+	plt.gca().invert_yaxis()
 
 	plt.savefig('/scratch/mp586/Code/Graphics/Northland_msf_'+name+'.png')
 	plt.close()
