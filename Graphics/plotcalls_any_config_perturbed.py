@@ -127,7 +127,17 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 [div,div_avg,div_seasonal_avg,div_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'div','1/sec',level=level)
 [div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=level)
 
-rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+[cape,cape_avg,cape_seasonal_avg,cape_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'cape','J/kg')
+[cape_ctl,cape_avg_ctl,cape_seasonal_avg_ctl,cape_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'cape','J/kg')
+
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg-cape_avg_ctl),area_array,'J/kg','cape_avg_minus_ctl','rainnorm',landmaskxr)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg),area_array,'J/kg','cape_avg','rainnorm',landmaskxr)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg_ctl),area_array,'J/kg','cape_ctl','rainnorm',landmaskxr)
+
+exit()
+
+
+# rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
 
 
 PE = precipitation - net_lhe
@@ -235,14 +245,14 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(toa_sw_avg - toa_sw_avg_ct
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg),area_array,'(W/m^2)','flux_TOA_avg','rainnorm',landmaskxr, minval = -50., maxval = 50.)
 
 
-if land != 'aquaplanet':
-	rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask, sfc='land')
+# if land != 'aquaplanet':
+# 	rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask, sfc='land')
 
-############# RH change vs P and E changes - scatter plots #####################
-rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
-rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
-# dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask)
-################################################################################
+# ############# RH change vs P and E changes - scatter plots #####################
+# rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='all')
+# rh_P_E_change(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask,sfc='ocean')
+# # dP_vs_PE_ctl(outdir,runmin,runmax,rh_avg,rh_avg_ctl,precipitation_avg,precipitation_avg_ctl,net_lhe_avg,net_lhe_avg_ctl,tsurf_avg,tsurf_avg_ctl,landmask)
+# ################################################################################
 
 
 
