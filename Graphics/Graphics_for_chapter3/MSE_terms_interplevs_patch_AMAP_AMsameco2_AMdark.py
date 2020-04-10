@@ -77,6 +77,13 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 [height1,height1_avg,height1_seasonal_avg,height1_month_avg,height1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'height','m')
 [height1_ctl,height1_avg_ctl,height1_seasonal_avg_ctl,height1_month_avg_ctl,height1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m')
 
+[ucomp1,ucomp1_avg,ucomp1_seasonal_avg,ucomp1_month_avg,ucomp1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s')
+[ucomp1_ctl,ucomp1_avg_ctl,ucomp1_seasonal_avg_ctl,ucomp1_month_avg_ctl,ucomp1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s')
+
+[vcomp1,vcomp1_avg,vcomp1_seasonal_avg,vcomp1_month_avg,vcomp1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'vcomp','m/s')
+[vcomp1_ctl,vcomp1_avg_ctl,vcomp1_seasonal_avg_ctl,vcomp1_month_avg_ctl,vcomp1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s')
+
+
 
 
 [tsurf1,tsurf1_avg,tsurf1_seasonal_avg,tsurf1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
@@ -86,6 +93,7 @@ area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (
 [lw_down1,lw_down1_avg,lw_down1_seasonal_avg,lw_down1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lw','W/m^2',factor = 1.) # 
 [net_t1,net_t1_avg,net_t1_seasonal_avg,net_t1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_t','W/m^2',factor = 1.) # 
 [toa_sw1,toa_sw1_avg,toa_sw1_seasonal_avg,toa_sw1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'toa_sw','W/m^2',factor = 1.) # positive DOWN
+[olr1,olr1_avg,olr1_seasonal_avg,olr1_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'olr','W/m^2',factor = 1.) # positive DOWN
 
 [tsurf1_ctl,tsurf1_avg_ctl,tsurf1_seasonal_avg_ctl,tsurf1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
 [lhe_flux1_ctl,lhe_flux1_avg_ctl,lhe_flux1_seasonal_avg_ctl,lhe_flux1_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','W/m2',factor = 1.) # latent heat flux at surface (UP)
@@ -263,19 +271,19 @@ outdir = 'Isca' + '/' + exp1_name
 data = xr.open_dataset('/scratch/mp586/'+testdir+'/run0001/atmos_monthly.nc')
 dp = xr.DataArray(data.phalf.diff('phalf').values*100, coords=[('pfull', data.pfull)])
 
-pfull = temp1.pres_lev * 100 # convert from hPa to Pa
+pfull = ucomp_temp1.pres_lev * 100 # convert from hPa to Pa
 pfull = np.expand_dims(pfull, axis = 1)
 pfull = np.expand_dims(pfull, axis = 2)
 pfull = np.repeat(pfull, 64, axis=1)
 pfull = np.repeat(pfull, 128, axis = 2)
-pres_lev = temp1.pres_lev
-pfull = xr.DataArray(pfull, coords = [pres_lev, temp1.lat, temp1.lon], dims = ['pres_lev','lat','lon'])
+pres_lev = ucomp_temp1.pres_lev
+pfull = xr.DataArray(pfull, coords = [pres_lev, ucomp_temp1.lat, ucomp_temp1.lon], dims = ['pres_lev','lat','lon'])
 
 dp = np.expand_dims(dp, axis = 1)
 dp = np.expand_dims(dp, axis = 2)
 dp = np.repeat(dp, 64, axis=1)
 dp = np.repeat(dp, 128, axis = 2)
-dp = xr.DataArray(dp, coords = [pres_lev, temp1.lat, temp1.lon], dims = ['pres_lev','lat','lon'])
+dp = xr.DataArray(dp, coords = [pres_lev, ucomp_temp1.lat, ucomp_temp1.lon], dims = ['pres_lev','lat','lon'])
 
 
 
@@ -289,9 +297,17 @@ g = 9.81
 L = 2.500e6 #J/kg, https://github.com/ExeClim/Isca/blob/77a3d49c5e3131dc6312d32b3698feac2cc8d156/postprocessing/plevel_interpolation/src/shared/constants/constants.F90
 
 
-sensible_u1_avg = np.sum(cp_dry*temp_u1_avg*dp/g, axis = 0)
+sensible_u1_avg = np.sum(cp_dry*ucomp_temp1_avg*dp/g, axis = 0)
 
+sensible_v1_avg = np.sum(cp_dry*vcomp_temp1_avg*dp/g, axis = 0)
 
+latent_u1_avg = np.sum(L*sphum_u1_avg*dp/g, axis = 0)
+
+latent_v1_avg = np.sum(L*sphum_v1_avg*dp/g, axis = 0)
+
+potential_u1_avg = np.sum(height1_avg*ucomp1_avg*dp, axis=0)
+
+potential_v1_avg = np.sum(height1_avg*vcomp1_avg*dp, axis=0)
 
 
 
