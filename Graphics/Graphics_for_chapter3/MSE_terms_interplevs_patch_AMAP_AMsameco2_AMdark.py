@@ -9,7 +9,7 @@ from matplotlib.patches import Rectangle
 
 import sys
 sys.path.insert(0, '/scratch/mp586/Code/PYCODES')
-from plotting_routines_kav7_ongv3_py3 import *
+from plotting_routines_kav7 import *
 import stats as st
 
 GFDL_BASE = os.environ['GFDL_BASE']
@@ -23,15 +23,15 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267'
+control_dir = 'withtv/aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
     control_dir= control_model + '/' + control_dir
 
 #print control_dir
-ctl_runmin=121
-ctl_runmax=241
+ctl_runmin=25
+ctl_runmax=97
 
 model = 'isca'
 if (model == 'Isca') or (model == 'isca'): 
@@ -42,9 +42,9 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267' # this needs to be the dark patch simulation
-runmin=120
-runmax=240
+testdir_in1= 'withtv/square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267' # this needs to be the dark patch simulation
+runmin=24
+runmax=96
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     exp1_name = 'ISCA_HPC_'+testdir_in1
     testdir = model_data + '/ISCA_HPC/' + testdir_in1
@@ -55,18 +55,24 @@ else:
 
 
 
-area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/GFDL_BASE/GFDL_FORK/GFDLmoistModel/') # added _all because then dx and dy are also returned 
+area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/Isca/') # added _all because then dx and dy are also returned 
 area_array = xr.DataArray(area_array) # returned in units of m bzw m^2, because radius in cell_area.py is given in metres
 
 area_array_3D = np.expand_dims(area_array, axis=0)
 area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (pressure, lat, lon)
 
 
-[sphum1_ctl,sphum1_avg_ctl,sphum1_seasonal_avg_ctl,sphum1_month_avg_ctl,sphum1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg')
-[sphum1,sphum1_avg,sphum1_seasonal_avg,sphum1_month_avg,sphum1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum','kg/kg')
+[sphum_u1_ctl,sphum_u1_avg_ctl,sphum_u1_seasonal_avg_ctl,sphum_u1_month_avg_ctl,sphum_u1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_u','kgm/kgs')
+[sphum_u1,sphum_u1_avg,sphum_u1_seasonal_avg,sphum_u1_month_avg,sphum_u1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum_u','kgm/kgs')
 
-[temp1,temp1_avg,temp1_seasonal_avg,temp1_month_avg,temp1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'temp','K')
-[temp1_ctl,temp1_avg_ctl,temp1_seasonal_avg_ctl,temp1_month_avg_ctl,temp1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K')
+[sphum_v1_ctl,sphum_v1_avg_ctl,sphum_v1_seasonal_avg_ctl,sphum_v1_month_avg_ctl,sphum_v1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_v','kgm/kgs')
+[sphum_v1,sphum_v1_avg,sphum_v1_seasonal_avg,sphum_v1_month_avg,sphum_v1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'sphum_v','kgm/kgs')
+
+[ucomp_temp1,ucomp_temp1_avg,ucomp_temp1_seasonal_avg,ucomp_temp1_month_avg,ucomp_temp1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'ucomp_temp','Km/s')
+[ucomp_temp1_ctl,ucomp_temp1_avg_ctl,ucomp_temp1_seasonal_avg_ctl,ucomp_temp1_month_avg_ctl,ucomp_temp1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp_temp','Km/s')
+
+[vcomp_temp1,vcomp_temp1_avg,vcomp_temp1_seasonal_avg,vcomp_temp1_month_avg,vcomp_temp1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'vcomp_temp','Km/s')
+[vcomp_temp1_ctl,vcomp_temp1_avg_ctl,vcomp_temp1_seasonal_avg_ctl,vcomp_temp1_month_avg_ctl,vcomp_temp1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp_temp','Km/s')
 
 [height1,height1_avg,height1_seasonal_avg,height1_month_avg,height1_annual_avg,time]=seasonal_4D_variable_interp(testdir,model,runmin,runmax,'height','m')
 [height1_ctl,height1_avg_ctl,height1_seasonal_avg_ctl,height1_month_avg_ctl,height1_annual_avg_ctl,time]=seasonal_4D_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m')
@@ -283,7 +289,7 @@ g = 9.81
 L = 2.500e6 #J/kg, https://github.com/ExeClim/Isca/blob/77a3d49c5e3131dc6312d32b3698feac2cc8d156/postprocessing/plevel_interpolation/src/shared/constants/constants.F90
 
 
-sensible1_avg = np.sum(cp_dry*temp1_avg*dp/g, axis = 0)
+sensible_u1_avg = np.sum(cp_dry*temp_u1_avg*dp/g, axis = 0)
 
 
 
