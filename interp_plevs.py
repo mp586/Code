@@ -26,12 +26,21 @@ from isca.util import interpolate_output
 # dires = ['square_South_America_frierson_insolation_newbucket_0qflux_plus_2xCO2_spinup_361_commitd15c267',
 # 'square_South_America_frierson_insolation_newbucket_0qflux_commitd15c267']
 
-dires = ['square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267']
+# dires = ['square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267']
+#dires = ['square_South_America_frierson_insolation_newbucket_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267']
+
+#dires = ['square_South_America_frierson_insolation_newbucket_0qflux_samehcp_landocean_plus_2xCO2_spinup_361_commitd15c267',
+#'square_South_America_frierson_insolation_newbucket_0qflux_samehcp_landocean_commitd15c267']
+
+dires = ['withtv/square_South_America_frierson_insolation_lepref1_0qflux_samealbedo_to_01land_samehcp_landocean_commitd15c267',
+'withtv/aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267']
+
+
 
 from isca.util import interpolate_output
 for dire in dires:
-    for i in range(120, 300):
+    for i in range(120, 362):
         #print(i)
             infile = '/scratch/mp586/Isca_DATA/ISCA_HPC/'+dire+'/run%04d/atmos_monthly.nc' % i   
             outfile = '/scratch/mp586/Isca_DATA/ISCA_HPC/'+dire+'/run%04d/atmos_monthly_interp.nc' % i
-            interpolate_output(infile, outfile, p_levs='INPUT', var_names=['slp', 'height', 'omega', 'ucomp', 'vcomp', 'temp','rh','sphum','sphum_u','sphum_v'])
+            interpolate_output(infile, outfile, p_levs='INPUT', var_names=['slp', 'height', 'omega', 'ucomp', 'vcomp', 'temp','rh','sphum','sphum_u','sphum_v','ucomp_temp','vcomp_temp','ucomp_height','vcomp_height'])
