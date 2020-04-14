@@ -2505,7 +2505,7 @@ def squareland_plot_correlation(minlat,maxlat,array1,array2,title):
     plt.show()
 
 
-def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None, text_annotate=None):
+def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=0,save_fig=True, save_title = None,  array2 = None, text_annotate=None):
 
 
 
@@ -2709,11 +2709,11 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 #                manager.window.showMaximized()
 #            plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
 
-                if save_fig == True:
+        if save_fig == True:
                         plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.png', format = 'png', bbox_inches='tight')
                         plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+save_title+'_'+str(runmin)+'-'+str(runmax)+'.pdf', format = 'pdf', bbox_inches='tight')
 
-                else: 
+        else: 
                         fig.show()
 #    return fig
 
