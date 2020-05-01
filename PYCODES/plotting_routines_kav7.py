@@ -3062,6 +3062,142 @@ def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,ar
 
 	plt.close()
 
+
+def any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,minlat,maxlat,array,ucomp,vcomp,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True, steps = 21,scale=100):
+# plotting only the zonal average next to the map 
+# currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
+	plt.close()
+
+
+	small = 10 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 14 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 18 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+	time = array.month
+	lats=array.lat
+	lons=array.lon
+	
+	# why is this not working anymore when land areas are selected ? worked in commit d110990e
+	minlatindex=np.asarray(np.where(lats>=minlat))[0,0]
+	maxlatreverseindex=np.asarray(np.where(lats[::-1]<=maxlat))[0,0] 
+	selected_lats=lats[minlatindex:(lats.size-maxlatreverseindex)+1]
+
+	landlats = np.asarray(landmaskxr.lat)
+	landlons = np.asarray(landmaskxr.lon)
+
+	landmask = np.asarray(landmaskxr)
+
+
+	fig = plt.figure(figsize = (25,10))
+
+	array = xr.DataArray(array,coords=[time,lats,lons],dims=['time','lat','lon'])
+	lons_128 = lons # non-cyclic lons, i.e. lenght = 128
+	array = np.asarray(array) #- This line fixes the problem!
+	array, lons = addcyclic(array, lons)
+	array,lons = shiftgrid(np.max(lons)-180.,array,lons,start=False,cyclic=np.max(lons))
+	array = xr.DataArray(array,coords=[time,lats,lons],dims=['time','lat','lon'])
+
+
+	m = Basemap(projection='kav7',lon_0=0.,llcrnrlon=-180.,llcrnrlat=-30.,urcrnrlon=180.,urcrnrlat=30.,resolution='c')
+
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+	lon, lat = np.meshgrid(lons, lats)
+	xi, yi = m(lon, lat)
+
+	landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+	landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+	if minval==None and maxval==None:
+		minval = array.min()
+		maxval = array.max()
+
+		minval = np.absolute(minval)
+		maxval = np.absolute(maxval)
+
+		if maxval >= minval:
+			minval = - maxval
+		else: 
+			maxval = minval
+			minval = - minval
+
+	v = np.linspace(minval,maxval,steps) # , endpoint=True)
+
+	months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+
+	for i in range (0,12):
+		if (i < 4):
+			ax = plt.subplot2grid((3,4), (0,i))
+		elif (i >= 4) and (i < 8):
+			ax = plt.subplot2grid((3,4), (1,i-4))
+		elif (i >= 8):
+			ax = plt.subplot2grid((3,4), (2,i-8))
+
+
+		if palette=='rainnorm':
+		#	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
+		elif palette == 'PE_scale':
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
+		elif palette == 'raindefault':
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
+		elif palette=='temp':
+			cs = m.pcolor(xi,yi,array[i,:,:].sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+		#	    cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
+		elif palette=='temp0':
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+		elif palette=='fromwhite': 
+			cs = m.contourf(xi, yi, array[i,:,:].sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+			# pal = plt.cm.Blues
+			# pal.set_under('w',None)
+			# cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
+
+		elif palette=='bucket': 
+			cs = m.contourf(xi, yi, array[i,:,:].sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
+
+		elif palette=='tempdiff': 
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+		elif palette=='slp':
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
+		else:
+			cs = m.pcolor(xi,yi,array[i,:,:].sel(lat=selected_lats))		
+
+
+
+		if nmb_contours != 0:  # add contours 
+			cont = m.contour(xi,yi,array[i,:,:],nmb_contours,cmap='PuBu_r', linewidth=5)
+			if cont>=1.:
+				plt.clabel(cont, inline=2, fmt='%1.1f',fontsize=med)
+			else:
+				plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
+
+	# Add rectangles
+
+		if np.any(landmask != 0.):
+			m.contour(xi,yi,landmask, 1)
+		
+		ax.annotate(months[i], xy=(0.,1.), xycoords='axes fraction')
+		ax.quiver(xi[::4,::4], yi[::4,::4], ucomp[i,::4,::4], vcomp[i,::4,::4], scale = scale, scale_units = 'inches')
+
+	# Add Colorbar
+	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
+	cbar.set_label(units, size=med)
+	cbar.ax.tick_params(labelsize=small) 
+
+		# sns.palplot(sns.color_palette("BrBG", 7))
+
+	# Read landmask
+
+	# manager = plt.get_current_fig_manager()
+	# manager.window.showMaximized()
+
+	if save_fig == True:
+		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_allmonths.png', format = 'png', bbox_inches='tight')
+	#		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
+
+	plt.close()
+
+
 def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None):
 
 	plt.close()
@@ -3129,9 +3265,10 @@ def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,ar
 
 	v = np.linspace(minval,maxval,steps) # , endpoint=True)
 
-	seasons = ['MAM','JJA','SON','DJF']
+	# seasons = ['MAM','JJA','SON','DJF']
+	seasons = array.season.values
 
-	for i in range (0,4):
+	for i in range(len(seasons)):
 		if (i < 2):
 			ax = plt.subplot2grid((2,2), (0,i))
 		else:
@@ -3139,31 +3276,31 @@ def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,ar
 
 		if palette=='rainnorm':
 	#		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=0.),cmap='BrBG', vmin = minval, vmax = maxval)
-			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
+			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap='BrBG', extend = 'both')
 		elif palette == 'PE_scale':
-			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
+			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap='bwr_r', extend = 'both')
 		elif palette == 'raindefault':
-			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
+			cs = m.contourf(xi,yi,arraysel(season=seasons[i]).sel(lat=selected_lats), cmap=plt.cm.BrBG, extend = 'both')
 		elif palette=='temp':
-			cs = m.pcolor(xi,yi,array[i,:,:].sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
+			cs = m.pcolor(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),vmax=maxval)
 	#		cs = m.pcolor(xi,yi,array.sel(lat=selected_lats),norm=MidpointNormalize(midpoint=273.15), cmap=plt.cm.RdBu_r,vmin = 273.15-30.,vmax=273.15+30.) # forpaper
 		elif palette=='temp0':
-				cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+				cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
 		elif palette=='fromwhite': 
-			cs = m.contourf(xi, yi, array[i,:,:].sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
+			cs = m.contourf(xi, yi, array.sel(season=seasons[i]).sel(lat = selected_lats), v, cmap = 'Blues', extend = 'max')
 			# pal = plt.cm.Blues
 			# pal.set_under('w',None)
 			# cs = m.pcolormesh(xi,yi,array.sel(lat=selected_lats),cmap=pal,vmin=0,vmax=maxval)
 
 		elif palette=='bucket': 
-			cs = m.contourf(xi, yi, array[i,:,:].sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
+			cs = m.contourf(xi, yi, array.sel(season=seasons[i]).sel(lat = selected_lats), v, cmap = 'Greens', extend = 'max')
 
 		elif palette=='tempdiff': 
-			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
+			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap=plt.cm.RdBu_r, extend = 'both')
 		elif palette=='slp':
-			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
+			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
 		else:
-			cs = m.pcolor(xi,yi,array[i,:,:].sel(lat=selected_lats))
+			cs = m.pcolor(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats))
 
 
 		if nmb_contours != 0:  # add contours 
@@ -4263,7 +4400,7 @@ def plot_a_climatology(clim_field,area_array,landmaskxr):
 # 	return globavg, weighted_array #, globint 
 
 
-def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,minlon = 0.,maxlon = 360., axis=None, return_sd = False):
+def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90., minlon = 0., maxlon = 360., axis=None, return_sd = False):
 	
 # array and area array need to have the same latitude, longitude coords (either both from landmaskxr or both from array, but not a mix -- leads to completely wrong results)
 
@@ -4275,10 +4412,9 @@ def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,
 	array = xr.DataArray(array, coords=[lats,lons], dims = ['lat','lon'])
 	area_array = xr.DataArray(area_array, coords=[lats,lons], dims = ['lat','lon'])
 
-	if (minlat!=-90. and maxlat!=90.):
-		array = array.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon))
-		landmask = np.asarray(landmaskxr.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon)))
-		area_array = area_array.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon))
+	array = array.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon))
+	landmask = np.asarray(landmaskxr.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon)))
+	area_array = area_array.sel(lat=slice(minlat,maxlat)).sel(lon=slice(minlon,maxlon))
 
 	if option=='all_sfcs': # meaning both land and ocean
 		w_avg = np.average(array, axis=axis, weights=area_array)
@@ -4325,65 +4461,71 @@ def area_weighted_avg(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90.,
 
 
 # Not sure this is doing the correct thing, I think area array and array have to have exactly the same lat lon coords. Either take both from area_array or both from array
-# def area_weighted_avg_4D(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90):
+def area_weighted_avg_4D(array,area_array,landmaskxr,option,minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = None):
 
-# 	num_dims = np.size(np.shape(array))
+	num_dims = np.size(np.shape(array))
 
-# 	lats = array.lat
-# 	lons = array.lon
-# 	dim0_name = array.dims[0]
-# 	dim_0 = array[dim0_name]
-# 	landmask = np.asarray(landmaskxr)
-# 	axis = (num_dims - 2, num_dims - 1)
+	lats = array.lat
+	lons = array.lon
+	dim0_name = array.dims[0]
+	dim_0 = array[dim0_name]
+	landmask = np.asarray(landmaskxr)
+	if axis == None:
+		axis = (num_dims - 2, num_dims - 1)
 
-# 	if num_dims == 3:
-# 		area_array = xr.DataArray(area_array, coords=[dim_0,lats,lons], dims = [dim0_name,'lat','lon'])
+	if num_dims == 3:
+		area_array = xr.DataArray(area_array, coords=[dim_0,lats,lons], dims = [dim0_name,'lat','lon'])
 
-# 	elif num_dims == 4:
-# 		dim1_name = array.dims[1]
-# 		dim_1 = array[dim1_name]
-# 		area_array = xr.DataArray(area_array, coords=[dim_0,dim_1,lats,lons], dims = [dim0_name,dim1_name,'lat','lon'])
+	elif num_dims == 4:
+		dim1_name = array.dims[1]
+		dim_1 = array[dim1_name]
+		area_array = xr.DataArray(area_array, coords=[dim_0,dim_1,lats,lons], dims = [dim0_name,dim1_name,'lat','lon'])
 
-# 	if (minlat!=-90. and maxlat!=90.):
-# 		array = array.sel(lat=slice(minlat,maxlat))
-# 		landmask = np.asarray(landmaskxr.sel(lat=slice(minlat,maxlat)))
-# 		area_array = area_array.sel(lat=slice(minlat,maxlat))
+	if (minlat!=-90. or maxlat!=90.):
+		array = array.sel(lat=slice(minlat,maxlat))
+		landmask = np.asarray(landmaskxr.sel(lat=slice(minlat,maxlat)))
+		area_array = area_array.sel(lat=slice(minlat,maxlat))
 
-# 	if option=='all_sfcs': # meaning both land and ocean
-# 		w_avg = np.average(array, axis=axis, weights=area_array)
-# #		w_avg_check = (np.sum(array*area_array))/np.sum(area_array) # is the saame
-# #		aquaplanet_plot(-90.,90.,array,'1','all_sfc',0)
+	if (minlon!=0. or maxlon!=360.):
+		array = array.sel(lon=slice(minlon,maxlon))
+		landmask = np.asarray(landmaskxr.sel(lon=slice(minlon,maxlon)))
+		area_array = area_array.sel(lon=slice(minlon,maxlon))
 
-# 	elif option=='ocean':
-# 		ma = np.ma.array(array, mask=np.isnan(array.where(landmask!=1.)))
-# 		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
+	if option=='all_sfcs': # meaning both land and ocean
+		w_avg = np.average(array, axis=axis, weights=area_array)
+#		w_avg_check = (np.sum(array*area_array))/np.sum(area_array) # is the saame
+#		aquaplanet_plot(-90.,90.,array,'1','all_sfc',0)
+
+	elif option=='ocean':
+		ma = np.ma.array(array, mask=np.isnan(array.where(landmask!=1.)))
+		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
 
 
-# 		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
-# 		# aquaplanet_plot(-90.,90.,ma,'1','ocean masked array',0)
+		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
+		# aquaplanet_plot(-90.,90.,ma,'1','ocean masked array',0)
 
-# 		# xr.DataArray(mo).plot()
-# 		# plt.show()	
-# 		# plt.close()
-# 	elif option=='land': 
-# 		ma = np.ma.array(array, mask=np.isnan(array.where(landmask==1.)))
-# 		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
+		# xr.DataArray(mo).plot()
+		# plt.show()	
+		# plt.close()
+	elif option=='land': 
+		ma = np.ma.array(array, mask=np.isnan(array.where(landmask==1.)))
+		w_avg = np.ma.average(ma,axis=axis,weights=area_array)
 
-# 		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
+		# ma = xr.DataArray(ma, coords=[lats,lons], dims = ['lat','lon'])
 
-# 		# aquaplanet_plot(-90.,90.,ma,'1','land masked array',0)
+		# aquaplanet_plot(-90.,90.,ma,'1','land masked array',0)
 
-# 		# why can't I plot land mask and then ocean mask or vice  
-# 		# versa if calling ocean option first... ?
-# 		# is it a plotting issue or is the mask then wrong for the 2nd option?
-# 		# xr.DataArray(ml).plot() 
-# 		# plt.show()
-# 		# plt.close()
+		# why can't I plot land mask and then ocean mask or vice  
+		# versa if calling ocean option first... ?
+		# is it a plotting issue or is the mask then wrong for the 2nd option?
+		# xr.DataArray(ml).plot() 
+		# plt.show()
+		# plt.close()
 
-# 	if num_dims == 3:
-# 		return xr.DataArray(w_avg, coords = [dim_0], dims = [dim0_name])
-# 	elif num_dims == 4: 
-# 		return xr.DataArray(w_avg, coords = [dim_0,dim_1], dims = [dim0_name,dim1_name])
+	if num_dims == 3:
+		return xr.DataArray(w_avg)
+	elif num_dims == 4: 
+		return xr.DataArray(w_avg)
 
 
 

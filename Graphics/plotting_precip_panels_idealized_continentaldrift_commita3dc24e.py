@@ -22,7 +22,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
+control_dir = 'two_continents_40apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita6aebdd'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -41,7 +41,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+testdir_in1= 'two_continents_40apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita6aebdd'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -52,7 +52,7 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'two_continents'
+land = 'two_continents_40apart_at20lon'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
