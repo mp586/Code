@@ -22,7 +22,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_40apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita6aebdd'
+control_dir = 'square_South_America_lepref07_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -41,7 +41,8 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_40apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita6aebdd'
+testdir_in1= 'square_South_America_lepref07_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
+dire = testdir_in1
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -52,14 +53,14 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'two_continents_40apart_at20lon'
+land = 'square_South_America'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
 landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
 # for specified lats
-landmaskxr2C=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+landmaskxrSA=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
 
 area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/GFDL_BASE/GFDL_FORK/GFDLmoistModel/') # added _all because then dx and dy are also returned 
@@ -88,7 +89,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_10apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita3dc24e'
+control_dir = 'two_continents_lepref07_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -107,8 +108,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_10apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita3dc24e'
-dire = testdir_in1
+testdir_in1= 'two_continents_lepref07_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -119,14 +119,14 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'two_continents_10apart_at20lon'
+land = 'two_continents'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
 landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
 # for specified lats
-landmaskxr2C10=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+landmaskxr2C=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
 
 [net_lhe2,net_lhe2_avg,net_lhe2_seasonal_avg,net_lhe2_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
@@ -147,7 +147,7 @@ elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
     control_model = 'GFDL_DATA'
 
 HPC = 'yes'
-control_dir = 'two_continents_70apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita3dc24e'
+control_dir = 'square_Africa_lepref07_fixedSSTs_from_realworld_zonallysymm_commit7bb4387'
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
     control_dir= control_model + '/ISCA_HPC/' + control_dir
 else: 
@@ -166,7 +166,7 @@ elif (model == 'gfdl') or (model == 'GFDL'):
     output_dir1 = ''
 
 HPC = 'yes'
-testdir_in1= 'two_continents_70apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita3dc24e'
+testdir_in1= 'square_Africa_lepref07_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commit7bb4387'
 runmin=120
 runmax=480
 if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
@@ -177,14 +177,14 @@ else:
     exp1_name = testdir_in1
     testdir = model_data + '/' + testdir_in1
 
-land = 'two_continents_70apart_at20lon'
+land = 'square_Africa'
 landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
 
 landmask=landfile.variables['land_mask'][:]
 landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
 # for specified lats
-landmaskxr2C70=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+landmaskxrA=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
 
 
@@ -197,127 +197,6 @@ landmaskxr2C70=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon
 [t_surf3_ctl,t_surf3_avg_ctl,t_surf3_seasonal_avg_ctl,t_surf3_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
 
 
-
-################ read in data from exp 4 ###############################
-
-ctl_model = 'isca'
-if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
-    control_model = 'Isca_DATA'
-elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
-    control_model = 'GFDL_DATA'
-
-HPC = 'yes'
-control_dir = 'two_continents_100apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita3dc24e'
-if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    control_dir= control_model + '/ISCA_HPC/' + control_dir
-else: 
-    control_dir= control_model + '/' + control_dir
-
-#print control_dir
-ctl_runmin=121  # Should be a January month for seasonal variables to be correct
-ctl_runmax=481
-
-model = 'isca'
-if (model == 'Isca') or (model == 'isca'): 
-    model_data = 'Isca_DATA'
-    output_dir1 = 'Isca'
-elif (model == 'gfdl') or (model == 'GFDL'):
-    model_data = 'GFDL_DATA'
-    output_dir1 = ''
-
-HPC = 'yes'
-testdir_in1= 'two_continents_100apart_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita3dc24e'
-runmin=120
-runmax=480
-if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    exp1_name = 'ISCA_HPC/'+testdir_in1
-    testdir = model_data + '/ISCA_HPC/' + testdir_in1
-    testdir_in1 = '/ISCA_HPC/' + testdir_in1
-else: 
-    exp1_name = testdir_in1
-    testdir = model_data + '/' + testdir_in1
-
-land = 'two_continents_100apart_at20lon'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr2C100=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
-
-
-
-[net_lhe4,net_lhe4_avg,net_lhe4_seasonal_avg,net_lhe4_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
-[precipitation4,precipitation4_avg,precipitation4_seasonal_avg,precipitation4_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
-[t_surf4,t_surf4_avg,t_surf4_seasonal_avg,t_surf4_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
-
-[net_lhe4_ctl,net_lhe4_avg_ctl,net_lhe4_seasonal_avg_ctl,net_lhe4_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
-[precipitation4_ctl,precipitation4_avg_ctl,precipitation4_seasonal_avg_ctl,precipitation4_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'precipitation','mm/d', factor=86400)
-[t_surf4_ctl,t_surf4_avg_ctl,t_surf4_seasonal_avg_ctl,t_surf4_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
-
-
-
-################ read in data from exp 4 ###############################
-
-ctl_model = 'isca'
-if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
-    control_model = 'Isca_DATA'
-elif (ctl_model == 'gfdl') or (ctl_model == 'GFDL'):
-    control_model = 'GFDL_DATA'
-
-HPC = 'yes'
-control_dir = 'AM_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_commita6aebdd'
-if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    control_dir= control_model + '/ISCA_HPC/' + control_dir
-else: 
-    control_dir= control_model + '/' + control_dir
-
-#print control_dir
-ctl_runmin=121  # Should be a January month for seasonal variables to be correct
-ctl_runmax=481
-
-model = 'isca'
-if (model == 'Isca') or (model == 'isca'): 
-    model_data = 'Isca_DATA'
-    output_dir1 = 'Isca'
-elif (model == 'gfdl') or (model == 'GFDL'):
-    model_data = 'GFDL_DATA'
-    output_dir1 = ''
-
-HPC = 'yes'
-testdir_in1= 'AM_at20lon_newbucket_fixedSSTs_from_realworld_zonallysymm_plus_uniform_warming_and_2xCO2_spinup_361_commita6aebdd'
-runmin=120
-runmax=480
-if (HPC == 'Yes') or (HPC == 'yes') or (HPC == 'y'):
-    exp1_name = 'ISCA_HPC/'+testdir_in1
-    testdir = model_data + '/ISCA_HPC/' + testdir_in1
-    testdir_in1 = '/ISCA_HPC/' + testdir_in1
-else: 
-    exp1_name = testdir_in1
-    testdir = model_data + '/' + testdir_in1
-
-land = 'AM_at20lon'
-landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
-
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxrAM20=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
-
-
-
-[net_lhe5,net_lhe5_avg,net_lhe5_seasonal_avg,net_lhe5_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
-[precipitation5,precipitation5_avg,precipitation5_seasonal_avg,precipitation5_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'precipitation','mm/d', factor=86400)
-[t_surf5,t_surf5_avg,t_surf5_seasonal_avg,t_surf5_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'t_surf','K')
-
-[net_lhe5_ctl,net_lhe5_avg_ctl,net_lhe5_seasonal_avg_ctl,net_lhe5_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'flux_lhe','mm/d',factor = 1./28.) # latent heat flux at surface (UP)
-[precipitation5_ctl,precipitation5_avg_ctl,precipitation5_seasonal_avg_ctl,precipitation5_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'precipitation','mm/d', factor=86400)
-[t_surf5_ctl,t_surf5_avg_ctl,t_surf5_seasonal_avg_ctl,t_surf5_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'t_surf','K')
-
-
-
 ############ plotting ##############
 
 small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
@@ -325,451 +204,625 @@ med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 v = np.linspace(-1.,1.,21)
-nmb_contours = [1.,2.,3.,4.,5.,6.]
-
-# South America Only 
-
-array = precipitation2_avg - precipitation2_avg_ctl
-ctl_array = precipitation2_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
-landmask = np.asarray(landmaskxr2C10)
-
-
-fig, axes = plt.subplots(2,2, figsize = (25,12))
-fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
-
-
-axes[0,0].set_title('(a) 2C 10$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60.),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-# Africa Only 
-
-array = precipitation1_avg - precipitation1_avg_ctl
-ctl_array = precipitation1_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
-landmask = np.asarray(landmaskxr2C)
-
-axes[0,1].set_title('(b) 2C', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,1])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-
-# Two continents 
-
-array = precipitation3_avg - precipitation3_avg_ctl
-ctl_array = precipitation3_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
-landmask = np.asarray(landmaskxr2C70)
-
-
-axes[1,0].set_title('(c) 2C 70$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-
-# Two continents - America only 
-
-array = precipitation4_avg - precipitation4_avg_ctl
-ctl_array = precipitation4_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
-landmask = np.asarray(landmaskxr2C100)
-
-
-axes[1,1].set_title('(d) 2C 100$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,1])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-m.contour(xi,yi,landmask, 1)
-
-
-
-# Add Colorbar
-cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
-cbar.set_label('mm/d', size=med)
-cbar.ax.tick_params(labelsize=med)
-# SAVE BY HAND as ....
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_Pctl_conts_120-480_nomerids_narrowcbar.png', dpi=100)
-#fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_P-Econts_120-480_nomerids.svg', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_Pctl_conts_120-480_nomerids_narrowcbar.pdf', dpi=400)
-
-
-
-#######################
-
-v = np.linspace(-1.,1.,21)
-# nmb_contours = [1.,2.,3.,4.,5.,6.]
-
-# South America Only 
-
-array = precipitation2_avg - precipitation2_avg_ctl - (precipitation5_avg - precipitation5_avg_ctl)
-# ctl_array = precipitation2_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C10.lat)
-landlons = np.asarray(landmaskxr2C10.lon)
-
-landmask = np.asarray(landmaskxr2C10)
-
-
-fig, axes = plt.subplots(2,2, figsize = (25,12))
-fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
-
-
-axes[0,0].set_title('(a) 2C - AM 10$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-# ctl_array = np.asarray(ctl_array)
-# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60.),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-# cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-landmaskAM, lons_cyclic = addcyclic(np.asarray(landmaskxrAM20), landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1, linestyles = 'dotted')
-    m.contour(xi,yi,landmaskAM, 1)
-
-
-
-# Africa Only 
-
-array = precipitation1_avg - precipitation1_avg_ctl - (precipitation5_avg - precipitation5_avg_ctl)
-# ctl_array = precipitation1_avg_ctl
-lats=array.lat
-lons=array.lon
-landmask = np.asarray(landmaskxr2C)
-
-
-axes[0,1].set_title('(b) 2C - AM', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,1])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-# ctl_array = np.asarray(ctl_array)
-# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-# cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1, linestyles = 'dotted')
-    m.contour(xi,yi,landmaskAM, 1)
-
-
-# Two continents 
-
-array = precipitation3_avg - precipitation3_avg_ctl - (precipitation5_avg - precipitation5_avg_ctl)
-# ctl_array = precipitation3_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landmask = np.asarray(landmaskxr2C70)
-
-
-axes[1,0].set_title('(c) 2C - AM 70$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-# ctl_array = np.asarray(ctl_array)
-# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-# cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1, linestyles = 'dotted')
-    m.contour(xi,yi,landmaskAM, 1)
-
-
-# Two continents - America only 
-
-array = precipitation4_avg - precipitation4_avg_ctl - (precipitation5_avg - precipitation5_avg_ctl)
-# ctl_array = precipitation4_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landmask = np.asarray(landmaskxr2C100)
-
-
-axes[1,1].set_title('(d) 2C - AM 100$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,1])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-# ctl_array = np.asarray(ctl_array)
-# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
-
-# cont = m.contour(xi,yi,ctl_array,nmb_contours, cmap = 'Greys_r', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-m.contour(xi,yi,landmask, 1, linestyles = 'dotted')
-m.contour(xi,yi,landmaskAM, 1)
-
-
-
-# Add Colorbar
-cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
-cbar.set_label('mm/d', size=med)
-cbar.ax.tick_params(labelsize=med)
-# SAVE BY HAND as ....
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_2C-AM_120-480_nomerids_narrowcbar.png', dpi=100)
-#fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_P-Econts_120-480_nomerids.svg', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_cont_drift_2C-AM_120-480_nomerids_narrowcbar.pdf', dpi=400)
-
-
-#######################
-
-v = np.linspace(0.,8.,21)
 nmb_contours = [-1.,1.]
 
 # South America Only 
+
+array = precipitation1_avg - precipitation1_avg_ctl
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrSA.lat)
+landlons = np.asarray(landmaskxrSA.lon)
+
+landmask = np.asarray(landmaskxrSA)
+
+
+fig, axes = plt.subplots(2,2, figsize = (25,12))
+fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
+
+
+axes[0,0].set_title('(a) America only (AM07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+# Africa Only 
+
+array = precipitation3_avg - precipitation3_avg_ctl
+ctl_array = precipitation3_avg_ctl - net_lhe3_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrA.lat)
+landlons = np.asarray(landmaskxrA.lon)
+
+landmask = np.asarray(landmaskxrA)
+
+axes[0,1].set_title('(b) Africa only (AF07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
+# Two continents 
+
+array = precipitation2_avg - precipitation2_avg_ctl
+ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxr2C.lat)
+landlons = np.asarray(landmaskxr2C.lon)
+
+landmask = np.asarray(landmaskxr2C)
+
+
+axes[1,0].set_title('(c) Two continents (2C07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
+# Two continents - America only 
+
+array = (precipitation2_avg - precipitation2_avg_ctl) - (precipitation1_avg - precipitation1_avg_ctl)
+ctl_array = (precipitation2_avg_ctl - net_lhe2_avg_ctl) - (precipitation1_avg - net_lhe2_avg_ctl)
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxr2C.lat)
+landlons = np.asarray(landmaskxr2C.lon)
+
+landmask1 = np.asarray(landmaskxrSA)
+landmask2 = np.asarray(landmaskxrA)
+
+
+axes[1,1].set_title('(d) 2C07 - AM07', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+# ctl_array = np.asarray(ctl_array)
+# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+# ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask1,landlons1 = shiftgrid(np.max(landlons)-180.,landmask1,landlons,start=False,cyclic=np.max(landlons))
+
+landmask1, lons_cyclic1 = addcyclic(landmask1, landlons1)
+
+landmask2,landlons2 = shiftgrid(np.max(landlons)-180.,landmask2,landlons,start=False,cyclic=np.max(landlons))
+
+landmask2, lons_cyclic2 = addcyclic(landmask2, landlons2)
+
+m.contour(xi,yi,landmask1, 1)
+m.contour(xi,yi,landmask2, 1, linestyles = 'dotted')
+
+
+
+# Add Colorbar
+cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
+cbar.set_label('mm/d', size=med)
+cbar.ax.tick_params(labelsize=med)
+
+# SAVE BY HAND as ....
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_2c_africa_america_P-Econts_120-480_nomerids.png', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_2c_africa_america_P-Econts_120-480_nomerids.svg', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_4panels_2c_africa_america_P-Econts_120-480_nomerids.pdf', dpi=400)
+
+###################################################################################################################
+
+small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+v = np.linspace(-10.,10.,21)
+
+# South America Only 
+
+array = t_surf1_avg - t_surf1_avg_ctl
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrSA.lat)
+landlons = np.asarray(landmaskxrSA.lon)
+
+landmask = np.asarray(landmaskxrSA)
+
+
+fig, axes = plt.subplots(2,2, figsize = (25,12))
+fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
+
+
+axes[0,0].set_title('(a) America only (AM07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='RdBu_r', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+# Africa Only 
+
+array = t_surf3_avg - t_surf3_avg_ctl
+ctl_array = precipitation3_avg_ctl - net_lhe3_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrA.lat)
+landlons = np.asarray(landmaskxrA.lon)
+
+landmask = np.asarray(landmaskxrA)
+
+axes[0,1].set_title('(b) Africa only (AF07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='RdBu_r', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
+# Two continents 
+
+array = t_surf2_avg - t_surf2_avg_ctl
+ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxr2C.lat)
+landlons = np.asarray(landmaskxr2C.lon)
+
+landmask = np.asarray(landmaskxr2C)
+
+
+axes[1,0].set_title('(c) Two continents (2C07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='RdBu_r', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
+# Two continents - America only 
+
+array = (t_surf2_avg - t_surf2_avg_ctl) - (t_surf1_avg - t_surf1_avg_ctl)
+ctl_array = (precipitation2_avg_ctl - net_lhe2_avg_ctl) - (precipitation1_avg - net_lhe2_avg_ctl)
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxr2C.lat)
+landlons = np.asarray(landmaskxr2C.lon)
+
+landmask1 = np.asarray(landmaskxrSA)
+landmask2 = np.asarray(landmaskxrA)
+
+
+axes[1,1].set_title('(d) 2C07 - AM07', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+# ctl_array = np.asarray(ctl_array)
+# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+# ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='RdBu_r', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask1,landlons1 = shiftgrid(np.max(landlons)-180.,landmask1,landlons,start=False,cyclic=np.max(landlons))
+
+landmask1, lons_cyclic1 = addcyclic(landmask1, landlons1)
+
+landmask2,landlons2 = shiftgrid(np.max(landlons)-180.,landmask2,landlons,start=False,cyclic=np.max(landlons))
+
+landmask2, lons_cyclic2 = addcyclic(landmask2, landlons2)
+
+m.contour(xi,yi,landmask1, 1)
+m.contour(xi,yi,landmask2, 1, linestyles = 'dotted')
+
+
+
+# Add Colorbar
+cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
+cbar.set_label('K', size=med)
+cbar.ax.tick_params(labelsize=med)
+
+# SAVE BY HAND as ....
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Tavg_minus_ctl_4panels_2c_africa_america_120-480_nomerids.png', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Tavg_minus_ctl_4panels_2c_africa_america_120-480_nomerids.svg', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Tavg_minus_ctl_4panels_2c_africa_america_120-480_nomerids.pdf', dpi=100)
+
+
+###################################################################################################################
+
+small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+v = np.linspace(0.,8.,11)
+v_diff = np.linspace(-2.,2.,21)
+
+# South America Only 
+
+array = precipitation1_avg_ctl
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrSA.lat)
+landlons = np.asarray(landmaskxrSA.lon)
+
+landmask = np.asarray(landmaskxrSA)
+
+
+fig, axes = plt.subplots(2,2, figsize = (25,12))
+fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
+
+
+axes[0,0].set_title('(a) America only (AM07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+# Africa Only 
+
+array = precipitation3_avg_ctl
+ctl_array = precipitation3_avg_ctl - net_lhe3_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrA.lat)
+landlons = np.asarray(landmaskxrA.lon)
+
+landmask = np.asarray(landmaskxrA)
+
+axes[0,1].set_title('(b) Africa only (AF07)', size = med)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+ctl_array = np.asarray(ctl_array)
+ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
+cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes[0,1], shrink = 0.65) 
+cbar.set_label('mm/d', size=med)
+cbar.ax.tick_params(labelsize=med)
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+
+# Two continents 
 
 array = precipitation2_avg_ctl
 ctl_array = precipitation2_avg_ctl - net_lhe2_avg_ctl
@@ -780,144 +833,44 @@ lons=array.lon
 landlats = np.asarray(landmaskxr2C.lat)
 landlons = np.asarray(landmaskxr2C.lon)
 
-landmask = np.asarray(landmaskxr2C10)
-
-
-fig, axes = plt.subplots(2,2, figsize = (25,12))
-fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
-
-
-axes[0,0].set_title('(a) 2C 10$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60.),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-# Africa Only 
-
-array = precipitation1_avg_ctl
-ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
 landmask = np.asarray(landmaskxr2C)
 
-axes[0,1].set_title('(b) 2C', size = med)
+
+axes[1,0].set_title('(c) Two continents (2C07)', size = med)
 #fig = plt.figure()
 
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[0,1])
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
 array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
 
 array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
 ctl_array = np.asarray(ctl_array)
 ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
 ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
 lons = lons_cyclic
 
 m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
 
 lon, lat = np.meshgrid(lons, lats)
 xi, yi = m(lon, lat)
 
 cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
 
 # Add rectangles
 #    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-
-landmask, lons_cyclic = addcyclic(landmask, landlons)
-
-if np.any(landmask != 0.):
-    m.contour(xi,yi,landmask, 1)
-
-
-# Two continents 
-
-array = precipitation3_avg_ctl
-ctl_array = precipitation3_avg_ctl - net_lhe3_avg_ctl
-
-lats=array.lat
-lons=array.lon
-
-landlats = np.asarray(landmaskxr2C.lat)
-landlons = np.asarray(landmaskxr2C.lon)
-
-landmask = np.asarray(landmaskxr2C70)
-
-
-axes[1,0].set_title('(c) 2C 70$^{\circ}$', size = med)
-#fig = plt.figure()
-
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,0])
-array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
-array = np.asarray(array)
-array, lons_cyclic = addcyclic(array, lons)
-
-array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
-
-lons = lons_cyclic
-
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
-
-lon, lat = np.meshgrid(lons, lats)
-xi, yi = m(lon, lat)
-
-cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
-
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
-
-
-# Read landmask
-
-# Add rectangles
-#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
 
 landmask, lons_cyclic = addcyclic(landmask, landlons)
 
@@ -927,8 +880,8 @@ if np.any(landmask != 0.):
 
 # Two continents - America only 
 
-array = precipitation4_avg_ctl
-ctl_array = precipitation4_avg_ctl - net_lhe4_avg_ctl
+array = precipitation2_avg_ctl - precipitation1_avg_ctl
+ctl_array = (precipitation2_avg_ctl - net_lhe2_avg_ctl) - (precipitation1_avg - net_lhe2_avg_ctl)
 
 lats=array.lat
 lons=array.lon
@@ -936,53 +889,64 @@ lons=array.lon
 landlats = np.asarray(landmaskxr2C.lat)
 landlons = np.asarray(landmaskxr2C.lon)
 
-landmask = np.asarray(landmaskxr2C100)
+landmask1 = np.asarray(landmaskxrSA)
+landmask2 = np.asarray(landmaskxrA)
 
 
-axes[1,1].set_title('(d) 2C 100$^{\circ}$', size = med)
+axes[1,1].set_title('(d) 2C07 - AM07', size = med)
 #fig = plt.figure()
 
-m = Basemap(projection='kav7',lon_0=180.,resolution='c', ax = axes[1,1])
+m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
 array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
 
 array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+# ctl_array = np.asarray(ctl_array)
+# ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
+# ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+# ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
 lons = lons_cyclic
 
 m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(0.,360.,60),labels=[0,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
 
 lon, lat = np.meshgrid(lons, lats)
 xi, yi = m(lon, lat)
 
-cs = m.contourf(xi,yi,array, v, cmap='Blues', extend = 'max')
+cs = m.contourf(xi,yi,array, v_diff, cmap='BrBG', extend = 'both')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
 
 # Add rectangles
 #    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
-landmask, lons_cyclic = addcyclic(landmask, landlons)
+landmask1,landlons1 = shiftgrid(np.max(landlons)-180.,landmask1,landlons,start=False,cyclic=np.max(landlons))
 
-m.contour(xi,yi,landmask, 1)
+landmask1, lons_cyclic1 = addcyclic(landmask1, landlons1)
+
+landmask2,landlons2 = shiftgrid(np.max(landlons)-180.,landmask2,landlons,start=False,cyclic=np.max(landlons))
+
+landmask2, lons_cyclic2 = addcyclic(landmask2, landlons2)
+
+m.contour(xi,yi,landmask1, 1)
+m.contour(xi,yi,landmask2, 1, linestyles = 'dotted')
 
 
 
 # Add Colorbar
-cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes, shrink = 0.65) 
+cbar = fig.colorbar(cs, orientation = 'vertical', ax = axes[1,1], shrink = 0.65) 
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
 
 # SAVE BY HAND as ....
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pctl_4panels_cont_drift_P-Econts_120-480_nomerids.png', dpi=100)
-# fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pctl_4panels_cont_drift_P-Econts_120-480_nomerids_narrowcbar.svg', dpi=100)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pctl_4panels_cont_drift_P-Econts_120-480_nomerids.pdf', dpi=400)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_ctl_4panels_2c_africa_america_120-480_nomerids.png', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_ctl_4panels_2c_africa_america_120-480_nomerids.svg', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_ctl_4panels_2c_africa_america_120-480_nomerids.pdf', dpi=400)
+

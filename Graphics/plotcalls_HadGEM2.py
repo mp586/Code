@@ -34,7 +34,8 @@ E = xr.DataArray(E/28.,coords=[time,lat,lon],dims=['time','lat','lon'])
 E_avg = E.mean('time')
 worldmap_variable(outdir,E_avg,'mm/d','avg_E','fromwhite',0,8)
 PE_avg = P_avg - E_avg
-worldmap_variable(outdir,PE_avg,'mm/d','avg_P-E','rainnorm',-3.,3.)
+worldmap_variable(outdir,PE_avg,'mm/d','avg_P-E_rainnorm','rainnorm',-4.,4.)
+worldmap_variable(outdir,PE_avg,'mm/d','avg_P-E','PE_scale',-4.,4.)
 
 
 rh_avg_tropics = rh_avg.sel(lat=slice(-30.,30.))

@@ -17,6 +17,8 @@ from scipy import stats
 from scipy.stats import linregress as linreg
 from matplotlib.patches import Rectangle
 from scipy.odr import Model, Data, ODR
+sys.path.insert(0, os.path.join(GFDL_BASE,'src/extra/python/scripts'))
+import cell_area as ca
 
 
 class MidpointNormalize(colors.Normalize):
@@ -2056,9 +2058,9 @@ def worldmap_variable(outdir,array,units,title,palette,minval=None,maxval=None,n
     plt.close()
     
 
-    small = 12 #largefonts 14 # smallfonts 12 # medfonts = 14
-    med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-    lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+    small = 24 #largefonts 14 # smallfonts 12 # medfonts = 14
+    med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
+    lge = 32 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
     lats=array.lat
@@ -2066,10 +2068,7 @@ def worldmap_variable(outdir,array,units,title,palette,minval=None,maxval=None,n
     lon_0 = lons.mean() 
     lat_0 = lats.mean() 
 
-    fig = plt.figure(figsize = (35,15))
-
-    ax1 = plt.subplot2grid((2,2), (0,0))
-
+    fig, ax1 = plt.subplots(1,1, figsize = (20,15))
 
     m = Basemap(projection='kav7',lon_0=0.,resolution='c')
 
@@ -2134,11 +2133,12 @@ def worldmap_variable(outdir,array,units,title,palette,minval=None,maxval=None,n
 	    else:
 		    plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
-    cbar = m.colorbar(cs, location='right', pad="10%")
+    cbar = m.colorbar(cs, location = 'right', pad="10%")
     cbar.set_label(units, size=med)
     cbar.ax.tick_params(labelsize=small) 
     plt.title(title, size=lge)
     plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'.png', bbox_inches='tight', dpi=100)
+    plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'.pdf', bbox_inches='tight')
 
 
 def squareland_inputfile_4dvar(filename,varname):
@@ -2689,8 +2689,8 @@ def any_configuration_plot(outdir,runmin,runmax,minlat,maxlat,array1,area_array,
 		if array2 is not None:
 			plt.plot(zonavg_thin_land_ctl,lats, 'b--', label = 'land ctl')
 			plt.plot(zonavg_thin_ocean_ctl,lats, 'b',label = 'ocean ctl')
-		plt.plot(zonavg_thin_land,lats, 'k--', label = 'land pert')
-		plt.plot(zonavg_thin_ocean,lats, 'k',label = 'ocean pert')
+		plt.plot(zonavg_thin_land,lats, 'k--', label = 'land')
+		plt.plot(zonavg_thin_ocean,lats, 'k',label = 'ocean')
 		plt.ylabel('Latitude', size=med)
 		plt.xlabel(units, size=med)
 		ax2.yaxis.tick_right()
@@ -2928,7 +2928,7 @@ def any_configuration_plot_noshift(outdir,runmin,runmax,minlat,maxlat,array1,are
 #    return fig
 
 
-def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True, steps = 21):
+def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,area_array,units,title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,month_annotate=None,save_fig=True, steps = 21, extent = 'both'):
 # plotting only the zonal average next to the map 
 # currently hard coded -30.,30. slice instead of squarelats_min, squarelats_max
 	plt.close()
@@ -3025,7 +3025,7 @@ def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,ar
 		elif palette=='slp':
 			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
 		else:
-			cs = m.pcolor(xi,yi,array[i,:,:].sel(lat=selected_lats))		
+			cs = m.contourf(xi,yi,array[i,:,:].sel(lat=selected_lats), v, cmap = palette, extend = extent)		
 
 
 
@@ -3058,6 +3058,7 @@ def any_configuration_plot_allmonths(outdir,runmin,runmax,minlat,maxlat,array,ar
 
 	if save_fig == True:
 		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_allmonths.png', format = 'png', bbox_inches='tight')
+		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_allmonths.pdf', format = 'pdf', bbox_inches='tight')
 	#		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
 
 	plt.close()
@@ -3198,7 +3199,7 @@ def any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,minlat,maxlat,
 	plt.close()
 
 
-def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None):
+def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,area_array,units,plot_title,palette,landmaskxr,nmb_contours=0,minval=None,maxval=None,steps = 21, month_annotate=None,save_fig=True, save_title = None,  array2 = None, extent = 'both'):
 
 	plt.close()
 
@@ -3265,8 +3266,7 @@ def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,ar
 
 	v = np.linspace(minval,maxval,steps) # , endpoint=True)
 
-	# seasons = ['MAM','JJA','SON','DJF']
-	seasons = array.season.values
+	seasons = ['MAM','JJA','SON','DJF']
 
 	for i in range(len(seasons)):
 		if (i < 2):
@@ -3300,19 +3300,19 @@ def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,ar
 		elif palette=='slp':
 			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap=plt.cm.coolwarm, extend = 'both')
 		else:
-			cs = m.pcolor(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats))
+			cs = m.contourf(xi,yi,array.sel(season=seasons[i]).sel(lat=selected_lats), v, cmap = palette, extend = extent)
 
 
 		if nmb_contours != 0:  # add contours 
 			if array2 is not None:
-				cont = m.contour(xi,yi,ctl_array[i,:,:],nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+				cont = m.contour(xi,yi,ctl_array.sel(season=seasons[i]),nmb_contours, cmap = 'Greys', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 			else: 
-				cont = m.contour(xi,yi,array[i,:,:],nmb_contours, colors = 'k', linewidth=2)
+				cont = m.contour(xi,yi,array.sel(season=seasons[i]),nmb_contours, colors = 'k', linewidth=2)
 
 
 
-		# m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-		# m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+		m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+		m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
 	# Add rectangles
 
 		if np.any(landmask != 0.):
@@ -3339,7 +3339,7 @@ def any_configuration_plot_seasonal(outdir,runmin,runmax,minlat,maxlat,array1,ar
 
 	if save_fig == True:
 		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plot_title+'_'+str(runmin)+'-'+str(runmax)+'_allseasons.png', format = 'png', bbox_inches='tight')
-	#		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+title+'_'+str(runmin)+'-'+str(runmax)+'_highres.png', format = 'png', dpi = 400, bbox_inches='tight')
+		plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plot_title+'_'+str(runmin)+'-'+str(runmax)+'_allseasons.pdf', format = 'pdf', bbox_inches='tight')
 
 	plt.close()
 
@@ -3545,9 +3545,9 @@ def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,uni
 # palette is for the underlying plot
 # units are for the underlying plot
 
-	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 	landlats = np.asarray(landmaskxr.lat)
 	landlons = np.asarray(landmaskxr.lon)
@@ -3630,63 +3630,27 @@ def winds_one_level(outdir,runmin,runmax,plt_title,uwind,vwind,array,palette,uni
 		# 	plt.clabel(cont, inline=2, fmt='%1.3f', fontsize=med)
 
 # Add Colorbar
-	cbar = m.colorbar(cs, location='right', pad="10%") # usually on right 
+	cbar = m.colorbar(cs, location='right', pad=0.50) # usually on right 
 	cbar.set_label(units, size=med)
 	cbar.ax.tick_params(labelsize=med) 
 	cbar.set_clim(minval, maxval)
 
-	# if palette=='rainnorm':
-
-	# 	if maxval >= minval:
-	# 		minval = - maxval
-	# 	else: 
-	# 		maxval = minval
-	# 		minval = - minval
-
-	# 	cs = m.pcolor(xi,yi,array,
-	# 		      norm=MidpointNormalize(midpoint=0.),
-	# 		      cmap='BrBG',vmin=minval, vmax=maxval)
-	# elif palette == 'PE_scale':
-	# 	cs = m.pcolor(xi,yi,array,norm=MidpointNormalize(midpoint=0.),cmap='bwr_r',vmin=minval, vmax=maxval)
-	# elif palette == 'raindefault':
-	# 	cs = m.pcolor(xi,yi,array, 
-	# 		      cmap=plt.cm.BrBG)
-
-	# elif palette=='temp': 
-	# 	cs = m.pcolor(xi,yi,array, 
-	# 		      norm=MidpointNormalize(midpoint=273.15), 
-	# 		      cmap=plt.cm.RdBu_r,vmin = 273.15-(maxval-273.15),
-	# 		      vmax=maxval) 
-
-	# elif palette=='fromwhite': 
-	# 	pal = plt.cm.Blues
-	# 	pal.set_under('w',None)
-	# 	cs = m.pcolormesh(xi,yi,array,
-	# 			  cmap=pal,vmin=0,vmax=maxval)
-
-	# else:
-	# 	cs = m.pcolor(xi,yi,array)
-
-	# cbar = m.colorbar(cs, location='right', pad="10%")
-    # cbar.set_label(units)
-
 	Q = ax.quiver(xi[::3,::3], yi[::3,::3], uwind[::3,::3], vwind[::3,::3], units='width')
-	ax.quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
+	ax.quiverkey(Q, 0.7, 0.85, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+	# ax.quiverkey(Q, 0.92, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
 
-	if save == True:
-		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.png', dpi=100) # if add bbox_inches = 'tight' the quiverkey is not saved!
-		fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.pdf') # if add bbox_inches = 'tight' the quiverkey is not saved!
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.png') #dpi=100, bbox_inches = 'tight') # the quiverkey is not saved!
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/'+plt_title+'_level'+str(level)+'_'+str(runmin)+'-'+str(runmax)+'.pdf') # if add bbox_inches = 'tight' the quiverkey is not saved!
 
-	return fig
 
 def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,units,minval,maxval,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=1., scale = 100.): 
 
 	landlats = np.asarray(landmaskxr.lat)
 	landlons = np.asarray(landmaskxr.lon)
 	
-	fig, axes = plt.subplots(2,2, figsize = (25, 10))
+	fig, axes = plt.subplots(2,2, figsize = (22,10))
 
-	axes[0,0].set_title('MAM')
+	axes[0,0].set_title('MAM', fontsize = 24)
 	uwind = uwind_in.sel(season='MAM')
 	vwind = vwind_in.sel(season='MAM')
 	array = array_in.sel(season='MAM')
@@ -3706,8 +3670,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	vwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,vwind,lons_cyclic,start=False,
 			       cyclic=np.max(lons_cyclic))	
 
-	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0])
-	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize = 12)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize = 12)
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
@@ -3730,6 +3694,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	    cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 	elif palette == 'PE_scale':
 	    cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
+	elif palette == 'PE_scale_reverse':
+	    cs = m.contourf(xi,yi,array, v, cmap='bwr', extend = 'both')
 	elif palette == 'raindefault':
 	    cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
 	elif palette=='temp':
@@ -3752,8 +3718,10 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	# qk = axes[0,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', 
 	# 		   labelpos='E', coordinates='figure')
 
+	fig.subplots_adjust(wspace=0.03)
 
-	axes[0,1].set_title('JJA')
+
+	axes[0,1].set_title('JJA', fontsize = 24)
 	uwind = uwind_in.sel(season='JJA')
 	vwind = vwind_in.sel(season='JJA')
 	array = array_in.sel(season='JJA')
@@ -3770,8 +3738,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	vwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,vwind,lons_cyclic,start=False,
 			       cyclic=np.max(lons_cyclic))	
 
-	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0])
-	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize = 12)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize = 12)
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
@@ -3784,6 +3752,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	    cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 	elif palette == 'PE_scale':
 	    cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
+	elif palette == 'PE_scale_reverse':
+	    cs = m.contourf(xi,yi,array, v, cmap='bwr', extend = 'both')
 	elif palette == 'raindefault':
 	    cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
 	elif palette=='temp':
@@ -3806,9 +3776,9 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 
 	# qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', 
 	# 		   labelpos='E', coordinates='figure')
+	# fig.subplots_adjust(hspace=0.02)
 
-
-	axes[1,0].set_title('SON')
+	axes[1,0].set_title('SON', fontsize = 24)
 	uwind = uwind_in.sel(season='SON')
 	vwind = vwind_in.sel(season='SON')
 	array = array_in.sel(season='SON')
@@ -3825,8 +3795,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	vwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,vwind,lons_cyclic,start=False,
 			       cyclic=np.max(lons_cyclic))	
 
-	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0])
-	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize = 12)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize = 12)
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
@@ -3839,6 +3809,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	    cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 	elif palette == 'PE_scale':
 	    cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
+	elif palette == 'PE_scale_reverse':
+	    cs = m.contourf(xi,yi,array, v, cmap='bwr', extend = 'both')
 	elif palette == 'raindefault':
 	    cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
 	elif palette=='temp':
@@ -3861,8 +3833,10 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 
 	# qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', 
 	# 		   labelpos='E', coordinates='figure')
+	# fig.subplots_adjust(hspace=0.02)
+	fig.subplots_adjust(wspace=0.03)
 
-	axes[1,1].set_title('DJF')
+	axes[1,1].set_title('DJF', fontsize = 24)
 	uwind = uwind_in.sel(season='DJF')
 	vwind = vwind_in.sel(season='DJF')
 	array = array_in.sel(season='DJF')
@@ -3879,8 +3853,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	vwind,lons_shift = shiftgrid(np.max(lons_cyclic)-180.,vwind,lons_cyclic,start=False,
 			       cyclic=np.max(lons_cyclic))	
 
-	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,1,0,0])
-	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1])
+	m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize = 12)
+	m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize = 12)
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
@@ -3893,6 +3867,8 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 	    cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 	elif palette == 'PE_scale':
 	    cs = m.contourf(xi,yi,array, v, cmap='bwr_r', extend = 'both')
+	elif palette == 'PE_scale_reverse':
+	    cs = m.contourf(xi,yi,array, v, cmap='bwr', extend = 'both')
 	elif palette == 'raindefault':
 	    cs = m.contourf(xi,yi,array, cmap=plt.cm.BrBG, extend = 'both')
 	elif palette=='temp':
@@ -3912,12 +3888,15 @@ def winds_seasons_one_level(uwind_in,vwind_in,plotname,level,array_in,palette,un
 
 
 	Q = axes[1,1].quiver(xi[::quivkey,::quivkey], yi[::quivkey,::quivkey], uwind[::quivkey,::quivkey], vwind[::quivkey,::quivkey],  scale = scale, scale_units = 'inches')
-	qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', 
-			   labelpos='E', coordinates='figure')	
-	cbar = fig.colorbar(cs,ax=axes)
-	cbar.set_label(units)
+	qk = axes[1,1].quiverkey(Q, 0.78, 0.84, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', 
+			   labelpos='E', coordinates='figure', fontproperties={'size': 22})	
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_4_seasons_'+plotname+'_'+str(runmin)+'-'+str(runmax)+'_level'+str(level)+'.png', dpi=100)
+	cbar = fig.colorbar(cs,ax=axes, orientation = 'vertical', shrink = 0.6)
+	cbar.set_label(units, size = 22)
+	cbar.ax.tick_params(labelsize=20) 
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_4_seasons_'+plotname+'_'+str(runmin)+'-'+str(runmax)+'_level'+str(level)+'.png', dpi=100, bbox_inches = 'tight')
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/winds_4_seasons_'+plotname+'_'+str(runmin)+'-'+str(runmax)+'_level'+str(level)+'.pdf', bbox_inches = 'tight')
 
 def winds_seasons(uwind_in,vwind_in,level,array_in,palette,units,minval,maxval,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=1.): 
 
@@ -4645,7 +4624,57 @@ def mass_streamfunction(testdir,model,runmin,runmax,v='vcomp', a=6376.0e3, g=9.8
 #     ...:         msf[i-runmin] = (np.cumsum(vbar*dp, axis='pfull')*c)[0]
 #     ...:      
 
-def plot_streamfunction(msf_array,title,units='10^10 kg/s',ctl_pert = 'pert'):
+
+
+def mass_streamfunction_interp(testdir,model,runmin,runmax,v='vcomp', a=6376.0e3, g=9.8):
+    """Calculate][] the mass streamfunction for the atmosphere.
+    Based on a vertical integral of the meridional wind.
+    Ref: Physics of Climate, Peixoto & Oort, 1992.  p158.
+    Parameters
+    ----------
+    data :  xarray.DataSet
+        GCM output data
+    v : str, optional
+        The name of the meridional flow field in `data`.  Default: 'vcomp'
+    a : float, optional
+        The radius of the planet. Default: Earth 6317km
+    g : float, optional
+        Surface gravity. Default: Earth 9.8m/s^2
+    Returns
+    -------
+    streamfunction : xarray.DataArray
+        The meridional mass streamfunction.
+
+    Author = James Penn
+    """
+
+    for i in range(runmin,runmax):
+	    if model=='isca':
+		    runnr="{0:04}".format(i)
+	    elif model=='gfdl':
+		    runnr="{0:03}".format(i)
+	    data = xr.open_dataset('/scratch/mp586/'+testdir+'/run'+runnr+'/atmos_monthly_interp.nc')
+	    vbar = data[v].mean('lon')
+	    if i == runmin:
+		    msf = np.empty_like(vbar)
+		    msf = msf.repeat((runmax-runmin),axis=0) 
+	    c = 2*np.pi*a*np.cos(vbar.lat*np.pi/180) / g
+# take a diff of half levels, and assign to pfull coordinates
+	    data_dp = xr.open_dataset('/scratch/mp586/'+testdir+'/run'+runnr+'/atmos_monthly.nc')
+	    dp = xr.DataArray((data_dp.phalf[::-1].diff('phalf').values)*100, coords=[('pfull', data.pfull)])
+	    msf[i-runmin] = (np.cumsum(vbar*dp, axis=vbar.dims.index('pfull')))*c
+	    # msf[i-runmin] = (np.cumsum(vbar*dp, axis='pfull')*c)
+	    # why cumsum and not # (np.sum(vbar*dp, axis = vbar.dims.index('pfull')))*c
+    time=[np.array(np.linspace(0,(runmax-runmin-1),(runmax-runmin),dtype='datetime64[M]'))]
+    msf=xr.DataArray(msf*1e-10,coords=[time[0],data.pfull,data.lat],dims=['time','pfull','lat'])
+    msf_avg=msf.mean(dim='time')
+    msf_seasonal_avg=msf.groupby('time.season').mean('time') 
+    msf_month_avg=msf.groupby('time.month').mean('time')
+    return (msf,msf_avg,msf_seasonal_avg,msf_month_avg)
+
+
+
+def plot_streamfunction(msf_array,title,units='10$^{10}$ kg/s',ctl_pert = 'pert'):
 
 	matplotlib.rcParams['contour.negative_linestyle']= 'dashed'
 
@@ -4673,7 +4702,7 @@ def plot_streamfunction(msf_array,title,units='10^10 kg/s',ctl_pert = 'pert'):
 	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_'+str(runmin)+'-'+str(runmax), bbox_inches='tight')
 
 
-def plot_streamfunction_seasonal(msf_array, outdir, runmin, runmax, units='10^10 kg/s', minval = None, maxval = None, ctl_pert = 'pert'):
+def plot_streamfunction_seasonal(msf_array, outdir, runmin, runmax, units='x10$^{10}$ kg/s', minval = None, maxval = None, steps = 21, ctl_pert = 'pert', figx=20, contrs = [-20.,-10.,0.,10.,20.]):
 	matplotlib.rcParams['contour.negative_linestyle']= 'dashed'
 
 	lats = msf_array.lat
@@ -4681,47 +4710,47 @@ def plot_streamfunction_seasonal(msf_array, outdir, runmin, runmax, units='10^10
 	
 	y, p = np.meshgrid(lats, pfull)
 
-        if minval == None:
-                minval = msf_array.min()
-                maxval = - minval
+	if minval == None:
+			minval = msf_array.min()
+			maxval = - minval
+	v = np.linspace(minval,maxval,steps)
+	print(v)
+	fig, axes = plt.subplots(2,2, sharex = True, sharey = True, figsize = (figx, 10)) # for tropics only -50., 50. 
 
-        v = np.linspace(minval,maxval,21)
-
-	fig, axes = plt.subplots(2,2, sharey = True, figsize = (25, 10))
 	fig.gca().invert_yaxis()
+	plt.rcParams['ytick.labelsize']=22
+	plt.rcParams['xtick.labelsize']=22
 
-	cset = axes[0,0].contourf(y, p, msf_array.sel(season='MAM'), v, cmap='RdBu_r')
-	cont = axes[0,0].contour(y, p, msf_array.sel(season='MAM'), 20, colors = 'k', linewidth=5, extend = 'both')
-	axes[0,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
-	axes[0,0].set_title('MAM')
-	axes[0,0].set_xlabel('Latitude N')
-	axes[0,0].set_ylabel('Pressure (hPa)')
+	cset = axes[0,0].contourf(y, p, msf_array.sel(season='MAM'), v, cmap='RdBu_r', extend = 'both')
+	cont = axes[0,0].contour(y, p, msf_array.sel(season='MAM'), contrs, colors = 'k', linewidth=5, extend = 'both')
+	axes[0,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=18)
+	axes[0,0].set_title('MAM', fontsize = 24)
+	axes[0,0].set_ylabel('Pressure (hPa)', fontsize = 24)
 
 	cset = axes[0,1].contourf(y, p, msf_array.sel(season='JJA'), v, cmap='RdBu_r', extend = 'both')
-	cont = axes[0,1].contour(y, p, msf_array.sel(season='JJA'), 20, colors = 'k', linewidth=5)
-	axes[0,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
-	axes[0,1].set_title('JJA')
-	axes[0,1].set_xlabel('Latitude N')
-	axes[0,1].set_ylabel('Pressure (hPa)')
+	cont = axes[0,1].contour(y, p, msf_array.sel(season='JJA'), contrs, colors = 'k', linewidth=5)
+	axes[0,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=18)
+	axes[0,1].set_title('JJA', fontsize = 24)
 
 	cset = axes[1,1].contourf(y, p, msf_array.sel(season='DJF'), v, cmap='RdBu_r', extend = 'both')
-	cont = axes[1,1].contour(y, p, msf_array.sel(season='DJF'), 20, colors = 'k', linewidth=5)
-	axes[1,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
-	axes[1,1].set_title('DJF')
-	axes[1,1].set_xlabel('Latitude N')
-	axes[1,1].set_ylabel('Pressure (hPa)')
+	cont = axes[1,1].contour(y, p, msf_array.sel(season='DJF'), contrs, colors = 'k', linewidth=5)
+	axes[1,1].clabel(cont, inline=2, fmt='%1.1f',fontsize=18)
+	axes[1,1].set_title('DJF', fontsize = 24)
+	axes[1,1].set_xlabel('Latitude ($^{\circ}$N)', fontsize = 24)
 
 	cset = axes[1,0].contourf(y, p, msf_array.sel(season='SON'), v, cmap='RdBu_r', extend = 'both')
-	cont = axes[1,0].contour(y, p, msf_array.sel(season='SON'), 20, colors = 'k', linewidth=5)
-	axes[1,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=14)
-	axes[1,0].set_title('SON')
-	axes[1,0].set_xlabel('Latitude N')
-	axes[1,0].set_ylabel('Pressure (hPa)')
+	cont = axes[1,0].contour(y, p, msf_array.sel(season='SON'), contrs, colors = 'k', linewidth=5)
+	axes[1,0].clabel(cont, inline=2, fmt='%1.1f',fontsize=18)
+	axes[1,0].set_title('SON', fontsize = 24)
+	axes[1,0].set_xlabel('Latitude ($^{\circ}$N)', fontsize = 24)
+	axes[1,0].set_ylabel('Pressure (hPa)', fontsize = 24)
 
 
 	cbar = fig.colorbar(cset,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
-	cbar.set_label(units)
-	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_seasonal_'+ctl_pert+'_'+str(runmin)+'-'+str(runmax)+'.png')
+	cbar.set_label(units, size = 24)
+	cbar.ax.tick_params(labelsize=22) 
+	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_seasonal_'+ctl_pert+'_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches = 'tight')
+	plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/streamfunction_seasonal_'+ctl_pert+'_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches = 'tight')
 
 	# plt.show()
 
@@ -4804,36 +4833,36 @@ def rh_P_E_T_interp(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,ts
 
 
 
-def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask):
+def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask,minlat=-30,maxlat=30):
 
 
 
-	small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-	med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
-	rh_avg_tropical_land = rh_avg.where(landmask==1.).sel(lat=slice(-30.,30.))
-	precip_avg_tropical_land = precipitation_avg.where(landmask==1.).sel(lat=slice(-30.,30.))
-	evap_avg_tropical_land = net_lhe_avg.where(landmask==1.).sel(lat=slice(-30.,30.))
-	tsurf_avg_tropical_land = tsurf_avg.where(landmask==1.).sel(lat=slice(-30.,30.))
+	rh_avg_tropical_land = rh_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	precip_avg_tropical_land = precipitation_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	evap_avg_tropical_land = net_lhe_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
+	tsurf_avg_tropical_land = tsurf_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))
 
 	rh_land_1d = np.asarray(rh_avg_tropical_land).flatten()
 	P_land_1d = np.asarray(precip_avg_tropical_land).flatten()
 	E_land_1d = np.asarray(evap_avg_tropical_land).flatten()
 	tsurf_land_1d = np.asarray(tsurf_avg_tropical_land).flatten()
 
-	rh_avg_tropical_ocean = rh_avg.where(landmask==0.).sel(lat=slice(-30.,30.))
-	precip_avg_tropical_ocean = precipitation_avg.where(landmask==0.).sel(lat=slice(-30.,30.))
-	evap_avg_tropical_ocean = net_lhe_avg.where(landmask==0.).sel(lat=slice(-30.,30.))
-	tsurf_avg_tropical_ocean = tsurf_avg.where(landmask==0.).sel(lat=slice(-30.,30.))
+	rh_avg_tropical_ocean = rh_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	precip_avg_tropical_ocean = precipitation_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	evap_avg_tropical_ocean = net_lhe_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
+	tsurf_avg_tropical_ocean = tsurf_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))
 
 	rh_ocean_1d = np.asarray(rh_avg_tropical_ocean).flatten()
 	P_ocean_1d = np.asarray(precip_avg_tropical_ocean).flatten()
 	E_ocean_1d = np.asarray(evap_avg_tropical_ocean).flatten()
 	tsurf_ocean_1d = np.asarray(tsurf_avg_tropical_ocean).flatten()
 
-
-	
+	X, Y = np.meshgrid(rh_avg_tropical_land.lon, rh_avg_tropical_land.lat)
+	Y_flat = Y.flatten()
 
 # 	rh_P_E = np.stack((rh_1d,P_1d,E_1d),axis=1)
 
@@ -4847,21 +4876,41 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 ######################################
 ###### PLOTTING ########
 
+	fig, ax = plt.subplots(1,1, figsize=(10,10))
+	a=ax.scatter(P_land_1d,tsurf_land_1d - 273.15,c=np.abs(Y_flat), s = 20., cmap = 'Blues_r')
+	ax.set_xlabel("$P$ $(mm/d)$",fontsize = lge)
+	ax.set_ylabel("$T_s$ $(^\circ C)$",fontsize = lge)
+	ax.tick_params(labelsize = med)
+	ax.tick_params(labelsize = med)
+	ax.spines['right'].set_visible(False)
+	ax.spines['top'].set_visible(False)
+	# fig.subplots_adjust(right=0.85)
+	cbar = fig.colorbar(a)
+	fig.text(0.92, 0.5, '$^{\circ}$ Latitude North/South', va='center', rotation='vertical', fontsize = lge)
+
+	cbar.ax.tick_params(labelsize=med) 
+	# cbar.ax.set_yticklabels(['0','10','20','30'])	
+
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight')
+
+
+
 	fig, axes = plt.subplots(1,2, sharex = True, figsize=(25,10))
 	axes[0].plot(rh_land_1d,P_land_1d,'k.',markersize = 5, label = 'P land (tropics)')
 	axes[0].plot(rh_land_1d,E_land_1d,'c.',markersize = 5, label = 'E land (tropics)')
 	a = axes[1].scatter(rh_land_1d,tsurf_land_1d - 273.15, c=P_land_1d, s = 7., cmap = 'BrBG', vmin = 0., vmax = 8.)
 	axes[0].set_xlabel("$r_s$ $(\%)$",fontsize = lge)
 	axes[1].set_xlabel("$r_s$ $(\%)$",fontsize = lge)
-	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
-	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(-30.,30.)).max() + 1.)
+	axes[0].set_xlim(rh_avg.sel(lat=slice(minlat,maxlat)).min() - 5., rh_avg.sel(lat=slice(minlat,maxlat)).max() + 5.)
+	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(minlat,maxlat)).max() + 1.)
 	axes[0].tick_params(labelsize = med)
 	axes[1].tick_params(labelsize = med)
 	axes[0].legend(fontsize = lge)
 	axes[1].legend(fontsize = lge)
 	axes[0].set_ylabel('$P$ and $E$ $(mm/day)$',fontsize = lge)
 	axes[1].set_ylabel('$T_S$ $(^\circ C)$',fontsize = lge)
-	axes[1].set_ylim(tsurf_avg.sel(lat=slice(-30.,30.)).min() - 273.15 - 2., tsurf_avg.sel(lat=slice(-30.,30.)).max() - 273.15 + 2.)
+	axes[1].set_ylim(tsurf_avg.sel(lat=slice(minlat,maxlat)).min() - 273.15 - 2., tsurf_avg.sel(lat=slice(minlat,maxlat)).max() - 273.15 + 2.)
 	axes[0].spines['right'].set_visible(False)
 	axes[0].spines['top'].set_visible(False)
 	axes[1].spines['right'].set_visible(False)
@@ -4877,21 +4926,9 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	axes[0].set_title('a) $P$ and $E$ vs $r_S$',fontsize = lge)
 	axes[1].set_title('b) $T_S$ vs $r_S$',fontsize = lge)
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight', dpi=400)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_land_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight', dpi=400)
 
-
-	fig, ax = plt.subplots(1,1, sharex = True, figsize=(10,10))
-	ax.plot(P_land_1d,tsurf_land_1d - 273.15,'c.',markersize = 5)
-	ax.set_xlabel("$P$ $(mm/d)$",fontsize = lge)
-	ax.set_ylabel("$T_s$ $(^\circ C)$",fontsize = lge)
-	ax.tick_params(labelsize = med)
-	ax.tick_params(labelsize = med)
-	ax.spines['right'].set_visible(False)
-	ax.spines['top'].set_visible(False)
-
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_vs_T_land_'+str(runmin)+'-'+str(runmax)+'.pdf', bbox_inches='tight', dpi=400)
 
 
 
@@ -4902,15 +4939,15 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	a = axes[1].scatter(rh_ocean_1d,tsurf_ocean_1d - 273.15, c=P_ocean_1d, label = 'P ocean (tropics)', s = 7. , cmap = 'BrBG', vmin = 0., vmax = 8.)
 	axes[0].set_xlabel("$RH$ $(\%)$",fontsize = lge)
 	axes[1].set_xlabel("$RH$ $(\%)$",fontsize = lge)
-	axes[0].set_xlim(rh_avg.sel(lat=slice(-30.,30.)).min() - 5., rh_avg.sel(lat=slice(-30.,30.)).max() + 5.)
-	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(-30.,30.)).max() + 1.)
+	axes[0].set_xlim(rh_avg.sel(lat=slice(minlat,maxlat)).min() - 5., rh_avg.sel(lat=slice(minlat,maxlat)).max() + 5.)
+	axes[0].set_ylim(-0.5, precipitation_avg.sel(lat=slice(minlat,maxlat)).max() + 1.)
 	axes[0].tick_params(labelsize = med)
 	axes[1].tick_params(labelsize = med)
 	axes[0].legend(fontsize = lge)
 	axes[1].legend(fontsize = lge)
 	axes[0].set_ylabel('$P$ and $E$ $(mm/day)$',fontsize = lge)
 	axes[1].set_ylabel('$T_S$ $(^\circ C)$',fontsize = lge)
-	axes[1].set_ylim(tsurf_avg.sel(lat=slice(-30.,30.)).min() - 273.15 -2. , tsurf_avg.sel(lat=slice(-30.,30.)).max() - 273.15 + 2.)
+	axes[1].set_ylim(tsurf_avg.sel(lat=slice(minlat,maxlat)).min() - 273.15 -2. , tsurf_avg.sel(lat=slice(minlat,maxlat)).max() - 273.15 + 2.)
 
 	fig.subplots_adjust(right=0.8)
 	cbar_ax = fig.add_axes([0.85, 0.15, 0.01, 0.7])
@@ -4918,7 +4955,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	cbar.set_label('$P$ $(mm/day)$', size=lge)
 	cbar.ax.tick_params(labelsize=med) 	
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_ocean_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_Twithprecipcolor_Plabel_ocean_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 
 
@@ -4936,7 +4973,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	ax[0].set_ylabel('P and E (mm/day)',fontsize = lge)
 
 #	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_land_oc_'+str(runmin)+'-'+str(runmax)+'_highres.pdf', bbox_inches='tight', dpi=400)
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_land_oc_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_land_oc_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 	fig, ax = plt.subplots(1,2, figsize=(25,10))
 	ax[0].plot(rh_land_1d,P_land_1d,'b.',label = 'P land (tropics)')
@@ -4951,7 +4988,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	ax[0].set_ylabel('P and E (mm/day)',fontsize = lge)
 	ax[1].set_ylabel('tsurf (K)',fontsize = lge)
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_T_land_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_T_land_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 	fig, ax = plt.subplots(1,2, figsize=(25,10))
 	ax[0].plot(rh_ocean_1d,P_ocean_1d,'b.',label = 'P ocean (tropics)')
@@ -4966,16 +5003,16 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	ax[0].set_ylabel('P and E (mm/day)',fontsize = lge)
 	ax[1].set_ylabel('tsurf (K)',fontsize = lge)
 
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_T_ocean_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_T_ocean_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 
 
 	fig, ax = plt.subplots(2,1,sharex = True,figsize = (15,10))
-	rh_oc_1d = np.asarray(rh_avg.where(landmask==0.).sel(lat=slice(-30.,30.))).flatten()
+	rh_oc_1d = np.asarray(rh_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))).flatten()
 	PE_avg = precipitation_avg - net_lhe_avg
-	PE_oc_1d = np.asarray(PE_avg.where(landmask==0.).sel(lat=slice(-30.,30.))).flatten()
-	PE_land_1d = np.asarray(PE_avg.where(landmask==1.).sel(lat=slice(-30.,30.))).flatten()
-	PE_all_1d = np.asarray(PE_avg.sel(lat=slice(-30.,30.))).flatten()
-	rh_all_1d = np.asarray(rh_avg.sel(lat=slice(-30.,30.))).flatten()
+	PE_oc_1d = np.asarray(PE_avg.where(landmask==0.).sel(lat=slice(minlat,maxlat))).flatten()
+	PE_land_1d = np.asarray(PE_avg.where(landmask==1.).sel(lat=slice(minlat,maxlat))).flatten()
+	PE_all_1d = np.asarray(PE_avg.sel(lat=slice(minlat,maxlat))).flatten()
+	rh_all_1d = np.asarray(rh_avg.sel(lat=slice(minlat,maxlat))).flatten()
 
 	ax[0].plot(rh_land_1d,PE_land_1d,'g.', label='P-E land (tropics)')
 	ax[1].plot(rh_oc_1d,PE_oc_1d,'b.', label='P-E ocean (tropics)')
@@ -4994,12 +5031,12 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 
 #	fig.suptitle('P-E versus RH')
 #	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_PE_land_oc_all_'+str(runmin)+'-'+str(runmax)+'_highres.pdf', bbox_inches='tight', dpi=400)
-	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_PE_land_oc_all_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_PE_land_oc_all_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 #	fig.show()
 
 	fig2, ax2 = plt.subplots(3,1,sharex = True,figsize = (25,10))
-	P_all_1d = np.asarray(precipitation_avg.sel(lat=slice(-30.,30.))).flatten()
-	E_all_1d = np.asarray(net_lhe_avg.sel(lat=slice(-30.,30.))).flatten()
+	P_all_1d = np.asarray(precipitation_avg.sel(lat=slice(minlat,maxlat))).flatten()
+	E_all_1d = np.asarray(net_lhe_avg.sel(lat=slice(minlat,maxlat))).flatten()
 
 	ax2[0].plot(rh_all_1d,P_all_1d,'b.', label='P tropics')
 	ax2[1].plot(rh_all_1d,E_all_1d,'g.', label='E tropics')
@@ -5012,7 +5049,7 @@ def rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg
 	ax2[1].set_ylabel('E (mm/d)')
 	ax2[2].set_ylabel('P-E (mm/d)')
 	fig2.suptitle('P, E and P-E versus RH (tropics)')
-	fig2.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_all_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
+	fig2.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/RH_P_E_all_'+str(minlat)+'-'+str(maxlat)+'N_'+str(runmin)+'-'+str(runmax)+'.png', bbox_inches='tight', dpi=100)
 #	fig2.show()
 
 # NB if I need a (2,2) subplot, need to use ax[0, 1] -- there has to be a space between the comma and the 1 otherwise it doesn't work! i.e. .plot(...) doesn't work and also can't access the subplot that I want! OR fig, axes = plt.subplots(2,2....) and then can call axes[0,0]...
@@ -5635,27 +5672,20 @@ def f(p, x):
 	"""Basic linear regression 'model' for use with ODR"""
 	return (p[0] * x) + p[1]
 
+def quiver_plots_4cases(runmin, runmax, plotname, cmap, dire, landmaskxr, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, array1, array2, array3, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
 
-
-
-
-
-
-
-
-
-
-
-def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, array1, array2, array3, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
-
-	small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
-	med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
-	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	small = 24 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
 	veclen = 10.
 	units_numerator = 'm'
 	units_denom = 's'
 	shiftby = 180. # = 180. --> 0 degrees in the middle, = 105. --> idealized continents overlap realistic ones 
 
+	area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/Isca/') # added _all because then dx and dy are also returned 
+	area_array = xr.DataArray(area_array) # returned in units of m bzw m^2, because radius in cell_area.py is given in metres
+	area_array_3D = np.expand_dims(area_array, axis=0)
+	area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (pressure, lat, lon)
 
 
 	v = np.linspace(minval, maxval, 21) # , endpoint=True)
@@ -5677,41 +5707,41 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_
 	array = array1
 	lons = uwind.lon 
 	lats = uwind.lat
-	pres = wwind.pres_lev
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
 	uwind = np.asarray(uwind)
 	wwind = np.asarray(wwind)
 	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))
+				   cyclic=np.max(lons_cyclic))
 	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))  
+				   cyclic=np.max(lons_cyclic))  
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-	                 start=False,cyclic=np.max(lons_cyclic))
+					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[0,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	cset1 = axes[0,0].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 	axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
-	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-	axes[0,0].set_title('(a) America only (AM)', fontsize = med)
+	axes[0,0].set_title('(a) America only (AM07)', fontsize = med)
 	# Africa Only 
 
 	uwind = (ucomp3_avg - ucomp3_avg_ctl) # [::-1,:,:]
@@ -5719,43 +5749,42 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_
 	array = array3
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
 	uwind = np.asarray(uwind)
 	wwind = np.asarray(wwind)
 	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))
+				   cyclic=np.max(lons_cyclic))
 	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))  
+				   cyclic=np.max(lons_cyclic))  
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-	                 start=False,cyclic=np.max(lons_cyclic))
+					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[0,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	cset1 = axes[0,1].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 
 
-	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	#qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-	axes[0,1].set_title('(b) Africa only (AF)', fontsize = med)
+	axes[0,1].set_title('(b) Africa only (AF07)', fontsize = med)
 
 	# Two continents 
 
@@ -5764,44 +5793,42 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_
 	array = array2
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
 	uwind = np.asarray(uwind)
 	wwind = np.asarray(wwind)
 	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))
+				   cyclic=np.max(lons_cyclic))
 	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))  
+				   cyclic=np.max(lons_cyclic))  
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-	                 start=False,cyclic=np.max(lons_cyclic))
+					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[1,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
-	axes[1,0].set_xlabel('Longitude E', fontsize = med)
+	cset1 = axes[1,0].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
+	axes[1,0].set_xlabel('Longitude ($^{\circ}$E)', fontsize = med)
 	axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
-	Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	#qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-	axes[1,0].set_title('(c) Two Continents (2C)', fontsize = med)
+	axes[1,0].set_title('(c) Two continents (2C07)', fontsize = med)
 
 	# Two continents - America 
 
@@ -5810,43 +5837,42 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_
 	array = array2 - array1
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
 	uwind = np.asarray(uwind)
 	wwind = np.asarray(wwind)
 	uwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,uwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))
+				   cyclic=np.max(lons_cyclic))
 	wwind,lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,wwind,lons_cyclic,start=False,
-	               cyclic=np.max(lons_cyclic))  
+				   cyclic=np.max(lons_cyclic))  
 
 	array, lons_cyclic = addcyclic(array, lons)
 	array = np.asarray(array)
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
-	                 start=False,cyclic=np.max(lons_cyclic))
-
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+					 start=False,cyclic=np.max(lons_cyclic))
+	
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
+	cset1 = axes[1,1].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
+	axes[1,1].set_xlabel('Longitude ($^{\circ}$E)', fontsize = med)
 
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[1,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
-	axes[1,1].set_xlabel('Longitude E', fontsize = med)
-
-	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-	axes[1,1].set_title('(d) 2C - AM', fontsize = med)
+	axes[1,1].set_title('(d) 2C07 - AM07', fontsize = med)
 
 	fig.gca().invert_yaxis()
 	axes[0,0].tick_params(labelsize = small)
@@ -5861,17 +5887,17 @@ def quiver_plots_4cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_
 
 	# Fot paper just direcly save the plot at output
 	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.png')
-	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.svg')
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.pdf')
 	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'_400dpi.svg', bbox_inches='tight', dpi = 400)
 
 
-def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, 
+def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, landmaskxr, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, 
 	ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, ucomp3_avg, ucomp3_avg_ctl, wcomp3_avg, wcomp3_avg_ctl, ucomp4_avg, ucomp4_avg_ctl, 
 	wcomp4_avg, wcomp4_avg_ctl, array1, array2, array3, array4, title_a, title_b, title_c, title_d, minval, maxval, vertmult, minlat=-10., maxlat=10.): 
 
-	small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
-	med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
-	lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+	small = 24 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
 	veclen = 10.
 	units_numerator = 'm'
 	units_denom = 's'
@@ -5882,6 +5908,12 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	v = np.linspace(minval, maxval, 21) # , endpoint=True)
 
 	fig, axes = plt.subplots(2, 2, sharey = True, figsize = (30,15))  # for paper, saving figure directly at output
+
+	area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/Isca/') # added _all because then dx and dy are also returned 
+	area_array = xr.DataArray(area_array) # returned in units of m bzw m^2, because radius in cell_area.py is given in metres
+	area_array_3D = np.expand_dims(area_array, axis=0)
+	area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (pressure, lat, lon)
+
 
 	# panel 1: Only South America 
 	uwind = (ucomp1_avg - ucomp1_avg_ctl) 
@@ -5898,7 +5930,12 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array = array1
 	lons = uwind.lon 
 	lats = uwind.lat
-	pres = wwind.pres_lev
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -5914,23 +5951,18 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 	                 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[0,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	cset1 = axes[0,0].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 	axes[0,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
-	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[0,0].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
 	axes[0,0].set_title('(a) '+title_a, fontsize = med)
 	# Africa Only 
@@ -5940,8 +5972,12 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array = array3
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -5957,24 +5993,19 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 	                 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[0,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	cset1 = axes[0,1].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 
 
-	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[0,1].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	#qk = axes[0,1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
 	axes[0,1].set_title('(b) '+title_b, fontsize = med)
 
@@ -5985,8 +6016,12 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array = array2
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -6002,25 +6037,20 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 	                 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
 
 	X, Z = np.meshgrid(lons_shift, pres)
 
-
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[1,0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
-	axes[1,0].set_xlabel('Longitude E', fontsize = med)
+	cset1 = axes[1,0].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
+	axes[1,0].set_xlabel('Longitude ($^{\circ}$E)', fontsize = med)
 	axes[1,0].set_ylabel('Pressure (hPa)', fontsize = med)
 
-	Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[1,0].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	#qk = axes[1,0].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
 	axes[1,0].set_title('(c) '+title_c, fontsize = med)
 
@@ -6031,8 +6061,12 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array = array4
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
-	presar = array.pres_lev # need separate z coords for winds because read them in in reverse z order to flip axis
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -6048,9 +6082,9 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 	                 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
@@ -6058,14 +6092,10 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 	X, Z = np.meshgrid(lons_shift, pres)
 
 
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
+	cset1 = axes[1,1].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
+	axes[1,1].set_xlabel('Longitude ($^{\circ}$E)', fontsize = med)
 
-	cset1 = axes[1,1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
-	axes[1,1].set_xlabel('Longitude E', fontsize = med)
-
-	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[1,1].quiver(X[::2,::2], Z[::2,::2], uwind[::2,::2], wwind[::2,::2], scale = 50, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	qk = axes[1,1].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
 	axes[1,1].set_title('(d) '+title_d, fontsize = med)
 
@@ -6081,30 +6111,34 @@ def quiver_plots_4_seperate_cases(runmin, runmax, plotname, dire, cmap, cbarlabe
 
 
 	# Fot paper just direcly save the plot at output
-	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.png')
-	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'.svg')
-	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_'+str(runmin)+'-'+str(runmax)+'_400dpi.svg', bbox_inches='tight', dpi = 400)
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_latweights_'+str(runmin)+'-'+str(runmax)+'.png')
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_latweights_'+str(runmin)+'-'+str(runmax)+'.pdf')
+	plt.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift_latweights_'+str(runmin)+'-'+str(runmax)+'_400dpi.svg', bbox_inches='tight', dpi = 400)
 
 
 
 
 
 
-def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, array1, array2, minval, maxval, vertmult, minlat=-10., maxlat=10., cmap = 'BrBG'): 
-	small = 20 #largefonts 14 # smallfonts 10 # medfonts = 14
-	med = 22 #largefonts 18 # smallfonts 14 # medfonts = 16
-	lge = 24 #largefonts 22 # smallfonts 18 # medfonts = 20
+def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, array1, array2, minval, maxval, vertmult, minlat=-10., maxlat=10., cmap = 'BrBG'): 
+	small = 24 #largefonts 14 # smallfonts 10 # medfonts = 14
+	med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
+	lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
 	veclen = 10.
 	units_numerator = 'm'
 	units_denom = 's'
 	shiftby = 180. # = 180. --> 0 degrees in the middle, = 105. --> idealized continents overlap realistic ones 
 
+	area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/Isca/') # added _all because then dx and dy are also returned 
+	area_array = xr.DataArray(area_array) # returned in units of m bzw m^2, because radius in cell_area.py is given in metres
+	area_array_3D = np.expand_dims(area_array, axis=0)
+	area_array_3D = np.repeat(area_array_3D, 40, axis = 0) # to make area_array 3D (pressure, lat, lon)
 
 
 	v = np.linspace(minval,maxval,21) # , endpoint=True)
 	
 
-	fig, axes = plt.subplots(1, 3, sharex = True, sharey = True, figsize = (20,15))
+	fig, axes = plt.subplots(1, 3, sharex = True, sharey = True, figsize = (18,8))
 
 
 	# panel 1: Only South America 
@@ -6113,7 +6147,12 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array = array1
 	lons = uwind.lon 
 	lats = uwind.lat
-	pres = wwind.pres_lev
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -6129,12 +6168,13 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
 
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 
 	array = array.sel(lon=slice(-50.,50.))
 	uwind = uwind.sel(lon=slice(-50.,50.))
@@ -6144,16 +6184,13 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	X, Z = np.meshgrid(lons_shift, pres)
 
 
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[0].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
 
-	Q = axes[0].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	cset1 = axes[0].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
+
+	Q = axes[0].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	# in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-	axes[0].set_title('(a) N3 CV05', fontsize = med)
-	axes[0].set_xlabel('Longitude E', fontsize = med)
+	axes[0].set_title('(a) N3 0%cond', fontsize = med)
 
 	# Africa Only 
 
@@ -6162,7 +6199,12 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array = array2
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -6178,11 +6220,14 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
+
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
+
 	array = array.sel(lon=slice(-50.,50.))
 	uwind = uwind.sel(lon=slice(-50.,50.))
 	wwind = wwind.sel(lon=slice(-50.,50.))
@@ -6191,17 +6236,12 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	X, Z = np.meshgrid(lons_shift, pres)
 
 
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-
-	cset1 = axes[1].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
+	cset1 = axes[1].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 
 
-	Q = axes[1].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	Q = axes[1].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 	#qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-	axes[1].set_title('(b) N3 SB', fontsize = med)
-	axes[1].set_xlabel('Longitude E', fontsize = med)
+	axes[1].set_title('(b) N3 50%cond', fontsize = med)
 
 	# Two continents - America 
 
@@ -6210,7 +6250,12 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array = array1 - array2 
 	lons = uwind.lon
 	lats = uwind.lat
-	pres = wwind.pres_lev
+	pres = wwind.pfull
+
+	wwind = area_weighted_avg_4D(wwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	uwind = area_weighted_avg_4D(uwind,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+	array = area_weighted_avg_4D(array,area_array_3D,landmaskxr,'all_sfcs',minlat = minlat, maxlat = maxlat, axis=1)
+
 	uwind, lons_cyclic = addcyclic(uwind, lons)
 	wwind, lons_cyclic = addcyclic(wwind, lons)
 
@@ -6226,11 +6271,13 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 	array, lons_shift = shiftgrid(np.max(lons_cyclic)-shiftby,array,lons_cyclic,
 					 start=False,cyclic=np.max(lons_cyclic))
 
-	array = xr.DataArray(array,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	uwind = xr.DataArray(uwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
-	wwind = xr.DataArray(wwind,coords=[pres,lats,lons_shift],dims=['pres','lat','lon'])
+
 	# landmask,landlons = shiftgrid(np.max(landlons)-80.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	# landmask, landlons = addcyclic(landmask, landlons)
+
+	array = xr.DataArray(array,coords=[pres,lons_shift],dims=['pres','lon'])
+	uwind = xr.DataArray(uwind,coords=[pres,lons_shift],dims=['pres','lon'])
+	wwind = xr.DataArray(wwind,coords=[pres,lons_shift],dims=['pres','lon'])
 
 	array = array.sel(lon=slice(-50.,50.))
 	uwind = uwind.sel(lon=slice(-50.,50.))
@@ -6241,16 +6288,12 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 
 
 
-	wwind_tropmean = wwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	uwind_tropmean = uwind.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
-	array_tropmean = array.sel(lat=slice(minlat,maxlat)).mean(dim='lat')
 
-	cset1 = axes[2].contourf(X, Z, array_tropmean, v, cmap=cmap, extend = 'both')
-	axes[2].set_xlabel('Longitude E', fontsize = med)
+	cset1 = axes[2].contourf(X, Z, array, v, cmap=cmap, extend = 'both')
 
-	Q = axes[2].quiver(X[::2,::2], Z[::2,::2], uwind_tropmean[::2,::2], wwind_tropmean[::2,::2], scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
-	qk = axes[2].quiverkey(Q, 0.87, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-	axes[2].set_title('(c) N3 CV05 - SB', fontsize = med)
+	Q = axes[2].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
+	qk = axes[2].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
+	axes[2].set_title('(c) N3 0% - 50%', fontsize = med)
 
 	fig.gca().invert_yaxis()
 
@@ -6260,9 +6303,15 @@ def quivers_2cases(runmin, runmax, plotname, dire, cbarlabel, ucomp1_avg, ucomp1
 
 	axes[0].set_ylabel('Pressure (hPa)', fontsize = med)
 	axes[0].tick_params(labelsize = small)
+	axes[1].tick_params(labelsize = small)
+	axes[2].tick_params(labelsize = small)
+
+
+	fig.text(0.4, 0.03, 'Longitude ($^{\circ}$E)', va='center', rotation='horizontal', fontsize = lge)
+
 
 	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.png')
-	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.svg')
+	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.svg', bbox_inches='tight')
 	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.pdf', dpi=400)
 
 

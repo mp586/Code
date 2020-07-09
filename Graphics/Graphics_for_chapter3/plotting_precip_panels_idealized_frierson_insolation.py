@@ -221,9 +221,9 @@ else:
 
 ############ plotting ##############
 
-small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 v = np.linspace(-2.,2.,21)
 nmb_contours = [-2.,1.,2.]
@@ -246,7 +246,7 @@ fig, axes = plt.subplots(2,2, figsize = (25,12))
 fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
 
 
-axes[0,0].set_title('(a) AP-patch - AP', size = med)
+axes[0,0].set_title('(a) AP-dark-patch minus AP', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
@@ -283,6 +283,8 @@ landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=Fals
 
 landmask, lons_cyclic = addcyclic(landmask, landlons)
 
+m.contour(xi,yi,landmask, 1, linestyles = 'dotted')
+
 # if np.any(landmask != 0.):
 #     m.contour(xi,yi,landmask, 1, linestyles='dashed')
 
@@ -297,7 +299,7 @@ ctl_array = precipitation3_avg_ctl - net_lhe3_avg_ctl
 lats=array.lat
 lons=array.lon
 
-axes[0,1].set_title('(b) AM-same - AP', size = med)
+axes[0,1].set_title('(b) AM-same minus AP', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
@@ -328,7 +330,7 @@ cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if n
 
 
 
-m.contour(xi,yi,landmask, 1, linestyles = 'dashed', color = 'white')
+m.contour(xi,yi,landmask, 1, linestyles = 'dashed')
 
 
 # Two continents 
@@ -341,7 +343,7 @@ lons=array.lon
 
 
 
-axes[1,0].set_title('(c) AM-same-2xCO2', size = med)
+axes[1,0].set_title('(c) AM-same-2xCO2 minus AM-same', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
@@ -371,7 +373,7 @@ cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
-m.contour(xi,yi,landmask, 1, color = 'white')
+m.contour(xi,yi,landmask, 1)
 
 
 # Two continents - America only 
@@ -382,7 +384,7 @@ ctl_array = precipitation4_avg_ctl - net_lhe4_avg_ctl
 lats=array.lat
 lons=array.lon
 
-axes[1,1].set_title('(d) AM-dark - AM-same', size = med)
+axes[1,1].set_title('(d) AM-dark minus AM-same', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])
@@ -412,7 +414,7 @@ cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
-m.contour(xi,yi,landmask, 1, color = 'white')
+m.contour(xi,yi,landmask, 1)
 
 
 

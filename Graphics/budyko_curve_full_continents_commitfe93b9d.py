@@ -138,6 +138,77 @@ Ep_estim_ctl_yrs = Ep_estim_ctl.groupby('time.year').mean('time')
 E_ctl_yrs = net_lhe_ctl.groupby('time.year').mean('time')
 P_ctl_yrs = precipitation_ctl.groupby('time.year').mean('time')
 
+lats = precipitation_avg.lat
+lons = precipitation_avg.lon
+
+med = 20
+fig = plt.figure(figsize = (15,5))
+
+v = np.linspace(0.,2.,21)
+
+values = [ep_avg_ctl/precipitation_avg_ctl, ep_avg/precipitation_avg, epveg_avg/precipitationveg_avg]
+
+
+name = ['ctl', 'bucket', '50%cond']
+
+
+
+m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40, llcrnrlon=-180, urcrnrlon=180)
+
+
+units = ''
+for i in range(len(values)):
+
+    ax = plt.subplot2grid((1, 3), (0, i))
+    ax.set_title('RC '+name[i], size = med)
+
+    # array = (valuesAM[i].where(valuesAM[i]<=2.0)).where(landmaskAM == 1)
+    array = (values[i]).where(landmask == 1)
+
+    array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+    array = np.asarray(array)
+    array, lons_cyclic = addcyclic(array, lons)
+    # array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+    array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+    # m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+    # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+    lon, lat = np.meshgrid(lons_cyclic, lats)
+    xi, yi = m(lon, lat)
+    cs = m.contourf(xi,yi,array, v, cmap='RdGy_r', extend = 'max')
+
+
+    # landmask,landlons_shift = shiftgrid(np.max(landlons)-180.,landmaskAM,landlons,start=False,cyclic=np.max(landlons))
+    # landmask, lons_cyclic = addcyclic(landmask, landlons_shift)
+    # m.contour(xi,yi,landmask, 1, colors = 'k')
+
+
+plt.subplots_adjust(left=0.1, right=0.8, wspace=0.02, hspace=0.02)
+cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
+cbar = plt.colorbar(cs, cax=cb_ax, ticks = [0,1,2])
+cbar.ax.set_yticklabels(['0', '1', '2'])  # vertically oriented colorbar
+cbar.ax.tick_params(labelsize=med)
+cbar.set_label('E$_P$/P', fontsize = med)
+
+plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_matrix.png', bbox_inches = 'tight', format = 'png', dpi = 400)
+plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_matrix.pdf', bbox_inches = 'tight', format = 'pdf')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 rge = np.linspace(1.,5.,99)
 
 obj = np.empty((len(rge)))

@@ -4,8 +4,9 @@
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 import sys
-sys.path.insert(0, '/scratch/mp586/Code/MSE')
+sys.path.insert(0, '/scratch/mp586/Code/Graphics/Graphics_for_chapter3/MSE')
 import gradients as gr, model_constants as mc
 from pylab import rcParams
 import sh
@@ -548,7 +549,7 @@ if __name__ == '__main__':
     axes[0,1].spines['right'].set_visible(False)
     axes[0,1].spines['top'].set_visible(False)
     fig.text(0.05, 0.5, r'$\Delta (- \nabla . \vec{v}_{h,2}$) (kg/m$^2$s)', va='center', rotation='vertical', fontsize = lge)
-    fig.text(0.45, 0.05, r'$\Delta (\Delta h)$ (x10$^7$ J/kg)', va='center', rotation='horizontal', fontsize = lge)
+    fig.text(0.45, 0.05, r'$\Delta (\delta h)$ (x10$^7$ J/kg)', va='center', rotation='horizontal', fontsize = lge)
     for i in range(4):
         del_llconv_flat = np.asarray(del_llconv_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.)).where(del_gms_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.)) > -0.9)).flatten() # use for no_outliers land .where(del_gms_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.)) > -0.9), # use for zoom land .where(abs(del_gms_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.))) < 0.01)
         del_fnet_flat = np.asarray(del_fnet_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.)).where(del_gms_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(0.,40.)) > -0.9)).flatten() # use for zoom ocean .where(abs(del_gms_all[i,:,:].sel(lat=slice(-10.,10.)).sel(lon=slice(41.,359.))) < 10)
@@ -571,6 +572,8 @@ if __name__ == '__main__':
         #     axes[0,i].plot(del_fnet_flat, del_fnet_flat*slope + intercept, 'k.')
         # else:
         #     axes[1,i-2].plot(del_fnet_flat, del_fnet_flat*slope + intercept, 'k.')
+    axes[1,1].xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+
     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/frac_gms_neelin_changes_llconv_gms_correlations_allexps_no_outlier_land.png', bbox_inches='tight')
     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/frac_gms_neelin_changes_llconv_gms_correlations_allexps_no_outlier_land.pdf', bbox_inches='tight')    
 
@@ -749,9 +752,9 @@ if __name__ == '__main__':
         fig, axes = plt.subplots(1, 3, sharex = True, sharey = True, figsize = (35,10))
         for i in range(len(mses)):
             cset = axes[i].contourf(Y, Z, area_weighted_avg_4D(xr.DataArray(-1.*(ds[j][mses[i]]), coords = [ds[0].pfull,ds[0].lat,ds[0].lon], dims = ['pfull','lat','lon']),area_array_3D,landmaskxrAP,'all_sfcs',minlon = 0., maxlon = 40., axis=2), v, cmap='bwr', extend = 'both')
-        axes[0].set_title('(a) '+r'$\nabla . (Lq*v)$', size = 28)
-        axes[1].set_title('(b) '+r'$\nabla . (c_p T*v)$', size = 28)
-        axes[2].set_title('(c) '+r'$\nabla . (gz*v)$', size = 28)
+        axes[0].set_title('(a) '+r'$\nabla . (Lq \cdot v)$', size = 28)
+        axes[1].set_title('(b) '+r'$\nabla . (c_p T \cdot v)$', size = 28)
+        axes[2].set_title('(c) '+r'$\nabla . (gz \cdot v)$', size = 28)
         plt.rcParams['ytick.labelsize']=22
         plt.rcParams['xtick.labelsize']=22
 
@@ -766,31 +769,62 @@ if __name__ == '__main__':
         fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[j]+'/mses_vertical_landlons.pdf', bbox_inches='tight')
 
 
+    run_list = ['aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267']
+    mses = ['mse_latent_p','mse_sens_p','mse_height_p']
+    Y, Z = np.meshgrid(ds[0].lat, ds[0].pfull)
+    v = np.linspace(-300.,300.,21)
 
-    lats = ds[0].lat
-    variables = ['mse_tot','mse_latent','mse_height', 'mse_sens']
-    colors = ['k','cyan','grey','grey']
-    labels = ['$F_{MSE}$', '$F_{Lq}$', '$F_{gz}$/10', '$F_{c_pT}$/10']
-    factor = [-1, -1, -0.1, -0.1]
-    style = ['-','-','--',':']
-    for i in range(len(run_list)):
+    for j in range(len(run_list)):
         plt.close()
-        fig, ax = plt.subplots(1,1,figsize = (20,10))
-        for j in range(len(variables)):
-            ax.plot(lats, area_weighted_avg(xr.DataArray(factor[j]*(ds[i][variables[j]]), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), color = colors[j], label = labels[j], linewidth = 2, linestyle = style[j])
-        ax2 = ax.twinx()
-        ax2.plot(lats, area_weighted_avg(xr.DataArray(86400.*ds_precip[i].precipitation, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), 'b', label = 'P', linewidth = 2)        
-        ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(ds[i].mse_sens + ds[i].mse_height), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), label = '$F_{DSE}$', color = 'grey', linewidth = 2)
-        ax.plot(lats, area_weighted_avg(xr.DataArray(ds[i].Fnet, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), label = '$F_{net}$', color = 'magenta', linewidth = 2)
-        ax.legend(fontsize = 24)
-        ax.set_ylabel('Energy Input and Flux Divergence (W/m$^2$)', fontsize=22)
-        ax2.set_ylabel('Precipitation (mm/d)', fontsize=22, color = 'b')
-        ax.set_ylim(-250.,250)
-        ax2.set_ylim(-15.,15.)
-        ax2.set_yticklabels(['','','','0','5','10','15'])
-        ax.set_xlabel('Latitude ($^{\circ}$N)', fontsize=22)      
-        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[i]+'/zonavg_energy_terms.png')
-        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[i]+'/zonavg_energy_terms.pdf')
+        fig, axes = plt.subplots(1, 3, sharex = True, sharey = True, figsize = (35,10))
+        for i in range(len(mses)):
+            cset = axes[i].contourf(Y, Z, area_weighted_avg_4D(xr.DataArray(-1.*(ds[j][mses[i]]), coords = [ds[0].pfull,ds[0].lat,ds[0].lon], dims = ['pfull','lat','lon']),area_array_3D,landmaskxrAP,'all_sfcs', axis=2), v, cmap='bwr', extend = 'both')
+        axes[0].set_title('(a) '+r'$\nabla . (Lq \cdot v)$', size = 28)
+        axes[1].set_title('(b) '+r'$\nabla . (c_p T \cdot v)$', size = 28)
+        axes[2].set_title('(c) '+r'$\nabla . (gz \cdot v)$', size = 28)
+        plt.rcParams['ytick.labelsize']=22
+        plt.rcParams['xtick.labelsize']=22
+
+        fig.gca().invert_yaxis()
+        cbar = fig.colorbar(cset,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+        cbar.set_label('Flux Divergence (W/kg)', size = 24)
+        cbar.ax.tick_params(labelsize=24)  
+        fig.text(0.08, 0.5, 'Pressure (hPa)', va='center', rotation='vertical', fontsize = 28)
+        fig.text(0.45, 0.05, 'Latitude ($^{\circ}$N)', va='center', rotation='horizontal', fontsize = 28)
+
+        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[j]+'/mses_vertical.png', format = 'png', dpi = 400, bbox_inches='tight')
+        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[j]+'/mses_vertical.pdf', bbox_inches='tight')
+
+
+
+
+    run_list = ['aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267']
+    mses = ['mse_latent_p','mse_sens_p','mse_height_p']
+    Y, Z = np.meshgrid(ds[0].lat.sel(lat=slice(-30.,30.)), ds[0].pfull)
+    v = np.linspace(-300.,300.,21)
+
+    for j in range(len(run_list)):
+        plt.close()
+        fig, axes = plt.subplots(1, 3, sharex = True, sharey = True, figsize = (35,10))
+        for i in range(len(mses)):
+            zonavg = area_weighted_avg_4D(xr.DataArray(-1.*(ds[j][mses[i]]), coords = [ds[0].pfull,ds[0].lat,ds[0].lon], dims = ['pfull','lat','lon']),area_array_3D,landmaskxrAM,'land',minlon = 0., maxlon = 40., axis=2)
+            zonavg = xr.DataArray(zonavg, coords = [ds[0].pfull,ds[0].lat], dims = ['pfull','lat'])
+            cset = axes[i].contourf(Y, Z, zonavg.sel(lat=slice(-30.,30.)), v, cmap='bwr', extend = 'both')
+        axes[0].set_title('(a) '+r'$\nabla . (Lq \cdot v)$', size = 28)
+        axes[1].set_title('(b) '+r'$\nabla . (c_p T \cdot v)$', size = 28)
+        axes[2].set_title('(c) '+r'$\nabla . (gz \cdot v)$', size = 28)
+        plt.rcParams['ytick.labelsize']=22
+        plt.rcParams['xtick.labelsize']=22
+
+        fig.gca().invert_yaxis()
+        cbar = fig.colorbar(cset,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+        cbar.set_label('Flux Divergence (W/kg)', size = 24)
+        cbar.ax.tick_params(labelsize=24)  
+        fig.text(0.08, 0.5, 'Pressure (hPa)', va='center', rotation='vertical', fontsize = 28)
+        fig.text(0.45, 0.05, 'Latitude ($^{\circ}$N)', va='center', rotation='horizontal', fontsize = 28)
+
+        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[j]+'/mses_vertical_land_only.png', format = 'png', dpi = 400, bbox_inches='tight')
+        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[j]+'/mses_vertical_land_only.pdf', bbox_inches='tight')
 
 
     lats = ds[0].lat
@@ -799,7 +833,7 @@ if __name__ == '__main__':
     labels = ['$F_{MSE}$', '$F_{Lq}$', '$F_{gz}$/10', '$F_{c_pT}$/10']
     factor = [-1, -1, -0.1, -0.1]
     style = ['-','-','--',':']
-    fig, axes = plt.subplots(1,2,figsize = (25,15))
+    fig, axes = plt.subplots(1,2,figsize = (25,12))
     plt.rcParams['ytick.labelsize']=24
     plt.rcParams['xtick.labelsize']=24 
     ctl_runs = ['(a) AP', '(b) AM-same']
@@ -816,12 +850,39 @@ if __name__ == '__main__':
         axes[i].set_xlabel('Latitude ($^{\circ}$N)', fontsize=28)      
         axes[i].set_title(ctl_runs[i], fontsize=28)
     axes[0].set_ylabel('Energy Input and Flux Divergence (W/m$^2$)', fontsize=28)
-    axes[0].legend(fontsize = 28)
+    axes[0].legend(fontsize = 24, loc = 'lower center', ncol = 3)
     axes[1].set_yticklabels([])    
     ax2.set_ylabel('Precipitation (mm/d)', fontsize=24, color = 'b')
     ax2.set_yticklabels(['','','','0','5','10','15'])      
     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/zonavg_energy_terms_ctls.png', bbox_inches = 'tight')
     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/zonavg_energy_terms_ctls.pdf', bbox_inches = 'tight')
+
+    fig, axes = plt.subplots(1,2,figsize = (20,10))
+    plt.rcParams['ytick.labelsize']=24
+    plt.rcParams['xtick.labelsize']=24 
+    ctl_runs = ['(a) AP', '(b) AM-same']
+    for i in range(len(ctl_runs)):
+        for j in range(len(variables)):
+            axes[i].plot(lats, area_weighted_avg(xr.DataArray(factor[j]*(ds[i][variables[j]]), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[3],'land',minlon = 0., maxlon = 40., axis=1), color = colors[j], label = labels[j], linewidth = 2, linestyle = style[j])
+        ax2 = axes[i].twinx()
+        ax2.plot(lats, area_weighted_avg(xr.DataArray(86400.*ds_precip[i].precipitation, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[3],'land',minlon = 0., maxlon = 40., axis=1), 'blue', label = 'P', linewidth = 2)        
+        axes[i].plot(lats, area_weighted_avg(xr.DataArray(-1.*(ds[i].mse_sens + ds[i].mse_height), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[3],'land',minlon = 0., maxlon = 40., axis=1), label = '$F_{DSE}$', color = 'grey', linewidth = 2)
+        axes[i].plot(lats, area_weighted_avg(xr.DataArray(ds[i].Fnet, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[3],'land',minlon = 0., maxlon = 40., axis=1), label = '$F_{net}$', color = 'magenta', linewidth = 2)
+        axes[i].set_ylim(-250.,250)
+        ax2.set_ylim(-15.,15.)
+        ax2.set_yticklabels([])
+        axes[i].set_xlabel('Latitude ($^{\circ}$N)', fontsize=28)      
+        axes[i].set_title(ctl_runs[i], fontsize=28)
+    axes[0].set_ylabel('Energy Input and Flux Divergence (W/m$^2$)', fontsize=28)
+    axes[0].legend(fontsize = 24, loc = 'lower center', ncol = 3)
+    axes[1].set_yticklabels([])    
+    ax2.set_ylabel('Precipitation (mm/d)', fontsize=24, color = 'b')
+    ax2.set_yticklabels(['','','','0','5','10','15'])      
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/zonavg_energy_terms_land_ctls.png', bbox_inches = 'tight')
+    fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/zonavg_energy_terms_land_ctls.pdf', bbox_inches = 'tight')
+
+
+
 
     dataset_diffs = [APpatch - APctl, AMsamectl - APctl, AMsameco2 - AMsamectl, AM01 - AMsamectl]
     dataset_diffs_names = ['AP-dark-patch_minus_AP-ctl', 'AM-same_minus_AP-ctl', 'AM-same-co2_minus_AM-same', 'AM-dark_minus_AM-same']
@@ -829,22 +890,47 @@ if __name__ == '__main__':
     dataset_precip_diffs = [APpatch_P - APctl_P, AMsamectl_P - APctl_P, AMsameco2_P - AMsamectl_P, AM01_P - AMsamectl_P]
     variables = ['mse_tot','mse_latent','Fnet']
 
-    for i in range(len(dataset_diffs)):
-        plt.close()
-        fig, ax = plt.subplots(1,1,figsize = (25,10))
-        for j in range(len(variables)):
-            ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(dataset_diffs[i][variables[j]]), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), label = labels[j], linewidth = 2)
-        ax2 = ax.twinx()
-        ax2.plot(lats, area_weighted_avg(xr.DataArray(86400.*dataset_precip_diffs[i].precipitation, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), 'b', label = '$P$', linewidth = 2)        
-        ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(dataset_diffs[i].mse_sens + dataset_diffs[i].mse_height), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), label = '$F_{DSE}$', linewidth = 2)
-        ax.legend(fontsize = 20)
-        ax.set_ylabel('Divergence ($W/m^2$)', fontsize=18)
-        ax2.set_ylabel('Precipitation (mm/d)', fontsize=18, color = 'b')
-        ax.set_ylim(-50.,50.)
-        ax2.set_ylim(-4.,4.)
-        ax.set_xlabel('Latitude ($^{\circ}$N)', fontsize=16)
-        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+dataset_diffs_names[i]+'_zonavg_energy_terms_land.png')
-        fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+dataset_diffs_names[i]+'_zonavg_energy_terms_land.png')
+    # lats = ds[0].lat
+    # variables = ['mse_tot','mse_latent','mse_height', 'mse_sens']
+    # colors = ['k','cyan','grey','grey']
+    # labels = ['$F_{MSE}$', '$F_{Lq}$', '$F_{gz}$/10', '$F_{c_pT}$/10']
+    # factor = [-1, -1, -0.1, -0.1]
+    # style = ['-','-','--',':']
+    # for i in range(len(run_list)):
+    #     plt.close()
+    #     fig, ax = plt.subplots(1,1,figsize = (20,10))
+    #     for j in range(len(variables)):
+    #         ax.plot(lats, area_weighted_avg(xr.DataArray(factor[j]*(ds[i][variables[j]]), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), color = colors[j], label = labels[j], linewidth = 2, linestyle = style[j])
+    #     ax2 = ax.twinx()
+    #     ax2.plot(lats, area_weighted_avg(xr.DataArray(86400.*ds_precip[i].precipitation, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), 'b', label = 'P', linewidth = 2)        
+    #     ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(ds[i].mse_sens + ds[i].mse_height), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), label = '$F_{DSE}$', color = 'grey', linewidth = 2)
+    #     ax.plot(lats, area_weighted_avg(xr.DataArray(ds[i].Fnet, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 360., axis=1), label = '$F_{net}$', color = 'magenta', linewidth = 2)
+    #     ax.legend(fontsize = 24)
+    #     ax.set_ylabel('Energy Input and Flux Divergence (W/m$^2$)', fontsize=22)
+    #     ax2.set_ylabel('Precipitation (mm/d)', fontsize=22, color = 'b')
+    #     ax.set_ylim(-250.,250)
+    #     ax2.set_ylim(-15.,15.)
+    #     ax2.set_yticklabels(['','','','0','5','10','15'])
+    #     ax.set_xlabel('Latitude ($^{\circ}$N)', fontsize=22)      
+    #     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[i]+'/zonavg_energy_terms.png')
+    #     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+run_list[i]+'/zonavg_energy_terms.pdf')
+
+    # for i in range(len(dataset_diffs)):
+    #     plt.close()
+    #     fig, ax = plt.subplots(1,1,figsize = (25,10))
+    #     for j in range(len(variables)):
+    #         ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(dataset_diffs[i][variables[j]]), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), label = labels[j], linewidth = 2)
+    #     ax2 = ax.twinx()
+    #     ax2.plot(lats, area_weighted_avg(xr.DataArray(86400.*dataset_precip_diffs[i].precipitation, coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), 'b', label = '$P$', linewidth = 2)        
+    #     ax.plot(lats, area_weighted_avg(xr.DataArray(-1.*(dataset_diffs[i].mse_sens + dataset_diffs[i].mse_height), coords = [ds[0].lat,ds[0].lon], dims = ['lat','lon']),area_array,landmask[i],'all_sfcs',minlon = 0., maxlon = 40., axis=1), label = '$F_{DSE}$', linewidth = 2)
+    #     ax.legend(fontsize = 20)
+    #     ax.set_ylabel('Divergence ($W/m^2$)', fontsize=18)
+    #     ax2.set_ylabel('Precipitation (mm/d)', fontsize=18, color = 'b')
+    #     ax.set_ylim(-50.,50.)
+    #     ax2.set_ylim(-4.,4.)
+    #     ax.set_xlabel('Latitude ($^{\circ}$N)', fontsize=16)
+    #     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+dataset_diffs_names[i]+'_zonavg_energy_terms_land.png')
+    #     fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/withtv/'+dataset_diffs_names[i]+'_zonavg_energy_terms_land.png')
 
 
     variables = ['mse_tot','mse_latent','Fnet']
@@ -945,13 +1031,13 @@ if __name__ == '__main__':
 
 
     lats = ds[0].lat    
-    variables = ['mse_tot','mse_sens','mse_latent','mse_height','Fnet']
+    variables = ['mse_tot'] #,'mse_sens','mse_latent','mse_height','Fnet']
     pref = [-1.,-1.,-1.,-1.,1.]
     small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
     med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
     lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
-    v = np.linspace(-80.,80.,21)
+    v = np.linspace(-20.,20.,17)
 
     # South America Only
 
@@ -967,7 +1053,8 @@ if __name__ == '__main__':
         axes[0,0].set_title('(a) AP-dark-patch minus AP', size = med)
         m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
         array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
-
+        landmask = np.asarray(landmaskxrAM)
+        landlons = np.asarray(landmaskxrAM.lon)
         array = np.asarray(array)
         array, lons_cyclic = addcyclic(array, lons)
         array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
@@ -981,7 +1068,9 @@ if __name__ == '__main__':
         xi, yi = m(lon, lat)
 
         cs = m.contourf(xi,yi,array, v, cmap='bwr', extend = 'both')
-
+        landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+        landmask, lons_cyclic = addcyclic(landmask, landlons)
+        m.contour(xi,yi,landmask, 1, color = 'k', linestyles = 'dotted')
 
         array = pref[j]*(AMsamectl - APctl)[variables[j]]
         landmask = np.asarray(landmaskxrAM)

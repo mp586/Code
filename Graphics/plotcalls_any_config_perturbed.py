@@ -15,7 +15,7 @@ GFDL_BASE = os.environ['GFDL_BASE']
 sys.path.insert(0, os.path.join(GFDL_BASE,'src/extra/python/scripts'))
 import cell_area as ca
 
-sys.path.insert(0, '/scratch/mp586/Code/MSE')
+sys.path.insert(0, '/scratch/mp586/Code/Graphics/Graphics_for_chapter3/MSE')
 import gradients as gr, model_constants as mc
 
 ctl_model = input('Enter model name as string ')
@@ -81,11 +81,12 @@ globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,
 #globavg_var_timeseries_total_and_land_perturbed(testdir,outdir,model,area_array,'bucket_depth',1,runmax,1.,landmask,control_dir,ctl_model,1,ctl_timeseries_max,select='land')
 
 # mass stream function adapted from J Penn
-[msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax, ctl_pert = 'pert')
+# [msf,msf_avg,msf_seasonal_avg,msf_month_avg] = mass_streamfunction(testdir,model,runmin,runmax) # 
+# plot_streamfunction_seasonal(msf_seasonal_avg, outdir, runmin, runmax, ctl_pert = 'pert')
 
-[msf_ctl,msf_avg_ctl,msf_seasonal_avg_ctl,msf_month_avg_ctl] = mass_streamfunction(control_dir,ctl_model,ctl_runmin,ctl_runmax) # 
-plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax, ctl_pert = 'ctl')
+[msf_ctl,msf_avg_ctl,msf_seasonal_avg_ctl,msf_month_avg_ctl] = mass_streamfunction_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax) # 
+plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runmax, minval=-30., maxval=30., steps=21, ctl_pert = 'ctl')
+plot_streamfunction_seasonal(msf_seasonal_avg_ctl.sel(lat=slice(-50.,50.)), outdir, ctl_runmin, ctl_runmax, minval=-30., maxval=30., steps=21, ctl_pert = 'ctl_tropics', figx=15)
 
 # [CIWV_ctl,CIWV_avg_ctl,CIWV_seasonal_avg_ctl,CIWV_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg',level='all')
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,(CIWV_avg_ctl),area_array,'kg/kg','CIWV_ctl','fromwhite',landmaskxr,nmb_contours=0, minval = 0, maxval = 0.011)
@@ -134,57 +135,218 @@ plot_streamfunction_seasonal(msf_seasonal_avg_ctl, outdir, ctl_runmin, ctl_runma
 
 #############################
 
+# Enter control directory name as string 'ISCA_HPC/square_South_America_newbucket_0qflux_samealbedo_samehcp_commitfe93b9d'
+# Enter runmin number 121
+# Enter runmax number for comparison 481
+# Enter end of ctl timeseries month 361
+# Enter data directory name as string 'ISCA_HPC/square_South_America_newbucket_0qflux_samealbedo_samehcp_plus_2xCO2_spinup_361_commitfe93b9d'
 
-[temp_ctl,temp_avg_ctl,temp_seasonal_avg_ctl,temp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K', level = 2)
-[sphum_ctl,sphum_avg_ctl,sphum_seasonal_avg_ctl,sphum_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg', level = 2)
-[height_ctl,height_avg_ctl,height_seasonal_avg_ctl,height_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 2)
+# [temp_ctl,temp_avg_ctl,temp_seasonal_avg_ctl,temp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'temp','K', level = 2)
+# [sphum_ctl,sphum_avg_ctl,sphum_seasonal_avg_ctl,sphum_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum','kg/kg', level = 2)
+# [height_ctl,height_avg_ctl,height_seasonal_avg_ctl,height_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 2)
 
 
 
-mse_subcloud = mc.cp_air * temp_month_avg_ctl + mc.L * sphum_month_avg_ctl+ mc.grav * height_month_avg_ctl
-mse_subcloud_zm = xr.DataArray(area_weighted_avg_4D(mse_subcloud,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
-precip_zm = xr.DataArray(area_weighted_avg_4D(precipitation_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# mse_subcloud = mc.cp_air * temp_month_avg_ctl + mc.L * sphum_month_avg_ctl+ mc.grav * height_month_avg_ctl
+# mse_subcloud_zm_land = xr.DataArray(area_weighted_avg_4D(mse_subcloud,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# precip_zm_land = xr.DataArray(area_weighted_avg_4D(precipitation_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# mse_subcloud_zm_ocean = xr.DataArray(area_weighted_avg_4D(mse_subcloud,area_array_3Dtime,landmaskxr,'ocean',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# precip_zm_ocean = xr.DataArray(area_weighted_avg_4D(precipitation_month_avg_ctl,area_array_3Dtime,landmaskxr,'ocean',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
 
-T, Y = np.meshgrid(mse_subcloud.month, mse_subcloud.lat)
-pp = plt.contourf(T, Y, (precip_zm.transpose()),cmap = 'Blues')
-plt.contour(T, Y, (mse_subcloud_zm.transpose()), 20, cmap = 'Greys')
-plt.colorbar(pp)
-plt.xlabel('Month')
-plt.ylabel('Latitude')
-plt.title('Land')
-plt.show()
+# maxlat_land = temp_ctl.lat[np.argmax(mse_subcloud_zm_land, axis = 1)]
+# maxlat_ocean = temp_ctl.lat[np.argmax(mse_subcloud_zm_ocean, axis = 1)]
 
-exit()
-##############################
-##############################
-[div,div_avg,div_seasonal_avg,div_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'div','1/sec',level=2)
-[div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=2)
-[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = 2)
-[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = 2)
-[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 2)
-[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 2)
+# T, Y = np.meshgrid(mse_subcloud.month, mse_subcloud.lat.sel(lat=slice(-30.,30.)))
 
-any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,-90.,90.,(div_month_avg_ctl)*10**5, (ucomp_month_avg_ctl), (vcomp_month_avg_ctl), area_array,'1/s','div_u_v_interp_850hPa_ctl','PE_scale',landmaskxr, minval = -1., maxval = 1., steps = 41, scale = 100)
+# v = np.linspace(0.,12.,13) # using different colourbar min/max/steps because it's seasonal P and not annual mean! 
+# fig, axes = plt.subplots(1,2, sharey = True, sharex = True, figsize = (20,10))
+# pp = axes[0].contourf(T, Y, (precip_zm_land.transpose()).sel(lat=slice(-30.,30.)),v,cmap = 'Blues', extend = 'max')
+# con = axes[0].contour(T, Y, (mse_subcloud_zm_land.transpose()).sel(lat=slice(-30.,30.))/(10**5), [3.0, 3.1, 3.2, 3.25, 3.28, 3.29, 3.3, 3.31], cmap = 'Greys_r')
+# axes[1].contourf(T, Y, (precip_zm_ocean.transpose()).sel(lat=slice(-30.,30.)),v,cmap = 'Blues', extend = 'max')
+# con2 = axes[1].contour(T, Y, (mse_subcloud_zm_ocean.transpose()).sel(lat=slice(-30.,30.))/(10**5), [3.0, 3.1, 3.2, 3.25, 3.28, 3.29, 3.3, 3.31], cmap = 'Greys_r')
 
-div_zonmean = xr.DataArray(area_weighted_avg_4D(div_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
-ucomp_zonmean = xr.DataArray(area_weighted_avg_4D(ucomp_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
-vcomp_zonmean = xr.DataArray(area_weighted_avg_4D(vcomp_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
+# # 3.25, 3.26, 3.27, 3.28, 3.29, 3.3, 3.31, 3.32, 3.33
+# axes[0].clabel(con, [3.1, 3.2, 3.25, 3.28, 3.29, 3.3, 3.31], fmt = '%1.2f', fontsize = 18)
+# axes[1].clabel(con2, [3.1, 3.2, 3.25, 3.28, 3.29, 3.3], fmt = '%1.2f', fontsize = 18)
 
-any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,-90.,90.,(div_month_avg_ctl - div_zonmean)*10**5, (ucomp_month_avg_ctl - ucomp_zonmean), (vcomp_month_avg_ctl - vcomp_zonmean), area_array,'1/s','div_u_v_interp_850hPa_ctl_zonanoms','PE_scale',landmaskxr, minval = -1., maxval = 1., steps = 41, scale = 20)
-any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,bucket_depth_month_avg_ctl.where(landmask == 1.),area_array,'m','bucket_depth_ctl','fromwhite',landmaskxr, minval = 0., maxval = .15, steps = 41)
+# axes[0].plot(mse_subcloud.month, maxlat_land, 'wx', markersize=10)
+# axes[1].plot(mse_subcloud.month, maxlat_ocean, 'wx', markersize=10)
 
-winds_one_level(outdir,runmin,runmax,'870hPa_div_uv_',ucomp_avg_ctl,vcomp_avg_ctl,div_avg_ctl*10**5,
-	'PE_scale','m',landmaskxr,-1., 1., veclen=1,level=2,units_numerator = 'm', units_denom = 's')
-################################
+# cbar = fig.colorbar(pp,ax=axes) # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('Precipitation (mm/d)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# # axes[0].set_xlabel('Month', fontsize = 22)
+# axes[0].set_xticks(np.linspace(1,12,12))
+# axes[0].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 18)
+# # axes[1].set_xlabel('Month', fontsize = 22)
+# axes[1].set_xticks(np.linspace(1,12,12))
+# axes[1].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 18)
+# axes[0].set_ylabel('Latitude ($^{\circ}$N)', fontsize = 22)
+# axes[0].set_title('(a) Land East', fontsize = 22)
+# axes[1].set_title('(b) Ocean', fontsize = 22)
+# plt.rcParams['ytick.labelsize']=22
 
-# [cape,cape_avg,cape_seasonal_avg,cape_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'cape','J/kg')
-# [cape_ctl,cape_avg_ctl,cape_seasonal_avg_ctl,cape_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'cape','J/kg')
+# # axes[0].plot(mse_subcloud.month, (np.ones(12))*30, 'k--')
+# # axes[0].plot(mse_subcloud.month, (np.ones(12))*-30, 'k--')
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_ctl_mse_subc_zonmean_40s40n_landEast_120-480.png', dpi=100, bbox_inches = 'tight')
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/P_ctl_mse_subc_zonmean_40s40n_landEast_120-480.pdf', dpi=400, bbox_inches = 'tight')
 
-#any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg-cape_avg_ctl),area_array,'J/kg','cape_avg_minus_ctl','rainnorm',landmaskxr)
-#any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg),area_array,'J/kg','cape_avg','rainnorm',landmaskxr)
-#any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg_ctl),area_array,'J/kg','cape_ctl','rainnorm',landmaskxr)
+# # mse_subcloud_seasons = mc.cp_air * temp_seasonal_avg_ctl + mc.L * sphum_seasonal_avg_ctl+ mc.grav * height_seasonal_avg_ctl
+# # any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,precipitation_seasonal_avg_ctl,area_array,'mm/day','P_ctl_mseb_conts','fromwhite',landmaskxr,nmb_contours = [3.0, 3.1, 3.2, 3.25, 3.28, 3.29, 3.3, 3.31], minval = 0., maxval = 12., steps = 13, array2=mse_subcloud_seasons/(10**5))
+# # any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,precipitation_month_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr, minval = 0., maxval = 12., steps = 13)
 
-# rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
+# # any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,mse_subcloud_seasons/(10**5),area_array,'x10^5 J/kg','mseb','bucket',landmaskxr, minval = 3.0, maxval = 3.4,steps = 31)
+
+# sens_subcloud_zm_land = xr.DataArray(area_weighted_avg_4D(mc.cp_air*temp_month_avg_ctl/(10**5),area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# sens_subcloud_zm_ocean = xr.DataArray(area_weighted_avg_4D(mc.cp_air*temp_month_avg_ctl/(10**5),area_array_3Dtime,landmaskxr,'ocean',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# latent_subcloud_zm_land = xr.DataArray(area_weighted_avg_4D(mc.L*sphum_month_avg_ctl/(10**4),area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# latent_subcloud_zm_ocean = xr.DataArray(area_weighted_avg_4D(mc.L*sphum_month_avg_ctl/(10**4),area_array_3Dtime,landmaskxr,'ocean',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# height_subcloud_zm_land = xr.DataArray(area_weighted_avg_4D(mc.grav*height_month_avg_ctl/(10**4),area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# height_subcloud_zm_ocean = xr.DataArray(area_weighted_avg_4D(mc.grav*height_month_avg_ctl/(10**4),area_array_3Dtime,landmaskxr,'ocean',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+# bucket_depth_zm_land = xr.DataArray(area_weighted_avg_4D(bucket_depth_month_avg_ctl/(0.15*0.75),area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 20., maxlon = 40., axis = 2), coords = [mse_subcloud.month,mse_subcloud.lat], dims = ['month','lat'])
+
+# fig, axes = plt.subplots(2,2, sharey = True, figsize = (20,15))
+# plt.rcParams['ytick.labelsize']=22
+# v = np.linspace(0.,3.5,21)
+# sns = axes[0,0].contourf(T, Y, (sens_subcloud_zm_land.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Reds', extend = 'both')
+# lat = axes[0,1].contourf(T, Y, (latent_subcloud_zm_land.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Purples', extend = 'both')
+# hgt = axes[1,0].contourf(T, Y, (height_subcloud_zm_land.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Greens', extend = 'both')
+# mseall = axes[1,1].contourf(T, Y, ((mse_subcloud_zm_land*10**-5).transpose()).sel(lat=slice(-30.,30.)),cmap = 'Blues', extend = 'both')
+# cbar = fig.colorbar(sns,ax=axes[0,0],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^5$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(lat,ax=axes[0,1],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^4$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(hgt,ax=axes[1,0],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^4$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(mseall,ax=axes[1,1],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^5$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# axes[0,0].set_xticks(np.linspace(1,12,12))
+# axes[0,1].set_xticks(np.linspace(1,12,12))
+# axes[1,0].set_xticks(np.linspace(1,12,12))
+# axes[1,1].set_xticks(np.linspace(1,12,12))
+# axes[0,0].set_title('(a) Sensible Heat', fontsize = 28)
+# axes[0,1].set_title('(b) Latent Heat', fontsize = 28)
+# axes[1,0].set_title('(c) Potential Energy', fontsize = 28)
+# axes[1,1].set_title('(d) MSE$_b$', fontsize = 28)
+# axes[1,0].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[1,1].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[0,0].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[0,1].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# fig.text(0.05, 0.5, 'Latitude ($^{\circ}$N)', va='center', rotation='vertical', fontsize = 28)
+# # fig.text(0.45, 0.05, 'Month', rotation='horizontal', fontsize = 28)
+
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/MSEb_terms_40s40n_landEast_120-360.png', dpi=100, bbox_inches = 'tight')
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/MSEb_terms_40s40n_landEast_120-360.pdf', bbox_inches = 'tight')
+
+
+# fig, axes = plt.subplots(2,2, sharey = True, figsize = (20,15))
+# plt.rcParams['ytick.labelsize']=22
+# v = np.linspace(0.,3.5,21)
+# sns = axes[0,0].contourf(T, Y, (sens_subcloud_zm_ocean.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Reds', extend = 'both')
+# lat = axes[0,1].contourf(T, Y, (latent_subcloud_zm_ocean.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Purples', extend = 'both')
+# hgt = axes[1,0].contourf(T, Y, (height_subcloud_zm_ocean.transpose()).sel(lat=slice(-30.,30.)),cmap = 'Greens', extend = 'both')
+# mseall = axes[1,1].contourf(T, Y, ((mse_subcloud_zm_ocean*10**-5).transpose()).sel(lat=slice(-30.,30.)),cmap = 'Blues', extend = 'both')
+# cbar = fig.colorbar(sns,ax=axes[0,0],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^5$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(lat,ax=axes[0,1],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^4$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(hgt,ax=axes[1,0],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^4$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# cbar = fig.colorbar(mseall,ax=axes[1,1],orientation = 'horizontal', format = '%.2f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.set_label('x10$^5$ (J/kg)', fontsize = 22)
+# cbar.ax.tick_params(labelsize=22) 
+# axes[0,0].set_xticks(np.linspace(1,12,12))
+# axes[0,1].set_xticks(np.linspace(1,12,12))
+# axes[1,0].set_xticks(np.linspace(1,12,12))
+# axes[1,1].set_xticks(np.linspace(1,12,12))
+# axes[0,0].set_title('(a) Sensible Heat', fontsize = 28)
+# axes[0,1].set_title('(b) Latent Heat', fontsize = 28)
+# axes[1,0].set_title('(c) Potential Energy', fontsize = 28)
+# axes[1,1].set_title('(d) MSE$_b$', fontsize = 28)
+# axes[1,0].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[1,1].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[0,0].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# axes[0,1].set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 22)
+# fig.text(0.05, 0.5, 'Latitude ($^{\circ}$N)', va='center', rotation='vertical', fontsize = 28)
+# # fig.text(0.45, 0.05, 'Month', rotation='horizontal', fontsize = 28)
+
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/MSEb_terms_40s40n_ocean_120-360.png', dpi=100, bbox_inches = 'tight')
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/MSEb_terms_40s40n_ocean_120-360.pdf', bbox_inches = 'tight')
+
+# v = np.linspace(0.,1.,11)
+# fig, ax = plt.subplots(1,1, figsize = (10,8))
+# bd = ax.contourf(T, Y, (bucket_depth_zm_land.transpose()).sel(lat=slice(-30.,30.)),v,cmap = 'Blues', extend = 'max')
+# ax.set_xticks(np.linspace(1,12,12))
+# ax.set_xticklabels(['J','F','M','A','M','J','J','A','S','O','N','D'], fontsize = 26)
+# ax.set_ylabel('Latitude ($^{\circ}$N)', fontsize=26)
+# cbar = fig.colorbar(bd,ax=ax,orientation = 'vertical', format = '%.1f') # ax = axes tells it to take space away from all the subplots. could adjust location by setting ax to axes[0,0] for example. 
+# cbar.ax.tick_params(labelsize=22) 
+# cbar.set_label('Soil moisture conductance', fontsize = 26)
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/bucket_saturation_120-360.png', dpi=100, bbox_inches = 'tight')
+# fig.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/bucket_saturation_120-360.pdf', bbox_inches = 'tight')
+
+
+
+
+# ##############################
+# ##############################
+# [div_ctl,div_avg_ctl,div_seasonal_avg_ctl,div_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'div','1/sec',level=2)
+# [ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = 2)
+# [vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = 2)
+
+# [sphum_u_ctl,sphum_u_avg_ctl,sphum_u_seasonal_avg_ctl,sphum_u_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_u','kgm/kgs', level = 2)
+# [sphum_v_ctl,sphum_v_avg_ctl,sphum_v_seasonal_avg_ctl,sphum_v_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_v','kgm/kgs', level = 2)
+
+# div_qu = gr.ddx(sphum_u_seasonal_avg_ctl) + gr.ddy(sphum_v_seasonal_avg_ctl, vector = False)
+
+# div_u = gr.ddx(ucomp_seasonal_avg_ctl) + gr.ddy(vcomp_seasonal_avg_ctl, vector = False)
+# winds_seasons_one_level(ucomp_seasonal_avg_ctl,vcomp_seasonal_avg_ctl,'850hPa_divu_uvwinds_ctl',2,div_u*10**5,'PE_scale_reverse','x10$^{-5}$ (1/s)',-1.,1.,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=10., scale = 50.)
+# winds_seasons_one_level(ucomp_seasonal_avg_ctl,vcomp_seasonal_avg_ctl,'850hPa_div_uvwinds_ctl',2,div_seasonal_avg_ctl*10**5,'PE_scale_reverse','x10$^{-5}$ (1/s)',-1.,1.,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=10., scale = 50.)
+# winds_seasons_one_level(ucomp_seasonal_avg_ctl,vcomp_seasonal_avg_ctl,'850hPa_div_minus_divu_uvwinds_ctl',2,(div_seasonal_avg_ctl-div_u)*10**20,'PE_scale_reverse','x10$^{-5}$ (1/s)',-1.,1.,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=1., scale = 80.)
+# winds_seasons_one_level(ucomp_seasonal_avg_ctl,vcomp_seasonal_avg_ctl,'850hPa_divqu_uvwinds_ctl',2,div_qu*10**7,'PE_scale_reverse','x10$^{-7}$ (1/s)',-1.,1.,landmaskxr,outdir,runmin,runmax,units_numerator='m',units_denom='s',quivkey=4,veclen=10., scale = 25.)
+
+
+# any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,-90.,90.,(div_month_avg_ctl)*10**5, (ucomp_month_avg_ctl), (vcomp_month_avg_ctl), area_array,'x10^-5 (1/s)','div_u_v_interp_850hPa_ctl','PE_scale',landmaskxr, minval = -1., maxval = 1., steps = 41, scale = 100)
+
+# div_zonmean = xr.DataArray(area_weighted_avg_4D(div_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
+# ucomp_zonmean = xr.DataArray(area_weighted_avg_4D(ucomp_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
+# vcomp_zonmean = xr.DataArray(area_weighted_avg_4D(vcomp_month_avg_ctl,area_array_3Dtime,landmaskxr,'all_sfcs',minlat=-90.,maxlat=90, minlon = 0., maxlon = 360., axis = 2), coords = [div_month_avg_ctl.month,div_month_avg_ctl.lat], dims = ['month','lat'])
+
+# any_configuration_plot_allmonths_quivers(outdir,runmin,runmax,-90.,90.,(div_month_avg_ctl - div_zonmean)*10**5, (ucomp_month_avg_ctl - ucomp_zonmean), (vcomp_month_avg_ctl - vcomp_zonmean), area_array,'1/s','div_u_v_interp_850hPa_ctl_zonanoms','PE_scale',landmaskxr, minval = -1., maxval = 1., steps = 41, scale = 20)
+# # any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,bucket_depth_month_avg_ctl.where(landmask == 1.),area_array,'m','bucket_depth_ctl','fromwhite',landmaskxr, minval = 0., maxval = .15, steps = 41)
+
+# winds_one_level(outdir,runmin,runmax,'870hPa_div_uv_',ucomp_avg_ctl,vcomp_avg_ctl,div_avg_ctl*10**5,
+# 	'PE_scale','x10^-5 (1/s)',landmaskxr,-1., 1., veclen=1,level=2,units_numerator = 'm', units_denom = 's')
+
+
+# # ################################
+
+
+# # ################################
+
+# # [ep_ctl,ep_avg_ctl,ep_seasonal_avg_ctl,ep_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'potential_evap','mm/day',factor = 86400) # latent heat flux at surface (UP)
+
+# # any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,(ep_month_avg_ctl/precipitation_month_avg_ctl).where(landmask == 1.),area_array,'1','ep_over_p','RdBu_r',landmaskxr, minval = 0., maxval = 2., steps = 41)
+
+# # any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(ep_seasonal_avg_ctl/precipitation_seasonal_avg_ctl).where(landmask == 1.),area_array,'1','ep_over_p','RdBu_r',landmaskxr, minval = 0., maxval = 2., steps = 41)
+
+
+
+# # [cape,cape_avg,cape_seasonal_avg,cape_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'cape','J/kg')
+# # [cape_ctl,cape_avg_ctl,cape_seasonal_avg_ctl,cape_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'cape','J/kg')
+
+# #any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg-cape_avg_ctl),area_array,'J/kg','cape_avg_minus_ctl','rainnorm',landmaskxr)
+# #any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg),area_array,'J/kg','cape_avg','rainnorm',landmaskxr)
+# #any_configuration_plot(outdir,runmin,runmax,-90.,90.,(cape_avg_ctl),area_array,'J/kg','cape_ctl','rainnorm',landmaskxr)
+
+# # rh_P_E_T(outdir,runmin,runmax,rh_avg,precipitation_avg,net_lhe_avg,tsurf_avg,landmask)
 
 
 PE = precipitation - net_lhe
@@ -202,7 +364,7 @@ any_configuration_plot_allmonths(outdir,runmin,runmax,-90.,90.,toa_sw_month_avg_
 #exit()
 
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,precipitation_seasonal_avg,area_array,'mm/day','P_avg','fromwhite',landmaskxr, minval = 0., maxval = 8., steps = 11)
-any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,precipitation_seasonal_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 8., steps = 11)
+any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,precipitation_seasonal_avg_ctl,area_array,'mm/day','P_ctl','fromwhite',landmaskxr,minval = 0., maxval = 12., steps = 13)
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(precipitation_seasonal_avg - precipitation_seasonal_avg_ctl),area_array,'mm/day','P_avg_minus_ctl','rainnorm',landmaskxr, minval=-2.,maxval=2.)
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(precipitation_seasonal_avg - precipitation_seasonal_avg_ctl),area_array,'mm/day','P_avg_minus_ctl_widebar','rainnorm',landmaskxr, minval=-4.,maxval=4.)
 
@@ -210,6 +372,7 @@ any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,tsurf_seasonal_avg
 
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(precipitation_avg - precipitation_avg_ctl),area_array,'mm/day','P_avg_minus_ctl_narrowbar','rainnorm',landmaskxr, minval=-1.,maxval=1.)
 
+exit()
 
 # # [flux_oceanq,flux_oceanq_avg,flux_oceanq_seasonal_avg,flux_oceanq_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'flux_oceanq','W/m^2')
 [olr_ctl,olr_avg_ctl,olr_seasonal_avg_ctl,olr_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'olr','W/m^2',factor = 1.) # 
@@ -331,7 +494,7 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(TOA_avg),area_array,'(W/m^
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl_narrowcbar','tempdiff',landmaskxr, minval = -4., maxval = 4.)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,(tsurf_avg-tsurf_avg_ctl),area_array,'K','$T_S$_avg_minus_ctl','tempdiff',landmaskxr, minval = -10, maxval = 10.,steps=21)
 any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg - 273.15,area_array,'C','$T_S$_avg','temp0',landmaskxr, minval = -40., maxval = 40., steps = 41)
-any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl - 273.15,area_array,'C','$T_S$_ctl','temp0',landmaskxr, minval = -40., maxval = 40., steps = 41)
+any_configuration_plot(outdir,runmin,runmax,-90.,90.,tsurf_avg_ctl - 273.15,area_array,'$\degree{}$C','$T_S$_ctl','temp0',landmaskxr, minval = -35., maxval = 35., steps = 29)
 # any_configuration_plot(outdir,runmin,runmax,-90.,90.,((tsurf_avg-tsurf_avg_ctl)/tsurf_avg_ctl)*100.,area_array,'%','$T_S$_avg_minus_ctl_relativechange','tempdiff',landmaskxr)
 
 
@@ -675,12 +838,20 @@ for i in range(0,12):
 ##############################################################################################
 # Moisture flux as model output 
 
-level = 15
+level = 2
 
-[sphum_u,sphum_u_avg,sphum_u_seasonal_avg,sphum_u_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum_u','kgm/kgs', level = level)
-[sphum_v,sphum_v_avg,sphum_v_seasonal_avg,sphum_v_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'sphum_v','kgm/kgs', level = level)
-[sphum_u_ctl,sphum_u_avg_ctl,sphum_u_seasonal_avg_ctl,sphum_u_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_u','kgm/kgs', level = level)
-[sphum_v_ctl,sphum_v_avg_ctl,sphum_v_seasonal_avg_ctl,sphum_v_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_v','kgm/kgs', level = level)
+[sphum_u,sphum_u_avg,sphum_u_seasonal_avg,sphum_u_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'sphum_u','kgm/kgs', level = level)
+[sphum_v,sphum_v_avg,sphum_v_seasonal_avg,sphum_v_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'sphum_v','kgm/kgs', level = level)
+[sphum_u_ctl,sphum_u_avg_ctl,sphum_u_seasonal_avg_ctl,sphum_u_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_u','kgm/kgs', level = level)
+[sphum_v_ctl,sphum_v_avg_ctl,sphum_v_seasonal_avg_ctl,sphum_v_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'sphum_v','kgm/kgs', level = level)
+
+[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s', level = level)
+[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'vcomp','m/s', level = level)
+[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = level)
+[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = level)
+
+[gph,gph_avg,gph_seasonal_avg,gph_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'height','m', level = 2) # geopotential height at 870 hPa
+[gph_ctl,gph_avg_ctl,gph_seasonal_avg_ctl,gph_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'height','m', level = 2) 
 
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(sphum_u_seasonal_avg - sphum_u_seasonal_avg_ctl),area_array,'kgm/kgs','sphum_u_avg_minus_ctl_lev'+str(level),'slp',landmaskxr,minval=-.05,maxval=.05)
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(sphum_u_seasonal_avg),area_array,'kgm/kgs','sphum_u_avg_lev'+str(level),'slp',landmaskxr,minval=-.002,maxval=.002)
@@ -702,10 +873,10 @@ any_configuration_plot(outdir,runmin,runmax,-90.,90.,(omega_avg - omega_avg_ctl)
 
 level = 37 #37
 
-[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'ucomp','m/s', level = level)
-[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable(testdir,model,runmin,runmax,'vcomp','m/s', level = level)
-[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = level)
-[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = level)
+[ucomp,ucomp_avg,ucomp_seasonal_avg,ucomp_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'ucomp','m/s', level = level)
+[vcomp,vcomp_avg,vcomp_seasonal_avg,vcomp_month_avg,time]=seasonal_surface_variable_interp(testdir,model,runmin,runmax,'vcomp','m/s', level = level)
+[ucomp_ctl,ucomp_avg_ctl,ucomp_seasonal_avg_ctl,ucomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'ucomp','m/s', level = level)
+[vcomp_ctl,vcomp_avg_ctl,vcomp_seasonal_avg_ctl,vcomp_month_avg_ctl,time]=seasonal_surface_variable_interp(control_dir,ctl_model,ctl_runmin,ctl_runmax,'vcomp','m/s', level = level)
 
 
 any_configuration_plot_seasonal(outdir,runmin,runmax,-90.,90.,(ucomp_seasonal_avg),area_array,'m/s','ucomp_avg_lev'+str(level),'slp',landmaskxr,minval=-10.,maxval=10.)
@@ -824,11 +995,11 @@ qv_stationary_ctl = (vcomp_avg_ctl*sphum_avg_ctl)
 
 
 
-winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_avg_minus_ctl_monthlydata_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
-	'slp','m',landmaskxr,veclen=10,level=37,units_numerator = 'm', units_denom = 's', save = True)
+winds_one_level(outdir,runmin,runmax,'870hPa_gph_winds_avg_minus_ctl_monthlydata_interp_',ucomp_avg - ucomp_avg_ctl,vcomp_avg - vcomp_avg_ctl,gph_avg - gph_avg_ctl,
+	'slp','m',landmaskxr,veclen=1,level=2,units_numerator = 'm', units_denom = 's', save = True)
 
 # annual mean plots 
-winds_one_level(outdir,runmin,runmax,'sphum_uv_avg_minus_ctl_monthlydata_',sphum_u_avg - sphum_u_avg_ctl,sphum_v_avg - sphum_v_avg_ctl,(PE_avg-PE_avg_ctl),'PE_scale','mm/d',landmaskxr,-2., 2.,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s', save = True)
+winds_one_level(outdir,runmin,runmax,'sphum_uv_avg_minus_ctl_monthlydata_interp_',sphum_u_avg - sphum_u_avg_ctl,sphum_v_avg - sphum_v_avg_ctl,(PE_avg-PE_avg_ctl),'PE_scale',r'$\Delta$ (P-E) mm/d',landmaskxr,-2., 2.,veclen=0.01,level=level,units_numerator = 'kg m', units_denom = 'kg s', save = True)
 winds_one_level(outdir,runmin,runmax,'sphum_uv_avg_',sphum_u_avg,sphum_v_avg,PE_avg,'PE_scale','mm/d',landmaskxr,-8., 8., veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s', save = True)
 winds_one_level(outdir,ctl_runmin,ctl_runmax,'sphum_uv_avg_ctl_',sphum_u_avg_ctl,sphum_v_avg_ctl,PE_avg_ctl,'PE_scale','mm/d',landmaskxr, -8., 8., veclen=0.1,level=level,units_numerator = 'kg m', units_denom = 'kg s', save = True)
 
