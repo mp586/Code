@@ -202,12 +202,12 @@ for i in range(len(control_sb_dirs)):
             precip_ctl_matrix[i,j,:,:] = precipitation_avg_ctl
             precip_pert_matrix[i,j,:,:] = precipitation_avg
         
-small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 18 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-names = ['CV0', 'CV02', 'CV05', 'CV07', 'SB']
+names = ['0%cond', '20%cond', '50%cond', '70%cond', 'bucket']
 conts = ['3$^{\circ}$','6$^{\circ}$', '12$^{\circ}$', '24$^{\circ}$', 'AM', 'AF','100$^{\circ}$','2AM','2C']
 
 fig = plt.figure(figsize = (22,15))
@@ -251,14 +251,19 @@ for i in range(len(control_sb_dirs)):
             m.contour(xi,yi,landmask, 1, colors = 'k')
 
 
-plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
-cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+# plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
+# cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
+# # add an axes, lower left corner in [0.83, 0.3] measured in figure coordinate with axes width 0.01 and height 0.4
+# cbar = plt.colorbar(cs, cax=cb_ax)
 
-plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_avg_minus_ctl_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
-plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_avg_minus_ctl_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
+plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.9, wspace=0.02, hspace=0.02)
+cb_ax = plt.axes([0.3, 0.05, 0.4, 0.03])
+cbar = plt.colorbar(cs, cax=cb_ax, orientation = 'horizontal')
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
+
+plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_avg_minus_ctl_120-480_lowcbar.png', bbox_inches = 'tight', format = 'png', dpi = 400)
+plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_avg_minus_ctl_120-480_lowcbar.pdf', bbox_inches = 'tight', format = 'pdf')
 
 
 plt.close()
@@ -299,8 +304,8 @@ for i in range(len(control_sb_dirs)):
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
 cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
 cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_ctl_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_'+variable+'_ctl_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
@@ -360,7 +365,7 @@ for i in range(len(control_sb_dirs)):
 
 
 
-fig = plt.figure(figsize = (20,15))
+fig = plt.figure(figsize = (10,8))
 v = np.linspace(minval,maxval,41) # , endpoint=True)
 
 warming = np.zeros((len(vp0_dirs),len(pert_dict),len(lats),len(lons)))
@@ -394,8 +399,8 @@ for i in range(len(control_sb_dirs)):
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
 cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
 cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_stomata_only_'+variable+'_change_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_stomata_only_'+variable+'_change_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
@@ -432,8 +437,8 @@ for i in range(len(control_sb_dirs)):
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
 cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
 cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_warming_only_'+variable+'_change_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_warming_only_'+variable+'_change_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
@@ -468,8 +473,8 @@ for i in range(len(control_sb_dirs)):
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
 cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
 cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_addition_'+variable+'_change_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_addition_'+variable+'_change_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
@@ -505,8 +510,8 @@ for i in range(len(control_sb_dirs)):
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
 cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
 cbar = plt.colorbar(cs, cax = cb_ax)
-cbar.set_label(units, size = 10)
-cbar.ax.tick_params(labelsize=10)
+cbar.set_label(units, size = med)
+cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_full_minus_addition_'+variable+'_change_120-480.png', bbox_inches = 'tight', format = 'png', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_full_minus_addition_'+variable+'_change_120-480.pdf', bbox_inches = 'tight', format = 'pdf')
@@ -529,20 +534,45 @@ dP_AF_veg = np.asarray(dP_AF_veg).flatten()
 mask = ~np.isnan(dP_AM_SB)                                                                      
 [slope, intercept, r_value, p_value, std_err] = stats.linregress(dP_AM_SB[mask],dP_AM_veg[mask])
 line_AM1 = slope*dP_AM_SB + intercept     
+print('AM1 r = '+str(r_value))
+print('AM1 slope = '+str(slope))
+
 [slope, intercept, r_value, p_value, std_err] = stats.linregress(dP_AM_veg[mask],dP_AM_SB[mask])
+print('AM2 r = '+str(r_value))
+print('AM2 slope = '+str(slope))
+
 line_AM2 = (dP_AM_SB - intercept)/slope
 [slope_lst, intercept_lst, x, x, x] = orthoregress(dP_AM_SB[mask],dP_AM_veg[mask])
 line_AM_lst = slope_lst*dP_AM_SB + intercept_lst
+print('AM slope = '+str(slope_lst))
 
                                                            
 mask = ~np.isnan(dP_AF_SB)                                                                               
 [slope, intercept, r_value, p_value, std_err] = stats.linregress(dP_AF_SB[mask],dP_AF_veg[mask])
 line_AF1 = slope*dP_AF_SB + intercept  
+print('AF1 r = '+str(r_value))
+print('AF1 slope = '+str(slope))
 [slope, intercept, r_value, p_value, std_err] = stats.linregress(dP_AF_veg[mask],dP_AF_SB[mask])
+print('AF2 r = '+str(r_value))
+print('AF2 slope = '+str(slope))
 line_AF2 = (dP_AF_SB - intercept)/slope
 [slope_lst, intercept_lst, x, x, x] = orthoregress(dP_AF_SB[mask],dP_AF_veg[mask])
 line_AF_lst = slope_lst*dP_AF_SB + intercept_lst
-                                                                  
+print('AF slope = '+str(slope_lst))
+
+# AM1 r = 0.558081345852
+# AM1 slope = 0.894637712237
+# AM2 r = 0.558081345852
+# AM2 slope = 0.348135099078
+# AM slope = 2.20749208202
+# AF1 r = 0.770666686075
+# AF1 slope = 0.788271314688
+# AF2 r = 0.770666686075
+# AF2 slope = 0.753455225325
+# AF slope = 1.02972373001                                      
+
+
+
 plt.plot(dP_AM_SB, dP_AM_veg, 'c.', markersize = 5., label = 'AM')
 plt.plot(dP_AF_SB, dP_AF_veg, 'm.', markersize = 5., label = 'AF')          
 plt.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgrey')      
@@ -552,8 +582,8 @@ plt.plot(np.linspace(low_lim,up_lim,100),np.linspace(low_lim,up_lim,100), 'dimgr
 plt.legend()                                                                 
 plt.xlim(low_lim,up_lim)                                                         
 plt.ylim(low_lim,up_lim)          
-plt.xlabel(variable+' change SB ('+units+')')     
-plt.ylabel(variable+' change veg 0.5 ('+units+')')
+plt.xlabel(variable+' change bucket ('+units+')')     
+plt.ylabel(variable+' change 50%cond ('+units+')')
 plt.plot(dP_AM_SB, line_AM1, color = 'c', linestyle = 'dashed') 
 plt.plot(dP_AM_SB, line_AM2, color = 'c', linestyle = 'dashed') 
 plt.plot(dP_AM_SB, line_AM_lst, 'k')                                                         
@@ -579,8 +609,8 @@ axes.set_xlim(low_lim,up_lim)
 axes.set_ylim(low_lim,up_lim)          
 # axes.set_xlabel(variable+' change SB ('+units+')', fontsize = med)     
 # axes.set_ylabel(variable+' change veg 0.5 ('+units+')', fontsize = med)
-axes.set_xlabel('$\Delta P$ SB ('+units+')', fontsize = med)     
-axes.set_ylabel('$\Delta P$ CV05 ('+units+')', fontsize = med)
+axes.set_xlabel('$\Delta P$ bucket ('+units+')', fontsize = med)     
+axes.set_ylabel('$\Delta P$ 50%cond ('+units+')', fontsize = med)
 
 axes.plot(dP_AM_SB, line_AM_lst, 'c')                                 
 axes.plot(dP_AF_SB, line_AF_lst, 'm') 

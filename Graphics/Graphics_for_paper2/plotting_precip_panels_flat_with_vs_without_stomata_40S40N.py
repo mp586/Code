@@ -149,7 +149,7 @@ landmask = np.asarray(landmaskxr)
 
 fig, axes = plt.subplots(3,1, figsize = (10,8))
 
-axes[0].set_title('(a) CV05', size = med)
+axes[0].set_title('(a) 50%cond', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -203,7 +203,7 @@ landlons = np.asarray(landmaskxr.lon)
 
 landmask = np.asarray(landmaskxr)
 
-axes[1].set_title('(b) SB', size = med)
+axes[1].set_title('(b) bucket', size = med)
 #fig = plt.figure()
 m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
@@ -254,7 +254,7 @@ landlons = np.asarray(landmaskxr.lon)
 
 landmask = np.asarray(landmaskxr)
 
-axes[2].set_title('(c) CV05 - SB', size = med)
+axes[2].set_title('(c) 50%cond - bucket', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -320,8 +320,8 @@ fig, ax = plt.subplots()
 ax.plot(dP_SB, dP_VP02, 'k.')
 ax.set_xlim(-6.,6.)
 ax.set_ylim(-6.,6.)
-ax.set_ylabel('$\Delta P$ (CV05) in mm/d')
-ax.set_xlabel('$\Delta P$ (SB) in mm/d')
+ax.set_ylabel('$\Delta P$ (50%cond) in mm/d')
+ax.set_xlabel('$\Delta P$ (bucket) in mm/d')
 
 mask = ~np.isnan(dP_SB)
 
@@ -355,7 +355,7 @@ landmask = np.asarray(landmaskxr)
 
 fig, axes = plt.subplots(3,1, figsize = (10,8))
 
-axes[0].set_title('(a) CV05', size = med)
+axes[0].set_title('(a) 50%cond', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -409,7 +409,7 @@ landlons = np.asarray(landmaskxr.lon)
 
 landmask = np.asarray(landmaskxr)
 
-axes[1].set_title('(b) SB', size = med)
+axes[1].set_title('(b) bucket', size = med)
 #fig = plt.figure()
 m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
@@ -460,7 +460,7 @@ landlons = np.asarray(landmaskxr.lon)
 
 landmask = np.asarray(landmaskxr)
 
-axes[2].set_title('(c) CV05 - SB', size = med)
+axes[2].set_title('(c) 50%cond - bucket', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)

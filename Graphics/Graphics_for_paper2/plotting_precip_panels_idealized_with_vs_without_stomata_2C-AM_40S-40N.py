@@ -245,9 +245,9 @@ array = precipitation3_avg - precipitation3_avg_ctl - (precipitation1_avg  - pre
 lats=array.lat
 lons=array.lon
 
-fig, axes = plt.subplots(3,1, figsize = (25,15))
+fig, axes = plt.subplots(3,1, figsize = (10,8))
 
-axes[0].set_title('(a) 2C - AM (SB)', size = med)
+axes[0].set_title('(a) 2C - AM (bucket)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -295,7 +295,7 @@ array = precipitation4_avg - precipitation4_avg_ctl - (precipitation2_avg - prec
 lats=array.lat
 lons=array.lon
 
-axes[1].set_title('(b) 2C - AM (CV05)', size = med)
+axes[1].set_title('(b) 2C - AM (50%cond)', size = med)
 #fig = plt.figure()
 m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
@@ -329,7 +329,7 @@ array =  precipitation3_avg - precipitation3_avg_ctl - (precipitation1_avg  - pr
 lats=array.lat
 lons=array.lon
 
-axes[2].set_title('(c) 2C - AM (SB - CV05)', size = med)
+axes[2].set_title('(c) 2C - AM (bucket - 50%cond)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -386,8 +386,8 @@ fig, ax = plt.subplots()
 ax.plot(dP_SB, dP_VP05, 'k.')
 ax.set_xlim(-6.,6.)
 ax.set_ylim(-6.,6.)
-ax.set_ylabel('$\Delta P$ (CV05) in mm/d')
-ax.set_xlabel('$\Delta P$ (SB) in mm/d')
+ax.set_ylabel('$\Delta P$ (50%cond) in mm/d')
+ax.set_xlabel('$\Delta P$ (bucket) in mm/d')
 
 mask = ~np.isnan(dP_SB)
 

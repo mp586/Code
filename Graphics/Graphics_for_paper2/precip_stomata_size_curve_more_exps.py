@@ -161,13 +161,16 @@ pert_dict = {'CV0': vp0_dirs,
 'CV07' : vp07_dirs,
 'SB': simple_bucket_dirs}
 
-pert_list = ['CV0','CV02','CV05','CV07', 'SB']
+pert_list = ['CV0','CV02','CV05','CV07','SB']
+pert_list_names = ['0%cond','20%cond','50%cond','70%cond','bucket']
 
 precip_pert_matrix = np.zeros((len(vp0_dirs),len(pert_list)))
 precip_ctl_matrix = np.zeros((len(vp0_dirs),len(pert_list)))
 
+precip_pert_sds = np.zeros((len(vp0_dirs),len(pert_list)))
+precip_ctl_sds = np.zeros((len(vp0_dirs),len(pert_list)))
 
-med = 18
+med = 24
 # fig = plt.figure(figsize=(20,20))
 
 minlats = [-10.]
@@ -182,71 +185,71 @@ for k in range(len(minlats)):
 			if testdir != 'x':
 				testdir = 'Isca_DATA/ISCA_HPC/'+testdir
 				[precipitation_ctl,precipitation_avg_ctl,x,x,x]=seasonal_surface_variable(testdir,'isca',121,481,'precipitation','mm/d', factor=86400)
-				precip_ctl_matrix[i,j] = area_weighted_avg(precipitation_avg_ctl,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat)
+				precip_ctl_matrix[i,j], precip_ctl_sds[i,j] = area_weighted_avg(precipitation_avg_ctl,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)
 
 			
 			testdir = pert_dict[pert_list[j]][i]
 			if testdir != 'x':
 				testdir = 'Isca_DATA/ISCA_HPC/'+testdir
 				[precipitation,precipitation_avg,x,x,x]=seasonal_surface_variable(testdir,'isca',120,480,'precipitation','mm/d', factor=86400)
-				precip_pert_matrix[i,j] = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat)
+				precip_pert_matrix[i,j], precip_pert_sds[i,j] = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)
 
 
 	precip_ctl_matrix[precip_ctl_matrix == 0] = 'nan'
 	precip_pert_matrix[precip_pert_matrix == 0] = 'nan'
 
-	fig, axes = plt.subplots(1,1, figsize = (10,10))
+	# fig, axes = plt.subplots(1,1, figsize = (10,10))
 
-	for j in range(len(pert_list)):
-		axes.plot([3,6,12,24,40,60,100],precip_ctl_matrix[:,j], '.', label = ctl_list[j])
-		axes.plot([3,6,12,24,40,60,100],precip_pert_matrix[:,j], '*', label = pert_list[j])
-	axes.spines['right'].set_visible(False)
-	axes.spines['top'].set_visible(False)
-	axes.tick_params(labelsize = med)
-	axes.tick_params(labelsize = med)
-	axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-	axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
-	fig.legend(fontsize = med, bbox_to_anchor=(0.83,0.83))
-	fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_stomata_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	plt.close()
+	# for j in range(len(pert_list)):
+	# 	axes.plot([3,6,12,24,40,60,100],precip_ctl_matrix[:,j], '.', label = ctl_list[j])
+	# 	axes.plot([3,6,12,24,40,60,100],precip_pert_matrix[:,j], '*', label = pert_list[j])
+	# axes.spines['right'].set_visible(False)
+	# axes.spines['top'].set_visible(False)
+	# axes.tick_params(labelsize = med)
+	# axes.tick_params(labelsize = med)
+	# axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
+	# axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
+	# fig.legend(fontsize = med, bbox_to_anchor=(0.83,0.83))
+	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_stomata_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
+	# plt.close()
 
 
 	precip_ctl_matrix_del6 = np.delete(precip_ctl_matrix,1,0)
 	precip_pert_matrix_del6 = np.delete(precip_pert_matrix,1,0)
 
-	fig, axes = plt.subplots(1,1, figsize = (10,10))
+	# fig, axes = plt.subplots(1,1, figsize = (10,10))
 
-	axes.plot([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4], '*', markersize = 10., label = 'SB ctl')
-	axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,4], '*', markersize = 10., label = 'SB pert')
-	axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,2], '*', markersize = 10., label = 'CV05 pert')
+	# axes.plot([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4], 's', markersize = 10., label = 'SB ctl')
+	# axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,4], 'o', markersize = 10., label = 'SB pert')
+	# axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,2], 'v', markersize = 10., label = 'CV05 pert')
 
 
-	axes.spines['right'].set_visible(False)
-	axes.spines['top'].set_visible(False)
-	axes.tick_params(labelsize = med)
-	axes.tick_params(labelsize = med)
-	axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-	axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
-	axes.set_ylim(0.,8.)
-	axes.set_xlim(0.,110.)
-	axes.set_xticks([3,12,24,40,60,100])
-	fig.legend(fontsize = med, loc = 'lower left', bbox_to_anchor=(0.1,0.1))
-	fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-	plt.close()
+	# axes.spines['right'].set_visible(False)
+	# axes.spines['top'].set_visible(False)
+	# axes.tick_params(labelsize = med)
+	# axes.tick_params(labelsize = med)
+	# axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
+	# axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
+	# axes.set_ylim(0.,8.)
+	# axes.set_xlim(0.,110.)
+	# axes.set_xticks([3,12,24,40,60,100])
+	# fig.legend(fontsize = med, loc = 'lower left', bbox_to_anchor=(0.1,0.1))
+	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
+	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+	# plt.close()
 
 
 
 	warming_only = precip_pert_matrix_del6[:,4] - precip_ctl_matrix_del6[:,4]
 	for j in range(len(pert_list) - 1):
-		fig, axes = plt.subplots(1,2, sharex = True, figsize = (20,10))
+		fig, axes = plt.subplots(1,2, sharex = True, figsize = (23,10))
 		stomata_only = precip_ctl_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 		addition = warming_only + stomata_only
 		full = precip_pert_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 
-		axes[1].plot([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4], '*', markersize = 10., label = 'SB ctl')
-		axes[1].plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,4], '*', markersize = 10., label = 'SB pert')
-		axes[1].plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,2], '*', markersize = 10., label = 'CV05 pert')
+		axes[1].plot([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = 'bucket ctl')
+		axes[1].plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = 'bucket pert')
+		axes[1].plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = '50%cond pert')
 
 
 		axes[1].spines['right'].set_visible(False)
@@ -254,19 +257,19 @@ for k in range(len(minlats)):
 		axes[1].tick_params(labelsize = med)
 		axes[1].tick_params(labelsize = med)
 		axes[1].set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-		axes[1].set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
+		axes[1].set_ylabel('P per Area (mm/d/m$^2$)', fontsize = med)
 		axes[1].set_ylim([0.,8.])
 		axes[1].set_xlim(0.,110.)
 		axes[1].set_xticks([3,12,24,40,60,100])
 		axes[1].legend(fontsize = med, loc = 'lower left')
-		axes[1].set_title('b) $P$ vs continental extent', fontsize = med)
+		axes[1].set_title('b) P vs continental extent', fontsize = med)
 
 
 		axes[0].plot([3,12,24,40,60,100],[0,0,0,0,0,0],'k')
-		axes[0].plot([3,12,24,40,60,100],warming_only,'b*', markersize = 10.,label = 'warming (SB pert - ctl)')
-		axes[0].plot([3,12,24,40,60,100],stomata_only,'g*', markersize = 10.,label = 'stomata ('+pert_list[j]+' ctl - SB ctl)')
-		axes[0].plot([3,12,24,40,60,100],addition,'r*', markersize = 10.,label = 'warming + stomata')
-		axes[0].plot([3,12,24,40,60,100],full,'m*', markersize = 10.,label = 'full change ('+pert_list[j]+' pert - SB ctl)')
+		axes[0].plot([3,12,24,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = 'bucket (pert - ctl)')
+		axes[0].plot([3,12,24,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = 'stomata ('+pert_list_names[j]+' ctl - bucket ctl)')
+		axes[0].plot([3,12,24,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = 'bucket + stomata')
+		axes[0].plot([3,12,24,40,60,100],full,'^', color='navy', markersize = 10.,label = 'full change ('+pert_list_names[j]+' pert - bucket ctl)')
 		axes[0].legend(fontsize = med, loc = 'lower right')
 
 		axes[0].spines['right'].set_visible(False)
@@ -274,13 +277,37 @@ for k in range(len(minlats)):
 		axes[0].tick_params(labelsize = med)
 		axes[0].tick_params(labelsize = med)
 		axes[0].set_ylim([-2., 2.])
-		axes[0].set_title('a) $\Delta P$ decomposition vs continental extent', fontsize = med)
+		axes[0].set_title('a) $\Delta$ P decomposition vs continental extent', fontsize = med)
 		axes[0].set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
-		axes[0].set_ylabel('$\Delta P$ per Area (mm/d/m$^2$)',fontsize = med)
+		axes[0].set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
 		plt.close()
 
+
+
+		print(pert_list[j])
+		[slope, intercept, r_value, p_value, std_err] = stats.linregress([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4])
+		print("slope linregress ctl = "+str(slope))
+		[slope, intercept, r_value, p_value, std_err] = stats.linregress([3,12,24,40,60,100],precip_pert_matrix_del6[:,4])
+		print("slope linregress bucket = "+str(slope))
+		[slope, intercept, r_value, p_value, std_err] = stats.linregress([3,12,24,40,60,100],precip_pert_matrix_del6[:,j])
+		print("slope linregress veg = "+str(slope))
+
+		[slope_lst, intercept_lst, x, x, x] = orthoregress([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4])
+		print("slope totalregress ctl= "+str(slope_lst))
+		[slope_lst, intercept_lst, x, x, x] = orthoregress([3,12,24,40,60,100],precip_pert_matrix_del6[:,4])
+		print("slope totalregress pert= "+str(slope_lst))
+		[slope_lst, intercept_lst, x, x, x] = orthoregress([3,12,24,40,60,100],precip_pert_matrix_del6[:,j])
+		print("slope totalregress veg= "+str(slope_lst))
+
+# CV05
+# slope linregress ctl = -0.063495873788
+# slope linregress bucket = -0.0674657883614
+# slope linregress veg = -0.0656376330027
+# slope totalregress ctl= -0.0635055054459
+# slope totalregress pert= -0.0674703639336
+# slope totalregress veg= -0.0656417572586
 
 
 

@@ -199,9 +199,9 @@ landmaskxrA=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon'])
 
 ############ plotting ##############
 
-small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 v = np.linspace(-1.,1.,21)
 nmb_contours = [-1.,1.]

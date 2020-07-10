@@ -184,9 +184,9 @@ else:
 
 ############ plotting ##############
 
-small = 18 #largefonts 14 # smallfonts 10 # medfonts = 14
-med = 20 #largefonts 18 # smallfonts 14 # medfonts = 16
-lge = 22 #largefonts 22 # smallfonts 18 # medfonts = 20
+small = 22 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 24 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 28 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 v = np.linspace(-2.,2.,21)
 nmb_contours = [-2.,1.,2.]
@@ -209,7 +209,7 @@ fig, axes = plt.subplots(2,2, figsize = (25,12))
 fig.subplots_adjust(hspace = 0.2, wspace = 0.05)
 
 
-axes[0,0].set_title('(a) Two Continents (2C) SB', size = med)
+axes[0,0].set_title('(a) Two Continents (2C) bucket', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,0])
@@ -262,7 +262,7 @@ landlons = np.asarray(landmaskxr2C.lon)
 
 landmask = np.asarray(landmaskxr2C)
 
-axes[0,1].set_title('(b) Two continents (2C) CV05', size = med)
+axes[0,1].set_title('(b) Two continents (2C) 50%cond', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[0,1])
@@ -318,7 +318,7 @@ landlons = np.asarray(landmaskxrSA.lon)
 landmask = np.asarray(landmaskxrSA)
 
 
-axes[1,0].set_title('(c) America (AM) CV05', size = med)
+axes[1,0].set_title('(c) America (AM) 50%cond', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,0])
@@ -373,7 +373,7 @@ landlons = np.asarray(landmaskxr2C.lon)
 landmask = np.asarray(landmaskxr2C)
 
 
-axes[1,1].set_title('(d) 2C CV05 - (AM CV05 + 2C SB)', size = med)
+axes[1,1].set_title('(d) b - (a + c)', size = med)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c', ax = axes[1,1])
