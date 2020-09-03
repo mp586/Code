@@ -18,6 +18,8 @@ import cell_area as ca
 sys.path.insert(0, '/scratch/mp586/Code/Graphics/Graphics_for_chapter3/MSE')
 import gradients as gr, model_constants as mc
 
+
+
 ctl_model = input('Enter model name as string ')
 if (ctl_model == 'Isca') or (ctl_model == 'isca'): 
     control_model = 'Isca_DATA'

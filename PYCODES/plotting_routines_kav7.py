@@ -19,7 +19,8 @@ from matplotlib.patches import Rectangle
 from scipy.odr import Model, Data, ODR
 sys.path.insert(0, os.path.join(GFDL_BASE,'src/extra/python/scripts'))
 import cell_area as ca
-
+sys.path.insert(0, '/scratch/mp586/Code/Graphics/Graphics_for_chapter3/MSE')
+import gradients as gr, model_constants as mc
 
 class MidpointNormalize(colors.Normalize):
 	"""
@@ -6313,6 +6314,69 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.png')
 	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.svg', bbox_inches='tight')
 	fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/w'+str(vertmult)+'_'+plotname+'_'+str(minlat)+'N-'+str(maxlat)+'N_lgefonts_nonshift.pdf', dpi=400)
+
+def column_int(var_in):
+	var_int = var_in.sum('pfull')/mc.grav
+	return var_int
+
+def check_water_conservation(sphum, P, E, bucket = None, using_interpolated_data = True, continents = 'aquaplanet', option = None):
+
+
+	data_dp = xr.open_dataset('/scratch/mp586/Isca_DATA/ISCA_HPC/withtv/aquaplanet_frierson_insolation_0qflux_mld20_commitd15c267/run0121/atmos_monthly.nc')
+	dp = data_dp.phalf.diff('phalf')*100
+	if using_interpolated_data == False: 
+		dp = xr.DataArray(dp, coords = [sphum.pfull.values], dims = ['pfull'])
+	else: 
+		dp = xr.DataArray(dp[::-1], coords = [sphum.pfull.values], dims = ['pfull'])
+
+	area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/Isca/') # added _all because then dx and dy are also returned 
+	area_array = xr.DataArray(area_array, coords=[sphum.lat,sphum.lon], dims = ['lat','lon'])	
+	landfile=Dataset(os.path.join(GFDL_BASE,'input/'+continents+'/land.nc'),mode='r')
+	landmask=landfile.variables['land_mask'][:]
+	landlats=landfile.variables['lat'][:]
+	landlons=landfile.variables['lon'][:]
+	landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+
+	ciwv = column_int(sphum*dp)
+
+	fig, axes = plt.subplots(3,1, figsize = (10,30))
+
+	time=[np.array(np.linspace(0,len(sphum.time),len(sphum.time),dtype='datetime64[M]'))]
+	ciwv = xr.DataArray(ciwv,coords = [time[0], sphum.lat, sphum.lon], dims = ['time','lat','lon'])
+	ciwv_yrs =  ciwv #.groupby('time.year').mean('time')
+	ciwv_yrs_AA = ciwv_yrs*area_array 
+	timeseries_ciwv_yrs = ciwv_yrs_AA.sum(['lat','lon'])
+	axes[1].plot(np.linspace(1,len(ciwv_yrs),len(ciwv_yrs)),timeseries_ciwv_yrs, 'r')
+
+	axes[1].plot(np.linspace(1,len(ciwv_yrs),len(ciwv_yrs)),timeseries_ciwv_yrs.rolling(time=12, center=True).mean(), 'k')
+
+	timeseries_bucket_yrs = timeseries_ciwv_yrs*0.
+	if bucket is not None: 
+		time=[np.array(np.linspace(0,len(bucket.time),len(bucket.time),dtype='datetime64[M]'))]
+		bucket = xr.DataArray(bucket,coords = [time[0], sphum.lat, sphum.lon], dims = ['time','lat','lon'])
+		bucket_yrs = bucket #.groupby('time.year').mean('time')
+		bucket_yrs_AA = (bucket_yrs*area_array)
+		timeseries_bucket_yrs = bucket_yrs_AA.where(landmask == 1.).sum(['lat','lon'])/ area_array.sum()
+		if option == 'all_land':
+			timeseries_bucket_yrs = bucket_yrs_AA.where(landmask == 0.).sum(['lat','lon'])/ area_array.sum()
+		axes[2].plot(np.linspace(1,len(bucket_yrs),len(bucket_yrs)),timeseries_bucket_yrs,'b')
+		axes[2].plot(np.linspace(1,len(bucket_yrs),len(bucket_yrs)),timeseries_bucket_yrs.rolling(time=12, center=True).mean(), 'k')
+
+#	axes[0].plot(np.linspace(1,len(ciwv_yrs.year),len(ciwv_yrs.year)), timeseries_ciwv_yrs + timeseries_bucket_yrs, 'k')
+
+	PE = xr.DataArray((P-E),coords = [time[0], sphum.lat, sphum.lon], dims = ['time','lat','lon']) # convert P-E back from mm/d to mm/s , mm/s = kg/m^2s for water
+	PE_yrs = PE #.groupby('time.year').mean('time')
+	PE_yrs_AA = PE_yrs * area_array 
+	timeseries_PE_yrs = PE_yrs_AA.sum(['lat','lon']) / area_array.sum()
+	axes[0].plot(np.linspace(1,len(ciwv_yrs),len(ciwv_yrs)), timeseries_PE_yrs, 'orange')
+	axes[0].plot(np.linspace(1,len(ciwv_yrs),len(ciwv_yrs)), timeseries_PE_yrs.rolling(time=12, center=True).mean(), 'k')
+	axes[0].set_title('Global average P-E (mm/d)')
+	axes[1].set_title('Atmospheric water content (kg)')
+	axes[2].set_title('Global average bucket depth over land (m)')
+	plt.show()
+
+	return timeseries_PE_yrs
+
 
 
 	# -----------------------------------------------------------------------------------
