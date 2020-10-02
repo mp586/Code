@@ -171,7 +171,7 @@ fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl
 
 ##### statistical tests 
 
-# check that the degrees of freedom are in fact = the number of years (i.e. number of datapoints for each gridpoint):
+# check that the datapoints are independent i.e. no auto-correlation:
 rs = np.empty_like(pctl_annual_mean[0])
 
 for i in range(len(precipitation1.lat)):
@@ -179,22 +179,32 @@ for i in range(len(precipitation1.lat)):
         r, p = scipy.stats.pearsonr(pctl_annual_mean[1:30,i,j],pctl_annual_mean[0:29,i,j])
         rs[i,j] = r
 
-rs.mean()
-rs.max()
-rs.min()
 plt.plot(np.sort(rs.flatten()))
+
+rs_pearson = rs
+
+rs = np.empty_like(pctl_annual_mean[0])
+
+for i in range(len(precipitation1.lat)):
+    for j in range(len(precipitation1.lon)):
+        r, p = scipy.stats.pearsonr(pavg_annual_mean[1:30,i,j],pavg_annual_mean[0:29,i,j]) 
+        rs[i,j] = r
+
+plt.plot(np.sort(rs.flatten()))
+
+rs_pearson_pert = rs
 
 
 small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
 med = 22 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 26 #largefonts 22 # smallfonts 18 # medfonts = 20
 
-v = np.linspace(-1.,1.,21)
+v = np.linspace(-0.3,0.3,7)
 nmb_contours = [.05,.1]
 
 # South America Only 
 
-array = rs
+array = rs_pearson
 ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
 
 lats=ctl_array.lat
@@ -206,9 +216,9 @@ landlons = np.asarray(landmaskxr.lon)
 landmask = np.asarray(landmaskxr)
 
 
-fig, axes = plt.subplots(1, 1, figsize = (25,10))
+fig, axes = plt.subplots(1, 1, figsize = (28,10))
 
-axes.set_title('a) $\Delta P$', size = med)
+axes.set_title('Autocorrelation', size = lge)
 #fig = plt.figure()
 
 m = Basemap(projection='kav7',lon_0=0.,resolution='c')
@@ -220,21 +230,24 @@ array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=F
 
 array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
-ctl_array = np.asarray(ctl_array)
-ctl_array, lons_cyclic = addcyclic(ctl_array, lons)
-ctl_array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,ctl_array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
-ctl_array = xr.DataArray(ctl_array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+# array2 = xr.DataArray(rs_pearson_pert,coords=[lats,lons],dims=['lat','lon'])
+
+# array2 = np.asarray(array2)
+# array2, lons_cyclic = addcyclic(array2, lons)
+# array2,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+# array2 = xr.DataArray(array2,coords=[lats,lons_cyclic],dims=['lat','lon'])
 
 lons = lons_cyclic
-m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
-m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=small)
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=med)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=med)
 
 lon, lat = np.meshgrid(lons, lats)
 xi, yi = m(lon, lat)
 
-cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+cs = m.contourf(xi,yi,array.where(np.abs(array) < 0.3), v, cmap='RdBu')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
@@ -247,7 +260,203 @@ landmask, lons_cyclic = addcyclic(landmask, landlons)
 
 if np.any(landmask != 0.):
     m.contour(xi,yi,landmask, 1)
-cbar = fig.colorbar(cs, orientation = 'vertical', shrink = 0.5) # usually on right 
+cbar = fig.colorbar(cs, orientation = 'vertical', shrink = 0.8) # usually on right 
+cbar.set_label('Correlation coefficient', size=med)
+cbar.ax.tick_params(labelsize=med)
+
+land = 'all_continents'
+landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
+
+landmask=landfile.variables['land_mask'][:]
+landlats=landfile.variables['lat'][:]
+landlons=landfile.variables['lon'][:]
+# for specified lats
+landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+
+fig.savefig('/scratch/mp586/Code/Graphics/Pearson_r_strict_ctl.pdf', bbox_inches='tight')
+
+
+
+# test whether the assumption of normal distribution applies 
+
+rs = np.empty_like(pctl_annual_mean[0])
+
+for i in range(len(precipitation1.lat)):
+    for j in range(len(precipitation1.lon)):
+        a, rs[i,j] = scipy.stats.shapiro(pctl_annual_mean[:,i,j])
+
+rs_shapiro = rs
+
+rs = np.empty_like(pctl_annual_mean[0])
+
+for i in range(len(precipitation1.lat)):
+    for j in range(len(precipitation1.lon)):
+        a, rs[i,j] = scipy.stats.shapiro(pavg_annual_mean[:,i,j])
+
+rs_shapiro_pert = rs
+
+array = rs_shapiro
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+lats=ctl_array.lat
+lons=ctl_array.lon
+
+landlats = np.asarray(landmaskxr.lat)
+landlons = np.asarray(landmaskxr.lon)
+
+landmask = np.asarray(landmaskxr)
+
+
+fig, axes = plt.subplots(1, 1, figsize = (28,10))
+
+axes.set_title('Shapiro Wilk test', size = lge)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c')
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+
+array2 = rs_shapiro_pert
+array2 = xr.DataArray(array2,coords=[lats,lons],dims=['lat','lon'])
+
+array2 = np.asarray(array2)
+array2, lons_cyclic = addcyclic(array2, lons)
+array2,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array2,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array2 = xr.DataArray(array2,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=med)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=med)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array.where(array>0.05).where(array2>0.05), np.linspace(0.,1.,21), cmap='Blues')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+cbar = fig.colorbar(cs, orientation = 'vertical', shrink = 0.8) # usually on right 
+cbar.ax.tick_params(labelsize=med)
+cbar.set_label('p-value', fontsize = lge)
+land = 'all_continents'
+landfile=Dataset(os.path.join(GFDL_BASE,'input/'+land+'/land.nc'),mode='r')
+
+landmask=landfile.variables['land_mask'][:]
+landlats=landfile.variables['lat'][:]
+landlons=landfile.variables['lon'][:]
+# for specified lats
+landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+fig.savefig('/scratch/mp586/Code/Graphics/Shapiro_p_ctlpert.pdf', bbox_inches='tight')
+
+
+
+small = 14 #largefonts 14 # smallfonts 10 # medfonts = 14
+med = 22 #largefonts 18 # smallfonts 14 # medfonts = 16
+lge = 26 #largefonts 22 # smallfonts 18 # medfonts = 20
+
+v = np.linspace(-1.,1.,21)
+
+# South America Only 
+
+array = precipitation1_avg - precipitation1_avg_ctl
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+
+lats=ctl_array.lat
+lons=ctl_array.lon
+
+landlats = np.asarray(landmaskxr.lat)
+landlons = np.asarray(landmaskxr.lon)
+
+landmask = np.asarray(landmaskxr)
+
+
+fig, axes = plt.subplots(1, 1, figsize = (28,10))
+
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c')
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+# pval_pctl_pavg = xr.DataArray(pval_pctl_pavg,coords=[lats,lons],dims=['lat','lon'])
+rs_shapiro = xr.DataArray(rs_shapiro,coords=[lats,lons],dims=['lat','lon'])
+rs_pearson = xr.DataArray(rs_pearson,coords=[lats,lons],dims=['lat','lon'])
+
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+
+
+pval_pctl_pavg = np.asarray(pval_pctl_pavg)
+pval_pctl_pavg, lons_cyclic = addcyclic(pval_pctl_pavg, lons)
+pval_pctl_pavg,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,pval_pctl_pavg,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+pval_pctl_pavg = xr.DataArray(pval_pctl_pavg,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+rs_pearson = np.asarray(rs_pearson)
+rs_pearson, lons_cyclic = addcyclic(rs_pearson, lons)
+rs_pearson,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,rs_pearson,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+rs_pearson = xr.DataArray(rs_pearson,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+rs_shapiro = np.asarray(rs_shapiro)
+rs_shapiro, lons_cyclic = addcyclic(rs_shapiro, lons)
+rs_shapiro,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,rs_shapiro,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+rs_shapiro = xr.DataArray(rs_shapiro,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+# rs_pearson_pert = np.asarray(rs_pearson_pert)
+# rs_pearson_pert, lons_cyclic = addcyclic(rs_pearson_pert, lons)
+# rs_pearson_pert,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,rs_pearson_pert,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+# rs_pearson_pert = xr.DataArray(rs_pearson_pert,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+# rs_shapiro_pert = np.asarray(rs_shapiro_pert)
+# rs_shapiro_pert, lons_cyclic = addcyclic(rs_shapiro_pert, lons)
+# rs_shapiro_pert,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,rs_shapiro_pert,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+# rs_shapiro_pert = xr.DataArray(rs_shapiro_pert,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+
+lons = lons_cyclic
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=med)
+m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,1], fontsize=med)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array.where(np.abs(rs_pearson) < 0.3).where(rs_shapiro > 0.05), v, cmap='BrBG', extend = 'both')
+stip = m.contourf(xi,yi,pval_pctl_pavg.where(pval_pctl_pavg < 0.05), hatches = '.', alpha = 0)
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+cbar = fig.colorbar(cs, orientation = 'vertical', shrink = 0.8) # usually on right 
 cbar.set_label('mm/d', size=med)
 cbar.ax.tick_params(labelsize=med)
 
@@ -259,4 +468,11 @@ landlats=landfile.variables['lat'][:]
 landlons=landfile.variables['lon'][:]
 # for specified lats
 landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_120-480_stippling_shapiro_strictpearson.png', bbox_inches='tight', dpi=100)
+
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_120-480_stippling_shapiro_strictpearson.svg', bbox_inches='tight', dpi=100)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_120-480_stippling_shapiro_strictpearson.pdf', bbox_inches='tight', dpi=400)
+
+
 
