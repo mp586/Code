@@ -287,6 +287,8 @@ cbar.set_label('E$_P$/P', fontsize = med)
 
 fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Energy_v_moisture_limits_40S40N_120-480.png', bbox_inches='tight', dpi=100)
 fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Energy_v_moisture_limits_40S40N_120-480.pdf', bbox_inches='tight', dpi=400)
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Energy_v_moisture_limits_40S40N_120-480.eps', bbox_inches='tight', dpi=600)
+
 
 # fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref02_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP02_P-Econts_40S40N_ctl_25-121_pert_24-120.png', bbox_inches='tight', dpi=100)
 # fig.savefig('/scratch/mp586/Code/Graphics/Isca/full_continents_newbucket_fixedSSTs_zonally_symmetric_vegetation_vegpref02_plus_2pt52K_and_2xCO2_spinup_361_witholr/Pavg_minus_ctl_bucket_vs_VP02_P-Econts_40S40N_ctl_25-121_pert_24-120.svg', bbox_inches='tight', dpi=100)
