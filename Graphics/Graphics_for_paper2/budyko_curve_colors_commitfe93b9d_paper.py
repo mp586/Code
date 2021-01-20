@@ -433,21 +433,21 @@ axes[0].set_title('a) America', fontsize = lge)
 axes[0].set_xlabel('$E_P/P$', fontsize = med)
 axes[0].set_ylabel('$E/P$', fontsize = med)
 
-axes[0].plot((epAM_ctl/PAM_ctl), fu_ctlAM, '*', color = 'rosybrown', markersize = 5, label = 'bucket ctl')
+axes[0].plot((epAM_ctl/PAM_ctl), fu_ctlAM, '*', color = 'rosybrown', markersize = 5, label = '100%cond, lowCO$_2$')
 # axes[0].plot((Ep_AM_estim_ctl/PAM_ctl), fu_ctlAM_estim, 'k*', label = 'Fu Eq. estim')
 
-axes[0].plot((epAM/PAM), fu_SB_AM, '*', color = 'cyan', markersize = 5, label = 'bucket pert')
-axes[0].plot((epAMveg/PAMveg), fu_veg_AM, '*', color = 'seagreen', markersize = 5, label = '50%cond pert')
+axes[0].plot((epAM/PAM), fu_SB_AM, '*', color = 'cyan', markersize = 5, label = '100%cond, highCO$_2$')
+axes[0].plot((epAMveg/PAMveg), fu_veg_AM, '*', color = 'seagreen', markersize = 5, label = '50%cond, highCO$_2$')
 
 axes[0].spines['right'].set_visible(False)
 axes[0].spines['top'].set_visible(False)
 
 
-axes[1].plot((epAFveg/PAFveg), (EAFveg/PAFveg), 'o', color = 'seagreen', markersize=3, label = '50%cond pert')
-axes[1].plot((epAF_ctl/PAF_ctl), (EAF_ctl/PAF_ctl), 'o', color = 'rosybrown', markersize = 3, label = 'bucket ctl')
+axes[1].plot((epAFveg/PAFveg), (EAFveg/PAFveg), 'o', color = 'seagreen', markersize=3, label = '50%cond, highCO$_2$')
+axes[1].plot((epAF_ctl/PAF_ctl), (EAF_ctl/PAF_ctl), 'o', color = 'rosybrown', markersize = 3, label = '100%cond, lowCO$_2$')
 # axes[1].plot((Ep_AF_estim_ctl/PAF_ctl), (EAF_ctl/PAF_ctl), 'b*', label = 'control estim')
 
-axes[1].plot((epAF/PAF), (EAF/PAF), 'o', color = 'cyan', markersize = 3, label = 'bucket pert')
+axes[1].plot((epAF/PAF), (EAF/PAF), 'o', color = 'cyan', markersize = 3, label = '100%cond, highCO$_2$')
 axes[1].plot([1.0,1.0],[0.0,1.0],color='dimgray',linewidth=2, linestyle = 'dashed')
 axes[1].plot([1.0,10.0],[1.0,1.0],color='dimgray',linewidth=2, linestyle = 'dashed')
 axes[1].plot([0.0,1.0],[0.0,1.0],color='dodgerblue',linewidth=2, linestyle = 'dashed')
@@ -537,7 +537,102 @@ outdir = 'Isca/ISCA_HPC/'+dire
 lats = precipitationAM_avg.lat
 lons = precipitationAM_avg.lon
 
-fig = plt.figure(figsize = (15,6.5))
+
+
+###### original version of the plot 
+
+# fig = plt.figure(figsize = (16,4))
+
+# v = np.linspace(0.,2.,21)
+
+# valuesAM = [epAM_avg_ctl/precipitationAM_avg_ctl, epAM_avg/precipitationAM_avg, epAMveg_avg/precipitationAMveg_avg]
+# valuesAF = [epAF_avg_ctl/precipitationAF_avg_ctl, epAF_avg/precipitationAF_avg, epAFveg_avg/precipitationAFveg_avg]
+
+
+# name = ['100%cond, lowCO$_2$', '100%cond, highCO$_2$', '50%cond, highCO$_2$']
+
+
+
+# m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-30, urcrnrlon=170)
+
+
+# units = ''
+# for i in range(len(valuesAM)):
+
+#     ax = plt.subplot2grid((2, 3), (0, i))
+#     ax.set_title(name[i], size = small)
+#     if i == 0:
+#         ax.set_ylabel('AM', size = small)
+
+#     # array = (valuesAM[i].where(valuesAM[i]<=2.0)).where(landmaskAM == 1)
+#     array = (valuesAM[i]).where(landmaskAM == 1)
+
+#     array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+#     array = np.asarray(array)
+#     array, lons_cyclic = addcyclic(array, lons)
+#     array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+#     array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+#     # m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+#     # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+#     lon, lat = np.meshgrid(lons_cyclic, lats)
+#     xi, yi = m(lon, lat)
+#     cs = m.contourf(xi,yi,array, v, cmap='RdGy_r', extend = 'max')
+
+
+#     # landmask,landlons_shift = shiftgrid(np.max(landlons)-180.,landmaskAM,landlons,start=False,cyclic=np.max(landlons))
+#     # landmask, lons_cyclic = addcyclic(landmask, landlons_shift)
+#     # m.contour(xi,yi,landmask, 1, colors = 'k')
+
+#     ax = plt.subplot2grid((2, 3), (1, i))
+#  #   ax.set_title(name[i], size = small)
+#     if i == 0: 
+#         ax.set_ylabel('AF', size = small)
+
+#     # array = (valuesAF[i].where(valuesAF[i]<=2.0)).where(landmaskAF == 1)
+#     array = (valuesAF[i]).where(landmaskAF == 1)
+
+#     array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+#     array = np.asarray(array)
+#     array, lons_cyclic = addcyclic(array, lons)
+#     array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+#     array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+#     # m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+#     # m.drawmeridians(np.arange(-180.,180.,60.),labels=[0,0,0,0], fontsize=small)
+
+#     lon, lat = np.meshgrid(lons_cyclic, lats)
+#     xi, yi = m(lon, lat)
+
+#     cs = m.contourf(xi,yi,array, v, cmap='RdGy_r', extend = 'max')
+
+
+#     # landmask,landlons_shift = shiftgrid(np.max(landlons)-180.,landmaskAF,landlons,start=False,cyclic=np.max(landlons))
+#     # landmask, lons_cyclic = addcyclic(landmask, landlons_shift)
+#     # m.contour(xi,yi,landmask, 1, colors = 'k')
+
+
+
+# plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
+# cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
+# cbar = plt.colorbar(cs, cax = cb_ax, ticks = [0,1,2])
+# cbar.ax.set_yticklabels(['0', '1', '2'])  # vertically oriented colorbar
+# cbar.ax.tick_params(labelsize=small)
+# cbar.set_label('E$_P$/P', fontsize = small)
+
+# plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.png', bbox_inches = 'tight', format = 'png', dpi = 400)
+# plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.pdf', bbox_inches = 'tight', format = 'pdf')
+# plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.eps', bbox_inches = 'tight', format = 'eps', dpi = 600)
+
+
+#### paper version of the plot 
+
+fig = plt.figure(figsize = (10,4))
 
 v = np.linspace(0.,2.,21)
 
@@ -545,18 +640,21 @@ valuesAM = [epAM_avg_ctl/precipitationAM_avg_ctl, epAM_avg/precipitationAM_avg, 
 valuesAF = [epAF_avg_ctl/precipitationAF_avg_ctl, epAF_avg/precipitationAF_avg, epAFveg_avg/precipitationAFveg_avg]
 
 
-name = ['ctl', 'bucket', '50%cond']
+name = ['(a) 100%cond\n    lowCO$_2$', '(b) 100%cond\n     highCO$_2$', '(c) 50%cond\n      highCO$_2$']
 
 
 
-m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-30, urcrnrlon=170)
+# m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-30, urcrnrlon=170)
 
 
 units = ''
 for i in range(len(valuesAM)):
 
     ax = plt.subplot2grid((2, 3), (0, i))
-    ax.set_title('AM '+name[i], size = med)
+    m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-20, urcrnrlon=80)
+    ax.set_title(name[i], size = small)
+    if i == 0:
+        ax.set_ylabel('AM', size = small)
 
     # array = (valuesAM[i].where(valuesAM[i]<=2.0)).where(landmaskAM == 1)
     array = (valuesAM[i]).where(landmaskAM == 1)
@@ -582,7 +680,10 @@ for i in range(len(valuesAM)):
     # m.contour(xi,yi,landmask, 1, colors = 'k')
 
     ax = plt.subplot2grid((2, 3), (1, i))
-    ax.set_title('AF '+name[i], size = med)
+ #   ax.set_title(name[i], size = small)
+    m = Basemap(projection='cyl',resolution='c', llcrnrlat=-40, urcrnrlat=40,llcrnrlon=60, urcrnrlon=160)
+    if i == 0: 
+        ax.set_ylabel('AF', size = small)
 
     # array = (valuesAF[i].where(valuesAF[i]<=2.0)).where(landmaskAF == 1)
     array = (valuesAF[i]).where(landmaskAF == 1)
@@ -611,15 +712,34 @@ for i in range(len(valuesAM)):
 
 
 plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.8, wspace=0.02, hspace=0.02)
-cb_ax = plt.axes([0.83, 0.3, 0.01, 0.4])
+cb_ax = plt.axes([0.83, 0.26, 0.02, 0.5])
 cbar = plt.colorbar(cs, cax = cb_ax, ticks = [0,1,2])
 cbar.ax.set_yticklabels(['0', '1', '2'])  # vertically oriented colorbar
-cbar.ax.tick_params(labelsize=med)
-cbar.set_label('E$_P$/P', fontsize = med)
+cbar.ax.tick_params(labelsize=small)
+cbar.set_label('E$_P$/P', fontsize = small)
 
-plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.png', bbox_inches = 'tight', format = 'png', dpi = 400)
-plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.pdf', bbox_inches = 'tight', format = 'pdf')
-plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix.eps', bbox_inches = 'tight', format = 'eps', dpi = 600)
+plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix_paper.png', bbox_inches = 'tight', format = 'png', dpi = 400)
+plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix_paper.pdf', bbox_inches = 'tight', format = 'pdf')
+plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AMAF_matrix_paper.eps', bbox_inches = 'tight', format = 'eps', dpi = 600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # fig = plt.figure(figsize = (15,6.5))
@@ -1012,66 +1132,6 @@ plt.savefig('/scratch/mp586/Code/Graphics/'+outdir+'/Energy_v_moisture_limits_AM
 # fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/budyko_curve_AF_AM.eps', bbox_inches = 'tight', dpi=600)
 
 
-fig,axes = plt.subplots(2,2,sharex = True, figsize = (15,10))
-
-axes[0,0].plot(precipitationAM_avg_ctl.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), net_lheAM_avg_ctl.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'rosybrown', markersize = 5, label = 'bucket ctl')
-axes[0,0].plot(precipitationAM_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), net_lheAM_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'cyan', markersize = 5, label = 'bucket pert')
-axes[0,0].plot(precipitationAMveg_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), net_lheAMveg_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'seagreen', markersize = 5, label = '50%cond pert')
-axes[0,0].set_xlim(0.,12.)
-axes[0,0].set_ylim(0.,6.)
-
-axes[0,0].spines['right'].set_visible(False)
-axes[0,0].spines['top'].set_visible(False)
-
-axes[0,0].set_title('a) $E$ America', fontsize = med)
-axes[0,0].set_ylabel('$E$ (mm/d)', fontsize = med)
-
-
-
-axes[0,1].plot(precipitationAF_avg_ctl.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), net_lheAF_avg_ctl.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'rosybrown', markersize = 5)
-axes[0,1].plot(precipitationAF_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), net_lheAF_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'cyan', markersize = 5)
-axes[0,1].plot(precipitationAFveg_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), net_lheAFveg_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'seagreen', markersize = 5)
-
-axes[0,1].set_title('b) $E$ Africa', fontsize = med)
-axes[0,1].set_ylim(0.,6.)
-
-
-axes[0,1].spines['right'].set_visible(False)
-axes[0,1].spines['top'].set_visible(False)
-
-
-axes[1,0].plot(precipitationAM_avg_ctl.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), epAM_avg_ctl.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'rosybrown', markersize = 5)
-axes[1,0].plot(precipitationAM_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), epAM_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'cyan', markersize = 5)
-axes[1,0].plot(precipitationAMveg_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), epAMveg_avg.where(landmaskAM == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'seagreen', markersize = 5)
-axes[1,0].set_xlabel('$P$ (mm/d)', fontsize = med)
-axes[1,0].set_ylabel('$E_P$ (mm/d)', fontsize = med)
-axes[1,0].set_ylim(0.,50.)
-axes[1,0].set_title('c) $E_P$ America', fontsize = med)
-
-axes[1,0].spines['right'].set_visible(False)
-axes[1,0].spines['top'].set_visible(False)
-
-axes[1,1].plot(precipitationAF_avg_ctl.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), epAF_avg_ctl.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'rosybrown', markersize = 5)
-axes[1,1].plot(precipitationAF_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), epAF_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'cyan', markersize = 5)
-axes[1,1].plot(precipitationAFveg_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), epAFveg_avg.where(landmaskAF == 1.).sel(lat = slice(-10., 10.)), 'o', color = 'seagreen', markersize = 5)
-axes[1,1].set_xlabel('$P$ (mm/d)', fontsize = med)
-axes[1,1].set_ylim(0.,50.)
-
-axes[1,1].spines['right'].set_visible(False)
-axes[1,1].spines['top'].set_visible(False)
-axes[1,1].set_title('d) $E_P$ Africa', fontsize = med)
-
-
-axes[0,0].tick_params(labelsize = med)
-axes[0,1].tick_params(labelsize = med)
-axes[1,0].tick_params(labelsize = med)
-axes[1,1].tick_params(labelsize = med)
-fig.legend(fontsize = med, markerscale = 1.5, bbox_to_anchor=(0.85,0.45))
-
-
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/budyko_curve_E_Ep_AM_AF_paper.pdf', bbox_inches = 'tight', dpi=400)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/budyko_curve_E_Ep_AM_AF_paper.png', bbox_inches = 'tight', dpi=400)
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/budyko_curve_E_Ep_AM_AF_paper.eps', bbox_inches = 'tight', dpi=600)
 
 
 

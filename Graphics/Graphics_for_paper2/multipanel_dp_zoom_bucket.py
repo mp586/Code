@@ -134,7 +134,7 @@ med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-names = ['0%cond', 'bucket']
+names = ['0%cond', '100%cond']
 conts = ['6$^{\circ}$','8$^{\circ}$','AM']
 
 fig = plt.figure(figsize = (22,15))
@@ -190,7 +190,7 @@ cbar.set_label(units, size = med)
 cbar.ax.tick_params(labelsize=med)
 
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_zoombucket_'+variable+'_avg_minus_ctl_120-480_lowcbar.png', bbox_inches = 'tight', format = 'png', dpi = 400)
-plt.savefig('/scratch/mp586/Code/Graphics/multipanel_zoombucket_'+variable+'_avg_minus_ctl_120-480_lowcbar.pdf', bbox_inches = 'tight', format = 'pdf')
+plt.savefig('/scratch/mp586/Code/Graphics/multipanel_zoombucket_'+variable+'_avg_minus_ctl_120-480_lowcbar.pdf', bbox_inches = 'tight', format = 'pdf', dpi = 400)
 plt.savefig('/scratch/mp586/Code/Graphics/multipanel_zoombucket_'+variable+'_avg_minus_ctl_120-480_lowcbar.eps', bbox_inches = 'tight', format = 'eps', dpi = 600)
 
 

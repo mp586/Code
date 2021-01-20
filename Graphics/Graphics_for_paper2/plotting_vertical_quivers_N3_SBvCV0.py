@@ -88,7 +88,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[0].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
     # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-    axes[0].set_title('(a) 6$^{\circ}$ 0%cond', fontsize = med)
+    axes[0].set_title('(a) 0%cond', fontsize = med)
 
     # Africa Only 
 
@@ -139,7 +139,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[1].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
     #qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-    axes[1].set_title('(b) 6$^{\circ}$ bucket', fontsize = med)
+    axes[1].set_title('(b) 100%cond', fontsize = med)
 
     # Two continents - America 
 
@@ -191,7 +191,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[2].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #    qk = axes[2].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-    axes[2].set_title('(c) 6$^{\circ}$ 0% - bucket', fontsize = med)
+    axes[2].set_title('(c) 0% - 100%cond', fontsize = med)
 
     fig.gca().invert_yaxis()
 

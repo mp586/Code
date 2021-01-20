@@ -162,7 +162,7 @@ pert_dict = {'CV0': vp0_dirs,
 'SB': simple_bucket_dirs}
 
 pert_list = ['CV0','CV02','CV05','CV07','SB']
-pert_list_names = ['0%cond','20%cond','50%cond','70%cond','bucket']
+pert_list_names = ['0%cond','20%cond','50%cond','70%cond','100%cond']
 
 precip_pert_matrix = np.zeros((len(vp0_dirs),len(pert_list)))
 precip_ctl_matrix = np.zeros((len(vp0_dirs),len(pert_list)))
@@ -247,9 +247,9 @@ for k in range(len(minlats)):
 		addition = warming_only + stomata_only
 		full = precip_pert_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 
-		axes[0].plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = 'bucket ctl')
-		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = 'bucket pert')
-		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = '50%cond pert')
+		axes[0].plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
+		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
+		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
 
 
 		axes[0].spines['right'].set_visible(False)
@@ -266,10 +266,10 @@ for k in range(len(minlats)):
 
 
 		axes[1].plot([6,14,25,40,60,100],[0,0,0,0,0,0],'k')
-		axes[1].plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = 'bucket (pert - ctl)')
-		axes[1].plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = 'stomata ('+pert_list_names[j]+' ctl - bucket ctl)')
-		axes[1].plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = 'bucket + stomata')
-		axes[1].plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = 'full change ('+pert_list_names[j]+' pert - bucket ctl)')
+		axes[1].plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
+		axes[1].plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
+		axes[1].plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
+		axes[1].plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
 		axes[1].legend(fontsize = med, loc = 'lower right')
 
 		axes[1].spines['right'].set_visible(False)
@@ -317,9 +317,9 @@ for k in range(len(minlats)):
 		addition = warming_only + stomata_only
 		full = precip_pert_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 
-		axes.plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = 'bucket ctl')
-		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = 'bucket pert')
-		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = '50%cond pert')
+		axes.plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
+		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
+		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
 
 
 		axes.spines['right'].set_visible(False)
@@ -360,10 +360,10 @@ for k in range(len(minlats)):
 
 
 		axes.plot([6,14,25,40,60,100],[0,0,0,0,0,0],'k')
-		axes.plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = 'bucket (pert - ctl)')
-		axes.plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = 'stomata ('+pert_list_names[j]+' ctl - bucket ctl)')
-		axes.plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = 'bucket + stomata')
-		axes.plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = 'full change ('+pert_list_names[j]+' pert - bucket ctl)')
+		axes.plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
+		axes.plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
+		axes.plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
+		axes.plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
 		axes.legend(fontsize = med, loc = 'lower right')
 
 		axes.spines['right'].set_visible(False)

@@ -247,10 +247,10 @@ lons=array.lon
 
 fig, axes = plt.subplots(3,1, figsize = (10,8))
 
-axes[1].set_title('(b) 2C - AM (bucket)', size = med)
+axes[0].set_title('(a) $\Delta P_{100\%cond}$', size = lge)
 #fig = plt.figure()
 
-m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
+m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
@@ -295,9 +295,9 @@ array = precipitation4_avg - precipitation4_avg_ctl - (precipitation2_avg - prec
 lats=array.lat
 lons=array.lon
 
-axes[0].set_title('(a) 2C - AM (50%cond)', size = med)
+axes[1].set_title('(b) $\Delta P_{50\%cond}$', size = lge)
 #fig = plt.figure()
-m = Basemap(projection='cyl',resolution='c', ax = axes[0],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
+m = Basemap(projection='cyl',resolution='c', ax = axes[1],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
 array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
 
 array = np.asarray(array)
@@ -329,7 +329,7 @@ array =  ((precipitation4_avg - precipitation4_avg_ctl) - (precipitation2_avg - 
 lats=array.lat
 lons=array.lon
 
-axes[2].set_title('(c) 2C - AM (50%cond - bucket)', size = med)
+axes[2].set_title('(c) $\Delta P_{50\%cond}$ - $\Delta P_{100\%cond}$', size = lge)
 #fig = plt.figure()
 
 m = Basemap(projection='cyl',resolution='c', ax = axes[2],llcrnrlat=-40, urcrnrlat=40,llcrnrlon=-180, urcrnrlon=180)
@@ -370,33 +370,33 @@ fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/Pavg_minus_ctl_
 
 plt.close('all')
 
-landmask=landfile.variables['land_mask'][:]
-landlats=landfile.variables['lat'][:]
-landlons=landfile.variables['lon'][:]
-# for specified lats
-landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+# landmask=landfile.variables['land_mask'][:]
+# landlats=landfile.variables['lat'][:]
+# landlons=landfile.variables['lon'][:]
+# # for specified lats
+# landmaskxr=xr.DataArray(landmask,coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
 
 
-dP_SB =  (precipitation1_avg - precipitation1_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
-dP_VP05 = (precipitation2_avg - precipitation2_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
+# dP_SB =  (precipitation1_avg - precipitation1_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
+# dP_VP05 = (precipitation2_avg - precipitation2_avg_ctl).where(landmask == 1).sel(lat = slice(-30.,30.))
 
-dP_SB = np.asarray(dP_SB).flatten()
-dP_VP05 = np.asarray(dP_VP05).flatten()
+# dP_SB = np.asarray(dP_SB).flatten()
+# dP_VP05 = np.asarray(dP_VP05).flatten()
 
 
-fig, ax = plt.subplots()
-ax.plot(dP_SB, dP_VP05, 'k.')
-ax.set_xlim(-6.,6.)
-ax.set_ylim(-6.,6.)
-ax.set_ylabel('$\Delta P$ (50%cond) in mm/d')
-ax.set_xlabel('$\Delta P$ (bucket) in mm/d')
+# fig, ax = plt.subplots()
+# ax.plot(dP_SB, dP_VP05, 'k.')
+# ax.set_xlim(-6.,6.)
+# ax.set_ylim(-6.,6.)
+# ax.set_ylabel('$\Delta P$ (50%cond) in mm/d')
+# ax.set_xlabel('$\Delta P$ (bucket) in mm/d')
 
-mask = ~np.isnan(dP_SB)
+# mask = ~np.isnan(dP_SB)
 
-[k,dy,r,p,stderr] = linreg(dP_SB[mask],dP_VP05[mask]) # aa = 8.4, dq = -32
-x1 = np.linspace(np.min(dP_SB[mask]),np.max(dP_SB[mask]),500)
-y = k*x1 + dy
-ax.plot(x1,y,'k-')
-ax.annotate('r = '+str("%.2f" % r)+', k = '+str("%.2f" % k)+', dy = '+str("%.2f" % dy), xy=(0.05,0.05), xycoords='axes fraction')
+# [k,dy,r,p,stderr] = linreg(dP_SB[mask],dP_VP05[mask]) # aa = 8.4, dq = -32
+# x1 = np.linspace(np.min(dP_SB[mask]),np.max(dP_SB[mask]),500)
+# y = k*x1 + dy
+# ax.plot(x1,y,'k-')
+# ax.annotate('r = '+str("%.2f" % r)+', k = '+str("%.2f" % k)+', dy = '+str("%.2f" % dy), xy=(0.05,0.05), xycoords='axes fraction')
 
-fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/dP_simple_bucket_versus_dP_VP05.png', bbox_inches='tight', dpi=100)
+# fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/dP_simple_bucket_versus_dP_VP05.png', bbox_inches='tight', dpi=100)
