@@ -2,6 +2,7 @@ from netCDF4 import Dataset
 import numpy as np
 import matplotlib as mpl 
 from matplotlib import pyplot as plt
+from matplotlib import patches as patches 
 from mpl_toolkits.basemap import Basemap, cm
 import xarray as xr
 import pandas as pd
@@ -198,45 +199,9 @@ for k in range(len(minlats)):
 	precip_ctl_matrix[precip_ctl_matrix == 0] = 'nan'
 	precip_pert_matrix[precip_pert_matrix == 0] = 'nan'
 
-	# fig, axes = plt.subplots(1,1, figsize = (10,10))
-
-	# for j in range(len(pert_list)):
-	# 	axes.plot([3,6,12,24,40,60,100],precip_ctl_matrix[:,j], '.', label = ctl_list[j])
-	# 	axes.plot([3,6,12,24,40,60,100],precip_pert_matrix[:,j], '*', label = pert_list[j])
-	# axes.spines['right'].set_visible(False)
-	# axes.spines['top'].set_visible(False)
-	# axes.tick_params(labelsize = med)
-	# axes.tick_params(labelsize = med)
-	# axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-	# axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
-	# fig.legend(fontsize = med, bbox_to_anchor=(0.83,0.83))
-	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_stomata_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	# plt.close()
-
 
 	precip_ctl_matrix_del6 = np.delete(precip_ctl_matrix,1,0)
 	precip_pert_matrix_del6 = np.delete(precip_pert_matrix,1,0)
-
-	# fig, axes = plt.subplots(1,1, figsize = (10,10))
-
-	# axes.plot([3,12,24,40,60,100],precip_ctl_matrix_del6[:,4], 's', markersize = 10., label = 'SB ctl')
-	# axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,4], 'o', markersize = 10., label = 'SB pert')
-	# axes.plot([3,12,24,40,60,100],precip_pert_matrix_del6[:,2], 'v', markersize = 10., label = 'CV05 pert')
-
-
-	# axes.spines['right'].set_visible(False)
-	# axes.spines['top'].set_visible(False)
-	# axes.tick_params(labelsize = med)
-	# axes.tick_params(labelsize = med)
-	# axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-	# axes.set_ylabel('$P$ per Area (mm/d/m$^2$)', fontsize = med)
-	# axes.set_ylim(0.,8.)
-	# axes.set_xlim(0.,110.)
-	# axes.set_xticks([3,12,24,40,60,100])
-	# fig.legend(fontsize = med, loc = 'lower left', bbox_to_anchor=(0.1,0.1))
-	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	# fig.savefig('/scratch/mp586/Code/Graphics/P_ctl_P_pert_SBctl_SBpert_VP05_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-	# plt.close()
 
 
 
@@ -310,7 +275,6 @@ for k in range(len(minlats)):
 # slope totalregress pert= -0.0674703639336
 # slope totalregress veg= -0.0656417572586
 
-
 	for j in range(len(pert_list) - 1):
 		fig, axes = plt.subplots(1,1, figsize = (13,10))
 		stomata_only = precip_ctl_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
@@ -324,32 +288,21 @@ for k in range(len(minlats)):
 
 		axes.spines['right'].set_visible(False)
 		axes.spines['top'].set_visible(False)
+		axes.spines['left'].set_visible(False)
+		axes.spines['bottom'].set_visible(False)
 		axes.tick_params(labelsize = med)
 		axes.tick_params(labelsize = med)
 		axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
 		axes.set_ylabel('P per Area (mm/d/m$^2$)', fontsize = med)
-		axes.set_ylim([0.,8.])
-		axes.set_xlim(0.,110.)
+		axes.set_ylim([0.,9.1])
+		axes.set_xlim(0.,115.)
 		axes.set_xticks([6,14,25,40,60,100])
+		axes.set_yticks(np.arange(0.,9.,1))
 		axes.legend(fontsize = med, loc = 'lower left')
-#		axes.set_title('P vs continental extent', fontsize = med)
 
+		for i in ([6,14,25,40,60,100]):
+			axes.add_patch(patches.Rectangle((i-i*0.1,8),i*0.2,1,fill=False))
 
-		# axes[1].plot([6,14,25,40,60,100],[0,0,0,0,0,0],'k')
-		# axes[1].plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = 'bucket (pert - ctl)')
-		# axes[1].plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = 'stomata ('+pert_list_names[j]+' ctl - bucket ctl)')
-		# axes[1].plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = 'bucket + stomata')
-		# axes[1].plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = 'full change ('+pert_list_names[j]+' pert - bucket ctl)')
-		# axes[1].legend(fontsize = med, loc = 'lower right')
-
-		# axes[1].spines['right'].set_visible(False)
-		# axes[1].spines['top'].set_visible(False)
-		# axes[1].tick_params(labelsize = med)
-		# axes[1].tick_params(labelsize = med)
-		# axes[1].set_ylim([-2., 2.])
-		# axes[1].set_title('(b) $\Delta$ P decomposition vs continental extent', fontsize = med)
-		# axes[1].set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
-		# axes[1].set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.png', bbox_inches = 'tight', format = 'png', dpi=400)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
@@ -359,7 +312,7 @@ for k in range(len(minlats)):
 		fig, axes = plt.subplots(1,1, figsize = (13,10))
 
 
-		axes.plot([6,14,25,40,60,100],[0,0,0,0,0,0],'k')
+		axes.plot([1,110],[0,0],'k')
 		axes.plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
 		axes.plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
 		axes.plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
@@ -368,39 +321,58 @@ for k in range(len(minlats)):
 
 		axes.spines['right'].set_visible(False)
 		axes.spines['top'].set_visible(False)
+		axes.spines['left'].set_visible(False)
+		axes.spines['bottom'].set_visible(False)
 		axes.tick_params(labelsize = med)
 		axes.tick_params(labelsize = med)
-		axes.set_ylim([-2., 2.])
-		axes.set_xlim(0.,110.)
+		axes.set_ylim([-1.51, 2.1])
+		axes.set_xlim(0.,115.)
 		axes.set_xticks([6,14,25,40,60,100])
+		axes.set_yticks(np.arange(-1.5,2.,0.5))
 #		axes.set_title('$\Delta$ P decomposition vs continental extent', fontsize = med)
 		axes.set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
 		axes.set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
+		# axes.plot([0,0],[-1.5,1.5], 'k')
+		# axes.plot([0,120],[-1.5,-1.5], 'k')
+
+
+		for i in ([6,14,25,40,60,100]):
+			axes.add_patch(patches.Rectangle((i-i*0.1,1.5),i*0.2,0.5,fill=False))
+
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.png', bbox_inches = 'tight', format = 'png', dpi=400)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
 		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 		plt.close()
 
+	fig, axes = plt.subplots(1,1, figsize = (13,10))
+	zerocond = precip_pert_matrix_del6[:,0] - precip_ctl_matrix_del6[:,4]
+	fiftycond = precip_pert_matrix_del6[:,2] - precip_ctl_matrix_del6[:,4]
+	fullcond = precip_pert_matrix_del6[:,4] - precip_ctl_matrix_del6[:,4]
 
+	axes.plot([6,14,25,40,60,100],zerocond, 'H', color = 'orange', markersize = 10., label = '$\Delta P_{0\%cond}$')
+	axes.plot([6,14,25,40,60,100],fiftycond, 'X', color = 'tan', markersize = 10., label = '$\Delta P_{50\%cond}$')
+	axes.plot([6,14,25,40,60,100],fullcond, 'v', color = 'olive', markersize = 10., label = '$\Delta P_{100\%cond}$')
 
-	for j in range(len(pert_list)):
-		plt.plot([3,6,12,24,40,60,100],(precip_pert_matrix[:,j] - precip_ctl_matrix[:,4])/precip_ctl_matrix[:,4], '.', label = pert_list[j])
-	plt.legend()
-	plt.plot([3,6,12,24,40,60,100],[0,0,0,0,0,0,0],'k')
-	plt.ylim([-1., 1.])
-	plt.xlabel('Continental extent ($^{\circ}$ lon)')
-	plt.ylabel('Rel. $\Delta$P per Area (mm/d/m$^2$)')
-	plt.savefig('/scratch/mp586/Code/Graphics/P_rel_change_stomata_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	plt.close()
+	axes.spines['right'].set_visible(False)
+	axes.spines['top'].set_visible(False)
+	axes.spines['left'].set_visible(False)
+	axes.spines['bottom'].set_visible(False)
+	axes.tick_params(labelsize = med)
+	axes.tick_params(labelsize = med)
+	axes.set_ylim([-2.5, 3.])
+	axes.set_xlim(0.,115.)
+	axes.set_xticks([6,14,25,40,60,100])
+	axes.set_yticks(np.arange(-2.,2.,0.5))
+	axes.set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
+	axes.set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
+	axes.legend(fontsize = med, loc = 'lower left')
 
-	for j in range(len(pert_list)):
-		plt.plot([3,6,12,24,40,60,100],(precip_pert_matrix[:,j] - precip_ctl_matrix[:,4]), '.', label = pert_list[j])
-	plt.legend()
-	plt.plot([3,6,12,24,40,60,100],[0,0,0,0,0,0,0],'k')
-	plt.ylim([-4., 4.])
-	plt.xlabel('Continental extent ($^{\circ}$ lon)')
-	plt.ylabel('Abs. $\Delta$P per Area (mm/d/m$^2$)')
-	plt.savefig('/scratch/mp586/Code/Graphics/P_change_stomata_cont_size_'+str(minlat)+'-'+str(maxlat)+'N.png', bbox_inches = 'tight', format = 'png', dpi=400)
+	for i in ([6,14,25,40,60,100]):
+		axes.add_patch(patches.Rectangle((i-i*0.1,2.),i*0.2,0.5,fill=False))
+
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.png', bbox_inches = 'tight', format = 'png', dpi=400)
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 	plt.close()
 
 

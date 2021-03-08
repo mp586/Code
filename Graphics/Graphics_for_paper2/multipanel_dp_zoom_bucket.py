@@ -134,7 +134,7 @@ med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
 lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
 
 
-names = ['0%cond', '100%cond']
+names = ['$\Delta P_{0\%cond}$', '$\Delta P_{100\%cond}$']
 conts = ['6$^{\circ}$','8$^{\circ}$','AM']
 
 fig = plt.figure(figsize = (22,15))

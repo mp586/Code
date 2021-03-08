@@ -18,7 +18,7 @@ import cell_area as ca
 
 
 
-def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, array1, array2, minval, maxval, vertmult, minlat=-10., maxlat=10., cmap = 'BrBG'): 
+def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, variable, cbarlabel, ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp2_avg_ctl, wcomp2_avg, wcomp2_avg_ctl, array1, array2, minval, maxval, vertmult, minlat=-10., maxlat=10., cmap = 'BrBG'): 
     small = 24 #largefonts 14 # smallfonts 10 # medfonts = 14
     med = 28 #largefonts 18 # smallfonts 14 # medfonts = 16
     lge = 30 #largefonts 22 # smallfonts 18 # medfonts = 20
@@ -88,7 +88,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[0].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
     # in order for the vectors to all be the same length on all panels and quiverkey to apply to all of them, set scale and scale_units 
-    axes[0].set_title('(a) 0%cond', fontsize = med)
+    axes[0].set_title('(a) $\Delta$'+variable+'$_{0\%cond}$', fontsize = lge)
 
     # Africa Only 
 
@@ -139,7 +139,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[1].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
     #qk = axes[1].quiverkey(Q, 0.9, 0.9, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure')
-    axes[1].set_title('(b) 100%cond', fontsize = med)
+    axes[1].set_title('(b) $\Delta$'+variable+'$_{100\%cond}$', fontsize = lge)
 
     # Two continents - America 
 
@@ -191,7 +191,7 @@ def quivers_2cases(runmin, runmax, plotname, dire, landmaskxr, cbarlabel, ucomp1
 
     Q = axes[2].quiver(X, Z, uwind, wwind, scale = 25, scale_units = 'inches') # if angle isn't set to 'xy', can't invert yaxis on quivers, but angle 'xy' doesn't plot quivers of (u,u) in 45 degree angle! angle 'uv' which is the default does and that's what I want
 #    qk = axes[2].quiverkey(Q, 0.83, 0.87, veclen, str(veclen)+r'$\frac{'+units_numerator+'}{'+units_denom+'}$', labelpos='E', coordinates='figure', fontproperties={'size': med})
-    axes[2].set_title('(c) 0% - 100%cond', fontsize = med)
+    axes[2].set_title('(c) a - b', fontsize = lge)
 
     fig.gca().invert_yaxis()
 
@@ -366,9 +366,9 @@ wcomp2_avg = - (omega2_avg * temp2_avg * Rspec)/(pfull * g)
 
 
 
-quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltarh_fct_latweights_', dire, landmaskxr, '$\Delta$ r (%)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (rh1_avg - rh1_avg_ctl), (rh2_avg - rh1_avg_ctl), minval=-10., maxval=10., vertmult=3000, minlat=-10., maxlat=10.)
-quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltasphum_fct_latweights_', dire, landmaskxr, '$\Delta$ q (kg/kg)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (sphum1_avg - sphum1_avg_ctl), (sphum2_avg - sphum1_avg_ctl), minval=-.003, maxval=.003, vertmult=3000, minlat=-10., maxlat=10.)
-quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltatemp_fct_latweights_', dire, landmaskxr, '$\Delta$ T (K)', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (temp1_avg - temp1_avg_ctl), (temp2_avg - temp1_avg_ctl), minval=-5., maxval=5., vertmult=3000, minlat=-10., maxlat=10., cmap = 'RdBu_r')
+quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltarh_fct_latweights_', dire, landmaskxr, 'r', '%', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (rh1_avg - rh1_avg_ctl), (rh2_avg - rh1_avg_ctl), minval=-10., maxval=10., vertmult=3000, minlat=-10., maxlat=10.)
+quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltasphum_gkg_fct_latweights_', dire, landmaskxr, 'q', 'g/kg', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (sphum1_avg - sphum1_avg_ctl)*1000., (sphum2_avg - sphum1_avg_ctl)*1000., minval=-3., maxval=3., vertmult=3000, minlat=-10., maxlat=10.)
+quivers_2cases(runmin, runmax, 'ucorr_interp_quivers_2cases_CV0vbucket_deltatemp_fct_latweights_', dire, landmaskxr, 'T', 'K', ucomp1_avg, ucomp1_avg_ctl, wcomp1_avg, wcomp1_avg_ctl, ucomp2_avg, ucomp1_avg_ctl, wcomp2_avg, wcomp1_avg_ctl, (temp1_avg - temp1_avg_ctl), (temp2_avg - temp1_avg_ctl), minval=-5., maxval=5., vertmult=3000, minlat=-10., maxlat=10., cmap = 'RdBu_r')
 
 
 
