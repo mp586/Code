@@ -274,7 +274,7 @@ xi, yi = m(lon, lat)
 
 cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
@@ -328,7 +328,7 @@ xi, yi = m(lon, lat)
 
 cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
@@ -384,7 +384,7 @@ xi, yi = m(lon, lat)
 
 cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
 
-cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
 
 
 # Read landmask
@@ -461,3 +461,63 @@ cbar.ax.tick_params(labelsize=med)
 
 fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2C_AM_SB_VP05_linadd_CORRECTION_paper.png', bbox_inches = 'tight')
 fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2C_AM_SB_VP05_linadd_CORRECTION_paper.pdf', bbox_inches = 'tight', dpi=400)
+
+
+
+array = (precipitation1_avg - precipitation4_avg) # = (precipitation1_avg - precipitation1_avg_ctl) - (precipitation4_avg - precipitation1_avg_ctl)
+ctl_array = precipitation1_avg_ctl - net_lhe1_avg_ctl
+
+lats=array.lat
+lons=array.lon
+
+landlats = np.asarray(landmaskxrSA.lat)
+landlons = np.asarray(landmaskxrSA.lon)
+
+landmask = np.asarray(landmaskxrSA)
+
+fig, axes = plt.subplots(1,1, figsize = (12,10))
+
+plt.title('$\Delta P_{50\%cond}$ - $\Delta P_{100\%cond}$ (AM)', size = lge)
+#fig = plt.figure()
+
+m = Basemap(projection='kav7',lon_0=0.,resolution='c')
+array = xr.DataArray(array,coords=[lats,lons],dims=['lat','lon'])
+
+array = np.asarray(array)
+array, lons_cyclic = addcyclic(array, lons)
+array,lons_cyclic = shiftgrid(np.max(lons_cyclic)-180.,array,lons_cyclic,start=False,cyclic=np.max(lons_cyclic))
+
+array = xr.DataArray(array,coords=[lats,lons_cyclic],dims=['lat','lon'])
+
+lons = lons_cyclic
+
+m.drawparallels(np.arange(-90.,99.,30.),labels=[1,0,0,0], fontsize=small)
+m.drawmeridians(np.arange(-180.,180.,60),labels=[0,0,0,0], fontsize=small)
+
+lon, lat = np.meshgrid(lons, lats)
+xi, yi = m(lon, lat)
+
+cs = m.contourf(xi,yi,array, v, cmap='BrBG', extend = 'both')
+
+# cont = m.contour(xi,yi,ctl_array,nmb_contours, colors = 'k', linewidth=2) # if nmb_contours is not an int, it can be interpreted as an array specifying the contour levels
+
+
+# Read landmask
+
+# Add rectangles
+#    landmask,landlons = shiftgrid(np.max(landlons)-100.,landmask,landlons,start=True,cyclic=np.max(landlons)) # this works when the array shift is commented....
+landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
+
+landmask, lons_cyclic = addcyclic(landmask, landlons)
+
+if np.any(landmask != 0.):
+    m.contour(xi,yi,landmask, 1)
+
+cbar = fig.colorbar(cs, orientation = 'vertical', shrink = 0.5) 
+cbar.set_label('mm/d', size=med)
+cbar.ax.tick_params(labelsize=med)
+
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2C_AM_SB_VP05_linadd_CORRECTION_paper_panelc.png', bbox_inches = 'tight')
+fig.savefig('/scratch/mp586/Code/Graphics/Isca/ISCA_HPC/'+dire+'/P_avg_minus_ctl_2C_AM_SB_VP05_linadd_CORRECTION_paper_panelc.pdf', bbox_inches = 'tight', dpi=400)
+
+

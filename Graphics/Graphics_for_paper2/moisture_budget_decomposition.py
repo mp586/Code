@@ -427,6 +427,7 @@ if __name__ == '__main__':
 	landmask,landlons = shiftgrid(np.max(landlons)-180.,landmask,landlons,start=False,cyclic=np.max(landlons))
 	landmask, lons_cyclic = addcyclic(landmask, landlons)
 
+	v = np.linspace(-1.,1.,41)
 	fig, axes = plt.subplots(5,2, figsize=(16,10))
 
 	for j in range(2):
@@ -467,7 +468,7 @@ if __name__ == '__main__':
 			    m.contour(xi,yi,landmask, 1)
 
 
-	axes[0,0].set_title('(a) AM bucket', fontsize = med)
+	axes[0,0].set_title('(a) AM 100%cond', fontsize = med)
 	axes[0,1].set_title('(b) AM 50%cond', fontsize = med)
 
 	# plt.subplots_adjust(bottom=0.1, top=0.9, left=0.1, right=0.9, wspace=0.02, hspace=0.02)

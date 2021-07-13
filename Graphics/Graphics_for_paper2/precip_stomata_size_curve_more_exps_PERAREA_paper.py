@@ -18,7 +18,6 @@ sys.path.insert(0, os.path.join(GFDL_BASE,'src/extra/python/scripts'))
 import cell_area as ca
 
 area_array, dx, dy = ca.cell_area_all(t_res=42,base_dir='/scratch/mp586/GFDL_BASE/GFDL_FORK/GFDLmoistModel/') # added _all because then dx and dy are also returned 
-area_array = xr.DataArray(area_array) # returned in units of m bzw m^2, because radius in cell_area.py is given in metres
 
 control_sb_dirs = [
 'narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387',
@@ -128,6 +127,8 @@ simple_bucket_dirs = [
 
 [precipitation_ctl,precipitation_avg_ctl,x,x,x]=seasonal_surface_variable('Isca_DATA/ISCA_HPC/narrow_three_newbucket_fixedSSTs_from_realworld_zonallysymm_commit7bb4387','isca',1,10,'precipitation','mm/d', factor=86400)
 
+area_array = xr.DataArray(area_array, coords=[precipitation_ctl.lat, precipitation_ctl.lon], dims = ['lat','lon'])
+
 
 lats = precipitation_avg_ctl.lat
 lons = precipitation_avg_ctl.lon
@@ -181,19 +182,20 @@ for k in range(len(minlats)):
 	maxlat = maxlats[k]
 	for i in range(len(vp0_dirs)):
 		landmaskxr=xr.DataArray(landmask_array[i,:,:],coords=[landlats,landlons],dims=['lat','lon']) # need this in order to use .sel(... slice) on it
+		landmask = np.asarray(landmaskxr)
 		for j in range(len(pert_list)):
 			testdir = ctl_dict[ctl_list[j]][i]
 			if testdir != 'x':
 				testdir = 'Isca_DATA/ISCA_HPC/'+testdir
 				[precipitation_ctl,precipitation_avg_ctl,x,x,x]=seasonal_surface_variable(testdir,'isca',121,481,'precipitation','mm/d', factor=86400)
-				precip_ctl_matrix[i,j], precip_ctl_sds[i,j] = area_weighted_avg(precipitation_avg_ctl,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)
+				precip_ctl_matrix[i,j], precip_ctl_sds[i,j] = area_weighted_avg(precipitation_avg_ctl,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)/np.nansum(area_array.where(landmask==1.).sel(lat=slice(minlat,maxlat)))
 
 			
 			testdir = pert_dict[pert_list[j]][i]
 			if testdir != 'x':
 				testdir = 'Isca_DATA/ISCA_HPC/'+testdir
 				[precipitation,precipitation_avg,x,x,x]=seasonal_surface_variable(testdir,'isca',120,480,'precipitation','mm/d', factor=86400)
-				precip_pert_matrix[i,j], precip_pert_sds[i,j] = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)
+				precip_pert_matrix[i,j], precip_pert_sds[i,j] = area_weighted_avg(precipitation_avg,area_array,landmaskxr,'land', minlat = minlat, maxlat = maxlat,return_sd = True)/np.nansum(area_array.where(landmask==1.).sel(lat=slice(minlat,maxlat)))
 
 
 	precip_ctl_matrix[precip_ctl_matrix == 0] = 'nan'
@@ -212,9 +214,9 @@ for k in range(len(minlats)):
 		addition = warming_only + stomata_only
 		full = precip_pert_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 
-		axes[0].plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
-		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
-		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
+		axes[0].plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4]*10**12, 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
+		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4]*10**12, 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
+		axes[0].plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j]*10**12, 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
 
 
 		axes[0].spines['right'].set_visible(False)
@@ -223,7 +225,7 @@ for k in range(len(minlats)):
 		axes[0].tick_params(labelsize = med)
 		axes[0].set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
 		axes[0].set_ylabel('P per Area (mm/d/m$^2$)', fontsize = med)
-		axes[0].set_ylim([0.,8.])
+		# axes[0].set_ylim([0.,8.])
 		axes[0].set_xlim(0.,110.)
 		axes[0].set_xticks([6,14,25,40,60,100])
 		axes[0].legend(fontsize = med, loc = 'lower left')
@@ -231,23 +233,23 @@ for k in range(len(minlats)):
 
 
 		axes[1].plot([6,14,25,40,60,100],[0,0,0,0,0,0],'k')
-		axes[1].plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
-		axes[1].plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
-		axes[1].plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
-		axes[1].plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
+		axes[1].plot([6,14,25,40,60,100],warming_only*10**12,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
+		axes[1].plot([6,14,25,40,60,100],stomata_only*10**12,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
+		axes[1].plot([6,14,25,40,60,100],addition*10**12,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
+		axes[1].plot([6,14,25,40,60,100],full*10**12,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
 		axes[1].legend(fontsize = med, loc = 'lower right')
 
 		axes[1].spines['right'].set_visible(False)
 		axes[1].spines['top'].set_visible(False)
 		axes[1].tick_params(labelsize = med)
 		axes[1].tick_params(labelsize = med)
-		axes[1].set_ylim([-2., 2.])
+		# axes[1].set_ylim([-2., 2.])
 		axes[1].set_title('(b) $\Delta$ P decomposition vs continental extent', fontsize = med)
 		axes[1].set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
 		axes[1].set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper.png', bbox_inches = 'tight', format = 'png', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper.png', bbox_inches = 'tight', format = 'png', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 		plt.close()
 
 
@@ -267,6 +269,18 @@ for k in range(len(minlats)):
 		[slope_lst, intercept_lst, x, x, x] = orthoregress([6,14,25,40,60,100],precip_pert_matrix_del6[:,j])
 		print("slope totalregress veg= "+str(slope_lst))
 
+
+
+# CV05 PERAREA
+# slope linregress ctl = -1.28336862464e-14
+# slope linregress bucket = -1.38087929622e-14
+# slope linregress veg = -1.34264238975e-14
+# slope totalregress ctl= -1.28336862464e-14
+# slope totalregress pert= -1.38087929622e-14
+# slope totalregress veg= -1.34264238975e-14
+
+
+
 # CV05
 # slope linregress ctl = -0.063495873788
 # slope linregress bucket = -0.0674657883614
@@ -276,14 +290,15 @@ for k in range(len(minlats)):
 # slope totalregress veg= -0.0656417572586
 
 	for j in range(len(pert_list) - 1):
+		# j = 2
 		fig, axes = plt.subplots(1,1, figsize = (13,10))
 		stomata_only = precip_ctl_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 		addition = warming_only + stomata_only
 		full = precip_pert_matrix_del6[:,j] - precip_ctl_matrix_del6[:,4]
 
-		axes.plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4], 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
-		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4], 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
-		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j], 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
+		axes.plot([6,14,25,40,60,100],precip_ctl_matrix_del6[:,4]*10**12, 's', color = 'slategrey', markersize = 10., label = '100%cond, lowCO$_2$')
+		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,4]*10**12, 'o', color = 'darkred', markersize = 10., label = '100%cond, highCO$_2$')
+		axes.plot([6,14,25,40,60,100],precip_pert_matrix_del6[:,j]*10**12, 'v', color = 'salmon', markersize = 10., label = pert_list_names[j]+', highCO$_2$')
 
 
 		axes.spines['right'].set_visible(False)
@@ -293,19 +308,19 @@ for k in range(len(minlats)):
 		axes.tick_params(labelsize = med)
 		axes.tick_params(labelsize = med)
 		axes.set_xlabel('Continental extent ($^{\circ}$ lon)', fontsize = med)
-		axes.set_ylabel('P per Area (mm/d/m$^2$)', fontsize = med)
-		axes.set_ylim([0.,9.1])
+		axes.set_ylabel('P per Area (x10$^{-12}$ mm/d/m$^2$)', fontsize = med)
+		axes.set_ylim([0.,6.])
 		axes.set_xlim(0.,115.)
 		axes.set_xticks([6,14,25,40,60,100])
-		axes.set_yticks(np.arange(0.,9.,1))
-		axes.legend(fontsize = med, loc = 'lower left')
+		axes.set_yticks(np.arange(0.,6.,1.))
+		axes.legend(fontsize = med, loc = 'center right')
 
 		for i in ([6,14,25,40,60,100]):
-			axes.add_patch(patches.Rectangle((i-i*0.1,8),i*0.2,1,fill=False))
+			axes.add_patch(patches.Rectangle((i-i*0.1,5.),i*0.2,0.6,fill=False))
 
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.png', bbox_inches = 'tight', format = 'png', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlya.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlya.png', bbox_inches = 'tight', format = 'png', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlya.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlya.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 		plt.close()
 
 
@@ -313,10 +328,10 @@ for k in range(len(minlats)):
 
 
 		axes.plot([1,110],[0,0],'k')
-		axes.plot([6,14,25,40,60,100],warming_only,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
-		axes.plot([6,14,25,40,60,100],stomata_only,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
-		axes.plot([6,14,25,40,60,100],addition,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
-		axes.plot([6,14,25,40,60,100],full,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
+		axes.plot([6,14,25,40,60,100],warming_only*10**12,'p', color='deepskyblue', markersize = 10.,label = '$\Delta P_{rad}$')
+		axes.plot([6,14,25,40,60,100],stomata_only*10**12,'P',color = 'seagreen',markersize = 10.,label = '$\Delta P_{phys}$')
+		axes.plot([6,14,25,40,60,100],addition*10**12,'D', color='lightgreen', markersize = 10.,label = '$\Delta P_{rad}$ + $\Delta P_{phys}$')
+		axes.plot([6,14,25,40,60,100],full*10**12,'^', color='navy', markersize = 10.,label = '$\Delta P_{50\%cond}$')
 		axes.legend(fontsize = med, loc = 'lower right')
 
 		axes.spines['right'].set_visible(False)
@@ -325,23 +340,23 @@ for k in range(len(minlats)):
 		axes.spines['bottom'].set_visible(False)
 		axes.tick_params(labelsize = med)
 		axes.tick_params(labelsize = med)
-		axes.set_ylim([-1.51, 2.1])
+		axes.set_ylim([-0.35, 0.46])
 		axes.set_xlim(0.,115.)
 		axes.set_xticks([6,14,25,40,60,100])
-		axes.set_yticks(np.arange(-1.5,2.,0.5))
-#		axes.set_title('$\Delta$ P decomposition vs continental extent', fontsize = med)
+		axes.set_yticks(np.arange(-0.3,0.4,0.1))
+	#		axes.set_title('$\Delta$ P decomposition vs continental extent', fontsize = med)
 		axes.set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
-		axes.set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
+		axes.set_ylabel('$\Delta$ P per Area (x10$^{-12}$ mm/d/m$^2$)',fontsize = med)
 		# axes.plot([0,0],[-1.5,1.5], 'k')
 		# axes.plot([0,120],[-1.5,-1.5], 'k')
 
 
 		for i in ([6,14,25,40,60,100]):
-			axes.add_patch(patches.Rectangle((i-i*0.1,1.5),i*0.2,0.5,fill=False))
+			axes.add_patch(patches.Rectangle((i-i*0.1,0.35),i*0.2,0.1,fill=False))
 
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.png', bbox_inches = 'tight', format = 'png', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_onlyb.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlyb.png', bbox_inches = 'tight', format = 'png', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlyb.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+		fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_'+pert_list[j]+'_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_onlyb.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 		plt.close()
 
 	fig, axes = plt.subplots(1,1, figsize = (20,10))
@@ -349,9 +364,9 @@ for k in range(len(minlats)):
 	fiftycond = precip_pert_matrix[:,2] - precip_ctl_matrix[:,4]
 	fullcond = precip_pert_matrix[:,4] - precip_ctl_matrix[:,4]
 
-	axes.plot([6,8,14,25,40,60,100],zerocond, 'H', color = 'orange', markersize = 10., label = '$\Delta P_{0\%cond}$')
-	axes.plot([6,8,14,25,40,60,100],fiftycond, 'X', color = 'tan', markersize = 10., label = '$\Delta P_{50\%cond}$')
-	axes.plot([6,8,14,25,40,60,100],fullcond, 'v', color = 'olive', markersize = 10., label = '$\Delta P_{100\%cond}$')
+	axes.plot([6,8,14,25,40,60,100],zerocond*10**12, 'H', color = 'orange', markersize = 10., label = '$\Delta P_{0\%cond}$')
+	axes.plot([6,8,14,25,40,60,100],fiftycond*10**12, 'X', color = 'tan', markersize = 10., label = '$\Delta P_{50\%cond}$')
+	axes.plot([6,8,14,25,40,60,100],fullcond*10**12, 'v', color = 'olive', markersize = 10., label = '$\Delta P_{100\%cond}$')
 
 	axes.spines['right'].set_visible(False)
 	axes.spines['top'].set_visible(False)
@@ -359,20 +374,21 @@ for k in range(len(minlats)):
 	axes.spines['bottom'].set_visible(False)
 	axes.tick_params(labelsize = med)
 	axes.tick_params(labelsize = med)
-	axes.set_ylim([-2.5, 3.])
+	axes.set_ylim([-1.7, 2.8])
 	axes.set_xlim(0.,115.)
 	axes.set_xticks([6,8,14,25,40,60,100])
-	axes.set_yticks(np.arange(-2.,2.,0.5))
+	axes.set_yticks(np.arange(-1.5,2.5,0.5))
 	axes.set_xlabel('Continental extent ($^{\circ}$ lon)',fontsize = med)
-	axes.set_ylabel('$\Delta$ P per Area (mm/d/m$^2$)',fontsize = med)
+	axes.set_ylabel('$\Delta$ P per Area (x10$^{-12}$ mm/d/m$^2$)',fontsize = med)
 	axes.legend(fontsize = med, loc = 'lower right')
+	axes.plot([1,110],[0,0],'k')
 
 	for i in ([6,8,14,25,40,60,100]):
-		axes.add_patch(patches.Rectangle((i-i*0.1,2.),i*0.2,0.5,fill=False))
+		axes.add_patch(patches.Rectangle((i-i*0.1,2.2),i*0.2,0.5,fill=False))
 
-	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.png', bbox_inches = 'tight', format = 'png', dpi=400)
-	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
-	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_paper_SI.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_SI.png', bbox_inches = 'tight', format = 'png', dpi=400)
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_SI.pdf', bbox_inches = 'tight', format = 'pdf', dpi=400)
+	fig.savefig('/scratch/mp586/Code/Graphics/P_stomata_all3_v_warming_and_contsize_'+str(minlat)+'-'+str(maxlat)+'N_PERAREA_paper_SI.eps', bbox_inches = 'tight', format = 'eps', dpi=600)
 	plt.close()
 
 
